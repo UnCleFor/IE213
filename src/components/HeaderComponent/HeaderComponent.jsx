@@ -22,11 +22,10 @@ const HeaderComponent = () => {
   const isTablet = useMediaQuery({ maxWidth: 1024 });
   const isMobile = useMediaQuery({ maxWidth: 768 });
 
-  // ✅ State để quản lý hiển thị thanh tìm kiếm
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <div style={{ position: "relative" }}> {/* ✅ Giữ layout của body */}
+    <div style={{ position: "relative" }}>
       <WrapperHeader
         style={{
           alignItems: "center",
@@ -46,21 +45,22 @@ const HeaderComponent = () => {
             />
           </Col>
 
-          {/* Thanh tìm kiếm hoặc Icon kính lúp */}
-          <Col xs={12} sm={14} md={12} style={{ textAlign: "center" }}>
-            {isMobile ? (
+          {/* Thanh tìm kiếm trên PC */}
+          {!isMobile && (
+            <Col sm={14} md={12} style={{ textAlign: "center" }}>
+              <SearchButton size="large" placeholder="What you want to buy?" textButton="Search" />
+            </Col>
+          )}
+
+          {/* Kính lúp + User + Cart */}
+          <Col xs={18} sm={6} md={8} style={{ display: "flex", justifyContent: "flex-end", gap: "20px" }}>
+            {isMobile && (
               <Button
                 type="text"
-                icon={<SearchOutlined style={{ fontSize: "20px", color: "brown"  }} />}
-                onClick={() => setShowSearch(true)} // ✅ Hiện tìm kiếm chồng lên header
+                icon={<SearchOutlined style={{ fontSize: "20px", color: "brown" }} />}
+                onClick={() => setShowSearch(true)}
               />
-            ) : (
-              <SearchButton size="large" placeholder="What you want to buy?" textButton="Search" />
             )}
-          </Col>
-
-          {/* Tài khoản & Giỏ hàng */}
-          <Col xs={6} sm={6} md={8} style={{ display: "flex", justifyContent: "flex-end", gap: "20px" }}>
             <WrapperHeaderAccount>
               <UserOutlined style={{ fontSize: "20px" }} />
               {!isMobile && (
@@ -81,7 +81,7 @@ const HeaderComponent = () => {
         </Row>
       </WrapperHeader>
 
-      {/* ✅ Thanh tìm kiếm chồng lên Header chứ không thay thế nó */}
+      {/* Thanh tìm kiếm toàn màn hình khi nhấn kính lúp */}
       {isMobile && showSearch && (
         <WrapperSearchMobile>
           <SearchInputWrapper>
@@ -92,9 +92,9 @@ const HeaderComponent = () => {
             />
             <Button
               type="text"
-              icon={<CloseOutlined style={{ fontSize: "18px",color: "brown"  }} />}
+              icon={<CloseOutlined style={{ fontSize: "18px", color: "brown" }} />}
               onClick={() => setShowSearch(false)}
-              style={{ padding: 5 }} // ✅ Giảm khoảng cách xung quanh dấu X
+              style={{ padding: 5 }}
             />
           </SearchInputWrapper>
         </WrapperSearchMobile>
@@ -102,5 +102,6 @@ const HeaderComponent = () => {
     </div>
   );
 };
+
 
 export default HeaderComponent;

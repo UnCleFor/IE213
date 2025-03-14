@@ -34,8 +34,7 @@ export const WrapperSearchMobile = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 10px;
-  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px 10px;
   z-index: 1000; /* ✅ Đảm bảo hiển thị trên header */
 `;
 
