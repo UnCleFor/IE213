@@ -2,8 +2,9 @@ import styled from "styled-components";
 import { Row } from "antd";
 
 export const WrapperHeader = styled(Row)`
-  padding: 30px 120px;
-  background-color: rgb(184, 184, 184); // Thay đổi màu theo nhu cầu
+  padding: 10px 120px;
+  background-color: rgb(255, 255, 255); // Thay đổi màu theo nhu cầu
+  justifyContent: "center";
 `;
 
 export const WrapperTextHeader = styled.span`
@@ -22,4 +23,27 @@ export const WrapperHeaderAccount = styled.div`
 export const WrapperTextHeaderSmall = styled.span`
   font-size: 12px;
   color: brown;
+`;
+export const WrapperSearchMobile = styled.div`
+  position: absolute; /* ✅ Hiển thị trên header thay vì thay thế */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px; /* Giữ chiều cao giống header */
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* ✅ Đảm bảo hiển thị trên header */
+`;
+
+// ✅ Style để thu gọn input tìm kiếm trên mobile
+export const SearchInputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 80%; /* ✅ Giảm độ rộng thanh tìm kiếm */
+  max-width: 400px; /* ✅ Giới hạn chiều rộng */
 `;
