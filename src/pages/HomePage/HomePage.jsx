@@ -14,22 +14,22 @@ const HomePage = () => {
     <div>
 
       {/* Phân loại sản phẩm */}
-      <WrapperTypeProduct>
+      {/* <WrapperTypeProduct>
         {arr.map((item) => {
           return (
             <TypeProduct name={item} key={item} />
           )
         })}
-      </WrapperTypeProduct>
+      </WrapperTypeProduct> */}
 
       {/* Slider sản phẩm */}
       <SliderComponent arrImages={[slider1,slider2,slider3]}/>
 
-      <div style={{marginTop: '20px', display: 'flex', alignItems: 'center', gap: '20px', paddingLeft:'200px'}}>
+      <div style={{marginTop: '20px', display: 'flex', alignItems: 'center', gap: '20px'}}>
         <CardComponent/>
+        {/* <CardComponent/>
         <CardComponent/>
-        <CardComponent/>
-        <CardComponent/>
+        <CardComponent/> */}
       </div>
      
       HomePage

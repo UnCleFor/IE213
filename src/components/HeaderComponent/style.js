@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { Row } from "antd";
 
 export const WrapperHeader = styled(Row)`
-  padding: 10px 120px;
+  padding: 10px 250px;
   background-color: rgb(255, 255, 255); // Thay đổi màu theo nhu cầu
   justifyContent: "center";
 `;

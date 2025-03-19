@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Col, Row, Button } from "antd";
-import { useMediaQuery } from "react-responsive";
+import { Col, Row, Button, Grid, theme } from "antd";
 import {
-  WrapperHeader,
+  // WrapperHeader,
   WrapperHeaderAccount,
   WrapperTextHeaderSmall,
   SearchInputWrapper,
-  WrapperSearchMobile, // ✅ Thêm style cho tìm kiếm mobile
+  WrapperSearchMobile,
 } from "./style";
 import {
   UserOutlined,
@@ -18,78 +17,97 @@ import {
 import SearchButton from "../SearchButton/SearchButton";
 import beautihome from "./beautihome.png";
 
-const HeaderComponent = () => {
-  const isTablet = useMediaQuery({ maxWidth: 1024 });
-  const isMobile = useMediaQuery({ maxWidth: 768 });
+const { useBreakpoint } = Grid;
+const { useToken } = theme;
 
+const HeaderComponent = () => {
+  const { token } = useToken();
+  const screens = useBreakpoint();
   const [showSearch, setShowSearch] = useState(false);
+
+  const styles = {
+    container: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      margin: "0 auto",
+      maxWidth: token.screenXL,
+      padding: screens.md ? `0px ${token.paddingLG}px` : `0px ${token.padding}px`,
+    },
+    header: {
+      backgroundColor: "white",
+      borderBottom: `${token.lineWidth}px ${token.lineType} ${token.colorSplit}`,
+      padding: "10px 20px",
+      boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Thêm box-shadow
+    },
+    logo: {
+      width: screens.xs ? "70px" : screens.md ? "90px" : "100px",
+      height: "auto",
+    },
+    mobileMenuButton: {
+      display: screens.md ? "none" : "block",
+      marginLeft: "auto",
+      color: "white",
+      fontSize: "20px",
+    },
+  };
 
   return (
     <div style={{ position: "relative" }}>
-      <WrapperHeader
-        style={{
-          alignItems: "center",
-          padding: isMobile ? "10px" : isTablet ? "15px 30px" : "",
-        }}
-      >
-        <Row align="middle" style={{ width: "100%" }} gutter={[16, 16]}>
-          {/* Logo */}
-          <Col xs={6} sm={4}>
-            <img
-              src={beautihome}
-              alt="BeautiHome Logo"
-              style={{
-                width: isMobile ? "70px" : isTablet ? "90px" : "100px",
-                height: "auto",
-              }}
-            />
-          </Col>
-
-          {/* Thanh tìm kiếm trên PC */}
-          {!isMobile && (
-            <Col sm={14} md={12} style={{ textAlign: "center" }}>
-              <SearchButton size="large" placeholder="What you want to buy?" textButton="Search" />
+      <div style={styles.header}>
+        <div style={styles.container}>
+          <Row align="middle" style={{ width: "100%" }} gutter={[16, 16]}>
+            {/* Logo */}
+            <Col xs={6} sm={4}>
+              <img src={beautihome} alt="BeautiHome Logo" style={styles.logo} />
             </Col>
-          )}
 
-          {/* Kính lúp + User + Cart */}
-          <Col xs={18} sm={6} md={8} style={{ display: "flex", justifyContent: "flex-end", gap: "20px" }}>
-            {isMobile && (
-              <Button
-                type="text"
-                icon={<SearchOutlined style={{ fontSize: "20px", color: "brown" }} />}
-                onClick={() => setShowSearch(true)}
-              />
+            {/* Thanh tìm kiếm trên PC */}
+            {!screens.xs && (
+              <Col sm={14} md={12} style={{ textAlign: "center" }}>
+                <SearchButton
+                  size="large"
+                  placeholder="What you want to buy?"
+                  textButton="Search"
+                />
+              </Col>
             )}
-            <WrapperHeaderAccount>
-              <UserOutlined style={{ fontSize: "20px" }} />
-              {!isMobile && (
-                <div>
-                  <WrapperTextHeaderSmall>Sign in/ Register</WrapperTextHeaderSmall>
-                  <div>
-                    <WrapperTextHeaderSmall>Account</WrapperTextHeaderSmall>
-                    <CaretDownOutlined />
-                  </div>
-                </div>
+
+            {/* Icon Tìm kiếm, User, Giỏ hàng */}
+            <Col xs={18} sm={6} md={8} style={{ display: "flex", justifyContent: "flex-end", gap: "20px" }}>
+              {screens.xs && (
+                <Button
+                  type="text"
+                  icon={<SearchOutlined style={{ fontSize: "20px", color: "brown" }} />}
+                  onClick={() => setShowSearch(true)}
+                />
               )}
-            </WrapperHeaderAccount>
-            <WrapperHeaderAccount>
-              <ShoppingCartOutlined style={{ fontSize: "20px" }} />
-              {!isMobile && <WrapperTextHeaderSmall>Cart</WrapperTextHeaderSmall>}
-            </WrapperHeaderAccount>
-          </Col>
-        </Row>
-      </WrapperHeader>
+              <WrapperHeaderAccount>
+                <UserOutlined style={{ fontSize: "20px", color: "brown" }} />
+                {!screens.xs && (
+                  <div>
+                    <WrapperTextHeaderSmall>Sign in/ Register</WrapperTextHeaderSmall>
+                    <div>
+                      <WrapperTextHeaderSmall>Account</WrapperTextHeaderSmall>
+                      <CaretDownOutlined />
+                    </div>
+                  </div>
+                )}
+              </WrapperHeaderAccount>
+              <WrapperHeaderAccount>
+                <ShoppingCartOutlined style={{ fontSize: "20px", color: "brown" }} />
+                {!screens.xs && <WrapperTextHeaderSmall>Cart</WrapperTextHeaderSmall>}
+              </WrapperHeaderAccount>
+            </Col>
+          </Row>
+        </div>
+      </div>
 
       {/* Thanh tìm kiếm toàn màn hình khi nhấn kính lúp */}
-      {isMobile && showSearch && (
+      {screens.xs && showSearch && (
         <WrapperSearchMobile>
           <SearchInputWrapper>
-            <SearchButton
-              size="large"
-              placeholder="What you want to buy?"
-              textButton="Search"
-            />
+            <SearchButton size="large" placeholder="What you want to buy?" textButton="Search" />
             <Button
               type="text"
               icon={<CloseOutlined style={{ fontSize: "18px", color: "brown" }} />}
@@ -102,6 +120,5 @@ const HeaderComponent = () => {
     </div>
   );
 };
-
 
 export default HeaderComponent;

@@ -15,3 +15,38 @@ code {
     monospace;
 }
 
+
+/* Chữ menu chính (navbar) màu trắng trên PC */
+@media (min-width: 768px) {
+  .custom-navbar .ant-menu-submenu-title {
+    color: white !important;
+  }
+}
+
+/* Chữ menu chính (navbar) màu đen trên mobile */
+@media (max-width: 767px) {
+  .custom-navbar .ant-menu-item,
+  .custom-navbar .ant-menu-submenu-title {
+    color: black !important;
+  }
+}
+
+/* Đổi màu gạch dưới khi chọn hoặc hover */
+.custom-navbar .ant-menu-item::after {
+  border-bottom: 2px solid white !important;
+}
+
+
+/* Đổi màu gạch chân khi chọn */
+:where(.ant-menu-light).ant-menu-horizontal > .ant-menu-item-selected::after,
+:where(.ant-menu-light).ant-menu-horizontal > .ant-menu-submenu-selected::after {
+    border-bottom-width: 2px !important;
+    border-bottom-color: #fff !important; /* Màu trắng */
+}
+
+/* Đổi màu gạch chân khi hover */
+:where(.ant-menu-light).ant-menu-horizontal > .ant-menu-item:hover::after,
+:where(.ant-menu-light).ant-menu-horizontal > .ant-menu-submenu:hover::after {
+    border-bottom-width: 2px !important;
+    border-bottom-color: #fff !important; /* Màu trắng */
+}
