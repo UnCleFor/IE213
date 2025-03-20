@@ -16,13 +16,13 @@ const FooterComponent = () => {
     <WrapperFooter>
       <Row justify="center" gutter={[16, 16]}>
         {/* Cột 1: Logo thay thế "Về chúng tôi" */}
-        <Col xs={24} sm={12} md={6} style={{ textAlign: "center" }}>
+        <Col xs={24} sm={24} md={12} style={{ textAlign: "center" }}>
           <WrapperFooterLogo src={beautihome} alt="BeautiHome Logo" />
      
         </Col>
 
         {/* Cột 2: Điều hướng */}
-        <Col xs={12} sm={6} md={4}>
+        <Col xs={12} sm={12} md={12}>
           <WrapperFooterTitle>DANH MỤC</WrapperFooterTitle>
           <WrapperFooterLinks>
             <a href="#">Tìm kiếm</a>
@@ -32,22 +32,10 @@ const FooterComponent = () => {
         </Col>
 
         {/* Cột 3: Chính sách */}
-        <Col xs={12} sm={6} md={4}>
-          <WrapperFooterTitle>CHÍNH SÁCH</WrapperFooterTitle>
-          <WrapperFooterLinks>
-            <a href="#">Chính sách đổi trả</a>
-            <a href="#">Chính sách bảo mật</a>
-            <a href="#">Điều khoản dịch vụ</a>
-          </WrapperFooterLinks>
-        </Col>
+   
 
         {/* Cột 4: Liên hệ */}
-        <Col xs={12} sm={6} md={4}>
-          <WrapperFooterTitle>LIÊN HỆ</WrapperFooterTitle>
-          <WrapperFooterText><HomeOutlined /> 123 Đường ABC, TP.HCM</WrapperFooterText>
-          <WrapperFooterText><PhoneOutlined /> 0123 456 789</WrapperFooterText>
-          <WrapperFooterText><MailOutlined /> beautehome@gmail.com</WrapperFooterText>
-        </Col>
+ 
       </Row>
 
       {/* Mạng xã hội */}
