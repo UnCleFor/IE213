@@ -1,6 +1,7 @@
 import React from 'react'
 import HeaderComponent from '../HeaderComponent/HeaderComponent'
 import NavbarComponent from '../NavbarComponent/NavbarComponent';
+import FooterComponent from '../FooterComponent/FooterComponent';
 
 // DefaultComponent là một layout bọc quanh nội dung chính của trang
 const DefaultComponent = ({ children }) => { 
@@ -12,7 +13,8 @@ const DefaultComponent = ({ children }) => {
       <NavbarComponent/>
 
       {/* children đại diện cho nội dung của từng trang (component được truyền vào) */}
-      {children}  
+      {children}
+      <FooterComponent/> 
     </div>
   );
 };
