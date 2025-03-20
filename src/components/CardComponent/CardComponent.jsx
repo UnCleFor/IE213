@@ -24,7 +24,7 @@ const CardComponent = () => {
             <img
               alt="product"
               src={tu_giay}
-              height="290px"
+              
               style={{
                 objectFit: "cover",
                 width: "100%",

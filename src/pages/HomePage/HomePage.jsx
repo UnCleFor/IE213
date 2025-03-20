@@ -8,6 +8,13 @@ import slider1 from '../../assets/images/slide1.webp'
 import slider2 from '../../assets/images/slide2.webp'
 import slider3 from '../../assets/images/slide3.webp'
 import CardComponent from '../../components/CardComponent/CardComponent'
+
+import { Col, Row } from 'antd';
+import ContainerComponent from '../../components/ContainerComponent/ContainerComponent'
+const style = {
+ 
+  padding: '16px 0',
+};
 const HomePage = () => {
   const arr = ['Bàn', 'Ghế', 'Tủ']
   return (
@@ -24,15 +31,38 @@ const HomePage = () => {
 
       {/* Slider sản phẩm */}
       <SliderComponent arrImages={[slider1,slider2,slider3]}/>
-
-      <div style={{marginTop: '20px', display: 'flex', alignItems: 'center', gap: '20px'}}>
-        <CardComponent/>
-        {/* <CardComponent/>
-        <CardComponent/>
-        <CardComponent/> */}
-      </div>
-     
-      HomePage
+      <ContainerComponent>
+        
+      
+      
+      <Row
+      gutter={{
+        xs: 8,
+        sm: 16,
+        md: 24,
+        lg: 32,
+      }}
+      >
+      <Col className="gutter-row" span={6}>
+        <div style={style}><CardComponent/></div>
+      </Col>
+      <Col className="gutter-row" span={6}>
+        <div style={style}><CardComponent/></div>
+      </Col>
+      <Col className="gutter-row" span={6}>
+        <div style={style}><CardComponent/></div>
+      </Col>
+      <Col className="gutter-row" span={6}>
+        <div style={style}><CardComponent/></div>
+      </Col>
+      <Col className="gutter-row" span={6}>
+        <div style={style}><CardComponent/></div>
+      </Col>
+      <Col className="gutter-row" span={6}>
+        <div style={style}><CardComponent/></div>
+      </Col>
+    </Row>
+      </ContainerComponent>
     </div>
   )
 }

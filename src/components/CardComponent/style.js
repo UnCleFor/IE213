@@ -8,7 +8,7 @@ export const StyledCard = styled(Card)`
 `;
 export const CardWrapper = styled.div`
   position: relative;
-  width: 290px;
+  width: auto;
   &:hover .hover-actions {
     opacity: 1;
     transform: translateY(0);

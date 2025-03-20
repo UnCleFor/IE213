@@ -17,6 +17,8 @@ import {
 import SearchButton from "../SearchButton/SearchButton";
 import beautihome from "./beautihome.png";
 
+import ContainerComponent from "../ContainerComponent/ContainerComponent";
+
 const { useBreakpoint } = Grid;
 const { useToken } = theme;
 
@@ -55,7 +57,7 @@ const HeaderComponent = () => {
   return (
     <div style={{ position: "relative" }}>
       <div style={styles.header}>
-        <div style={styles.container}>
+        <ContainerComponent>
           <Row align="middle" style={{ width: "100%" }} gutter={[16, 16]}>
             {/* Logo */}
             <Col xs={6} sm={4}>
@@ -100,7 +102,7 @@ const HeaderComponent = () => {
               </WrapperHeaderAccount>
             </Col>
           </Row>
-        </div>
+        </ContainerComponent>
       </div>
 
       {/* Thanh tìm kiếm toàn màn hình khi nhấn kính lúp */}
