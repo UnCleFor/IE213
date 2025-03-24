@@ -1,57 +1,62 @@
 import React from "react";
-import { Row, Col } from "antd";
-import {
-  WrapperFooter,
-  WrapperFooterTitle,
-  WrapperFooterLinks,
-  WrapperFooterText,
-  WrapperFooterIcons,
-  WrapperFooterLogo
-} from "./style";
-import { BsFacebook, BsInstagram, BsTwitter, BsGithub, BsDribbble, BsLinkedin } from "react-icons/bs";
-import beautihome from "./beautihome.png"; 
-import { PhoneOutlined, MailOutlined, HomeOutlined } from "@ant-design/icons";
-const FooterComponent = () => {
+import { FooterContainer, FooterSection, FooterTitle, FooterLink, FooterBottom, SubscribeSection, SocialIcons, ContactInfo } from "./style";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+
+const Footer = () => {
+  const navigate = useNavigate(); // Hook điều hướng
   return (
-    <WrapperFooter>
-      <Row justify="center" gutter={[16, 16]}>
-        {/* Cột 1: Logo thay thế "Về chúng tôi" */}
-        <Col xs={24} sm={24} md={12} style={{ textAlign: "center" }}>
-          <WrapperFooterLogo src={beautihome} alt="BeautiHome Logo" />
-     
-        </Col>
+    <FooterContainer>
+      <FooterSection>
+        <FooterTitle>BeauteHome</FooterTitle>
+        <FooterLink onClick={() => navigate("/aboutus")}>Về chúng tôi</FooterLink> 
+      </FooterSection>
 
-        {/* Cột 2: Điều hướng */}
-        <Col xs={12} sm={12} md={12}>
-          <WrapperFooterTitle>DANH MỤC</WrapperFooterTitle>
-          <WrapperFooterLinks>
-            <a href="#">Tìm kiếm</a>
-            <a href="#">Về chúng tôi</a>
-            <a href="#">Sản phẩm</a>
-          </WrapperFooterLinks>
-        </Col>
+      <FooterSection>
+        <FooterTitle>Khám phá</FooterTitle>
+        <FooterLink href="#">Phòng khách</FooterLink>
+        <FooterLink href="#">Phòng ăn</FooterLink>
+        <FooterLink href="#">Phòng ngủ</FooterLink>
+        <FooterLink href="#">Phòng làm việc</FooterLink>
+      </FooterSection>
 
-        {/* Cột 3: Chính sách */}
-   
+      
 
-        {/* Cột 4: Liên hệ */}
- 
-      </Row>
+      <FooterSection>
+        <FooterTitle>Chính sách</FooterTitle>
+        <FooterLink onClick={() => navigate("/chinhsachdoitra")}>Chính sách đổi trả</FooterLink>
+        <FooterLink href="#">Chính sách bảo mật</FooterLink>
+        <FooterLink href="#">Điều khoản dịch vụ</FooterLink>
+      </FooterSection>
 
-      {/* Mạng xã hội */}
-      <WrapperFooterIcons>
-        <a href="#"><BsFacebook /></a>
-        <a href="#"><BsInstagram /></a>
-        <a href="#"><BsTwitter /></a>
-        <a href="#"><BsGithub /></a>
-        <a href="#"><BsDribbble /></a>
-        <a href="#"><BsLinkedin /></a>
-      </WrapperFooterIcons>
+      <SubscribeSection>
+        <FooterTitle>Thông tin liên hệ</FooterTitle>
+        <ContactInfo>
+          <p>
+            <i className="fas fa-map-marker-alt"></i> Khu phố 6, P.Linh Trung, Tp.Thủ Đức, Tp.HCM.
+          </p>
+          <p>
+            <i className="fas fa-phone"></i> 0123 456 789
+          </p>
+          <p>
+            <i className="fas fa-envelope"></i> ilovebeautehome@gmail.com
+          </p>
+          <p>
+            <i className="fas fa-clock"></i> 08:30 S - 20:30 T Cả tuần
+          </p>
+        </ContactInfo>
+      </SubscribeSection>
 
-      {/* Copyright */}
-      <WrapperFooterText>© 2025 Công ty TNHH BeauteHome. All Rights Reserved.</WrapperFooterText>
-    </WrapperFooter>
+      <FooterBottom>
+        <p>© 2025 BeauteHome. All rights reserved.</p>
+        
+        <SocialIcons>
+          <a href="#"><i className="fab fa-facebook-f"></i></a>
+          <a href="#"><i className="fab fa-instagram"></i></a>
+          <a href="#"><i className="fab fa-pinterest"></i></a>
+        </SocialIcons>
+      </FooterBottom>
+    </FooterContainer>
   );
 };
 
-export default FooterComponent;
+export default Footer;

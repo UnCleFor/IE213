@@ -9,6 +9,8 @@ import { routes } from './routes/index'
 // Thêm default vào tất cả trang trừ trang NotFound
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
 
+import "@fortawesome/fontawesome-free/css/all.min.css";
+
 function App() {
   return (
     <div>
