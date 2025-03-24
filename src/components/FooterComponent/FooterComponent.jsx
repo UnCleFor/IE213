@@ -24,8 +24,8 @@ const Footer = () => {
       <FooterSection>
         <FooterTitle>Chính sách</FooterTitle>
         <FooterLink onClick={() => navigate("/chinhsachdoitra")}>Chính sách đổi trả</FooterLink>
-        <FooterLink href="#">Chính sách bảo mật</FooterLink>
-        <FooterLink href="#">Điều khoản dịch vụ</FooterLink>
+        <FooterLink onClick={() => navigate("/chinhsachbaomat")}>Chính sách bảo mật</FooterLink>
+        <FooterLink onClick={() => navigate("/dieukhoandichvu")}>Điều khoản dịch vụ</FooterLink>
       </FooterSection>
 
       <SubscribeSection>

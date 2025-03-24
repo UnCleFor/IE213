@@ -5,7 +5,8 @@ import ProductDetailsPage from "../pages/ProductDetailsPage/ProductDetailsPage";
 import ProductsPage from "../pages/ProductsPage/ProductsPage"
 import AboutUsPage from "../pages/AboutUsPage/AboutUsPage"
 import ChinhSachDoiTraPage from "../pages/ChinhSachDoiTraPage/ChinhSachDoiTraPage"
-
+import ChinhSachBaoMatPage from "../pages/ChinhSachBaoMatPage/ChinhSachBaoMatPage"
+import DieuKhoanDVPage from "../pages/DieuKhoanDVPage/DieuKhoanDVPage"
 // Mảng routes trong file routes/index.js chứa các đường dẫn
 export const routes = [
     {
@@ -41,6 +42,16 @@ export const routes = [
     {
         path: '/chinhsachdoitra',
         page: ChinhSachDoiTraPage,
+        isShowHeader: true
+    },
+    {
+        path: '/chinhsachbaomat',
+        page: ChinhSachBaoMatPage,
+        isShowHeader: true
+    },
+    {
+        path: '/dieukhoandichvu',
+        page: DieuKhoanDVPage,
         isShowHeader: true
     }
 ]
