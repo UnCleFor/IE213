@@ -1,17 +1,23 @@
+import { Row } from "antd";
 import styled from "styled-components";
 
-export const FooterContainer = styled.footer`
+export const ColorFooter = styled.div`
+  color: #fff;
+  background-color: #000;
+`
+export const FooterContainer = styled(Row)`
   background-color: #000;
   color: #fff;
-  padding: 40px 80px;
+  padding: 40px 0px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  width: 100%;
 `;
 
 export const FooterSection = styled.div`
   flex: 1;
-  min-width: 200px;
+  min-width: auto;
   margin-bottom: 20px;
 `;
 
@@ -35,7 +41,7 @@ export const FooterLink = styled.a`
 
 export const SubscribeSection = styled.div`
   flex: 1;
-  min-width: 300px;
+  //min-width: 300px;
   margin-bottom: 20px;
 `;
 

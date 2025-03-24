@@ -3,6 +3,7 @@ import ProductDetailsComponent from "../../components/ProductDetailsComponent/Pr
 import { WrapperTypeProduct } from "../HomePage/style";
 import TypeProduct from "../../components/TypeProduct/TypeProduct";
 import NavbarComponent from "../../components/NavbarComponent/NavbarComponent";
+import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 
 const ProductDetailsPage = () => {
     const arr = ['Bàn', 'Ghế', 'Tủ']
@@ -18,9 +19,11 @@ const ProductDetailsPage = () => {
                 })}
             </WrapperTypeProduct> */}
 
-            <div style={{ padding: '0px  120px', height: '1000px' }}>
-                <ProductDetailsComponent />
-            </div>
+            <ContainerComponent>
+            <ProductDetailsComponent />
+            </ContainerComponent>
+               
+            
         </div>
 
     );
