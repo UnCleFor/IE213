@@ -7,6 +7,8 @@ import AboutUsPage from "../pages/AboutUsPage/AboutUsPage"
 import ChinhSachDoiTraPage from "../pages/ChinhSachDoiTraPage/ChinhSachDoiTraPage"
 import ChinhSachBaoMatPage from "../pages/ChinhSachBaoMatPage/ChinhSachBaoMatPage"
 import DieuKhoanDVPage from "../pages/DieuKhoanDVPage/DieuKhoanDVPage"
+import SignInPage from "../pages/SignInPage/SignInPage";
+import SignUpPage from "../pages/SignUpPage/SignUpPage";
 // Mảng routes trong file routes/index.js chứa các đường dẫn
 export const routes = [
     {
@@ -53,5 +55,15 @@ export const routes = [
         path: '/dieukhoandichvu',
         page: DieuKhoanDVPage,
         isShowHeader: true
+    },
+    {
+        path: '/sign_in',
+        page: SignInPage,
+        inShowHeader: false
+    },
+    {
+        path: '/sign_up',
+        page: SignUpPage,
+        inShowHeader: false
     }
 ]
