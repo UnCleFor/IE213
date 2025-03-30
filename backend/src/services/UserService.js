@@ -102,7 +102,6 @@ const updateUser = (id, data) => {
             const checkUser = await User.findOne({
                 _id: id
             })
-
             // nếu === null thì chưa có => thông báo chưa có tài khoản
             if (checkUser === null){
                 resolve({
@@ -112,10 +111,10 @@ const updateUser = (id, data) => {
             }
 
             const updatedUser = await User.findByIdAndUpdate(id, data, { new: true})
+            console.log('updateUser',updateUser)
             resolve({
                 status:"Ố dè",
-                message: "Đăng nhập thành công",
-                data: updatedUser
+                message: "Cập nhật người dùng thành công"
             })
             
         }

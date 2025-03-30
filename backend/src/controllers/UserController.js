@@ -83,10 +83,9 @@ const updateUser = async (req,res) => {
         if (!userId) {
             return res.status(200).json({
                 status: 'Lỗi',
-                message: 'Mật khẩu nhập lại không trùng khớp'
+                message: 'Thiếu userId'
             })
         }
-        
         // thực hiện gọi dịch vụ tạo user mới
         const ketqua = await UserService.updateUser(userId, data)
         return res.status(200).json(ketqua)
@@ -108,7 +107,7 @@ const deleteUser = async (req,res) => {
             })
         }
         
-        // thực hiện gọi dịch vụ tạo user mới
+        // thực hiện xóa user
         const ketqua = await UserService.deleteUser(userId)
         return res.status(200).json(ketqua)
     }

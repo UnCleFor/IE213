@@ -3,16 +3,22 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const authMiddleWare = (req, res, next) => {
-    const token = req.headers.token.split('')[1]
-    jwt.verify(token, process.env.ACCESS_TOKEN, function(err, user) {
-        if (err){
+    
+    const token = req.headers.token?.split(' ')[1]; 
+    //console.log("Token nhận được:", token);
+    
+    jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
+        if (err) {
+           // console.log("JWT Error:", err.message); // In lỗi ra console
             return res.status(404).json({
-                message: 'The authemtication',
-                status: 'ERROR'
-            })
+                message: "The authentication failed",
+                status: "ERROR",
+            });
         }
-        const { payload } = user
-        if (payload?.isAdmin) {
+    
+        //const { payload } = user
+        if (user.isAdmin) {
+            //console.log('true')
             next()
         } else {
             return res.status(404).json({
