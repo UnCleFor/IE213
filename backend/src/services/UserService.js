@@ -95,7 +95,115 @@ const loginUser = (userLogin) => {
         }
     })
 }
+const updateUser = (id, data) => {
+    return new Promise( async(resolve,reject) => {
+        try {
+            // biến kiểm tra coi mail có trong database ko
+            const checkUser = await User.findOne({
+                _id: id
+            })
+
+            // nếu === null thì chưa có => thông báo chưa có tài khoản
+            if (checkUser === null){
+                resolve({
+                    status: 'Ô nô',
+                    message: 'Tài khoản này chưa được đăng kí'
+                })
+            }
+
+            const updatedUser = await User.findByIdAndUpdate(id, data, { new: true})
+            resolve({
+                status:"Ố dè",
+                message: "Đăng nhập thành công",
+                data: updatedUser
+            })
+            
+        }
+        catch(e) {
+            reject(e)
+        }
+    })
+}
+
+const deleteUser = (id) => {
+    return new Promise( async(resolve,reject) => {
+        try {
+            // biến kiểm tra coi mail có trong database ko
+            const checkUser = await User.findOne({
+                _id: id
+            })
+
+            // nếu === null thì chưa có => thông báo chưa có tài khoản
+            if (checkUser === null){
+                resolve({
+                    status: 'Ô nô',
+                    message: 'Tài khoản này chưa được đăng kí'
+                })
+            }
+
+            await User.findByIdAndDelete(id)
+            resolve({
+                status: 'Ố dè',
+                message: 'Xoá thông tin thành công'
+            })
+            
+        }
+        catch(e) {
+            reject(e)
+        }
+    })
+}
+
+const getAllUser = () => {
+    return new Promise( async(resolve,reject) => {
+        try {
+            const allUser = await User.find()
+            resolve({
+                status: 'Ố dè',
+                message: 'Thành công',
+                data: allUser
+            })
+        }
+        catch(e) {
+            reject(e)
+        }
+    })
+}
+
+const getDetailsUser = (id) => {
+    return new Promise( async(resolve,reject) => {
+        try {
+            // biến kiểm tra coi mail có trong database ko
+            const user = await User.findOne({
+                _id: id
+            })
+
+            // nếu === null thì chưa có => thông báo chưa có tài khoản
+            if (user === null){
+                resolve({
+                    status: 'Ô nô',
+                    message: 'Tài khoản này chưa được đăng kí'
+                })
+            }
+
+            resolve({
+                status: 'Ố dè',
+                message: 'Thành công',
+                data: user
+            })
+            
+        }
+        catch(e) {
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     createUser,
-    loginUser
+    loginUser,
+    updateUser,
+    deleteUser,
+    getAllUser,
+    getDetailsUser
 }

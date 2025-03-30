@@ -75,7 +75,90 @@ const loginUser = async (req,res) => {
         })
     }
 }
+
+const updateUser = async (req,res) => {
+    try {
+        const userId = req.params.id
+        const data = req.body
+        if (!userId) {
+            return res.status(200).json({
+                status: 'Lỗi',
+                message: 'Mật khẩu nhập lại không trùng khớp'
+            })
+        }
+        
+        // thực hiện gọi dịch vụ tạo user mới
+        const ketqua = await UserService.updateUser(userId, data)
+        return res.status(200).json(ketqua)
+    }
+    catch(e){
+        return res.status(404).json({
+            massage: e
+        })
+    }
+}
+
+const deleteUser = async (req,res) => {
+    try {
+        const userId = req.params.id
+        if (!userId) {
+            return res.status(200).json({
+                status: 'Lỗi',
+                message: 'Mật khẩu nhập lại không trùng khớp'
+            })
+        }
+        
+        // thực hiện gọi dịch vụ tạo user mới
+        const ketqua = await UserService.deleteUser(userId)
+        return res.status(200).json(ketqua)
+    }
+    catch(e){
+        return res.status(404).json({
+            massage: e
+        })
+    }
+}
+
+const getAllUser = async (req,res) => {
+    try {
+        // thực hiện gọi dịch vụ tạo user mới
+        const ketqua = await UserService.getAllUser()
+        return res.status(200).json(ketqua)
+    }
+    catch(e){
+        return res.status(404).json({
+            massage: e
+        })
+    }
+}
+
+const getDetailsUser = async (req,res) => {
+    try {
+        const userId = req.params.id
+        if (!userId) {
+            return res.status(200).json({
+                status: 'Lỗi',
+                message: 'Mật khẩu nhập lại không trùng khớp'
+            })
+        }
+        
+        // thực hiện gọi dịch vụ tạo user mới
+        const ketqua = await UserService.getDetailsUser(userId)
+        return res.status(200).json(ketqua)
+    }
+    catch(e){
+        return res.status(404).json({
+            massage: e
+        })
+    }
+}
+
+
 module.exports = {
     createUser,
-    loginUser
+    loginUser,
+    updateUser,
+    deleteUser,
+    getAllUser,
+    getDetailsUser
 }
