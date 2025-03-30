@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+
 dotenv.config()
 
 // tạo access_token để mã hóa dữ liệu gửi đi
 const generalAccessToken = async (payload) => {
     //console.log('ASTPayload:', payload);
-    const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN , { expiresIn: '1h' });
+    const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN , { expiresIn: '20s' });
     return access_token;
 };
 
@@ -16,7 +17,44 @@ const generalRefreshToken = async (payload) => {
     return refresh_token
 };
 
+const refreshTokenJwtService = async (token) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            console.log('Token nhận được:', token);
+
+            jwt.verify(token, process.env.REFRESH_TOKEN, async (err, decoded) => {
+                if (err) {
+                    return resolve({
+                        status: 'Lỗi',
+                        message: 'Token không hợp lệ',
+                    });
+                }
+
+                console.log('User decoded từ token:', decoded);
+
+                // Truy cập thông tin đúng từ decoded
+                const access_token = await generalAccessToken({
+                    id: decoded.id,
+                    isAdmin: decoded?.isAdmin,
+                });
+
+                console.log('access_token mới:', access_token);
+
+                resolve({
+                    status: 'Thành công',
+                    message: 'Refresh token thành công',
+                    access_token
+                });
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+
+
 module.exports = {
     generalAccessToken,
-    generalRefreshToken
+    generalRefreshToken,
+    refreshTokenJwtService
 };

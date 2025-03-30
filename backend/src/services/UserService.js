@@ -198,11 +198,13 @@ const getDetailsUser = (id) => {
     })
 }
 
+
 module.exports = {
     createUser,
     loginUser,
     updateUser,
     deleteUser,
     getAllUser,
-    getDetailsUser
+    getDetailsUser,
+
 }

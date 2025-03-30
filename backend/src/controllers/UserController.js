@@ -1,4 +1,5 @@
 const UserService = require('../services/UserService')
+const JwtService = require('../services/JwtService')
 // validator cho email (npm install email-validator)
 var validator = require("email-validator");
 
@@ -152,6 +153,25 @@ const getDetailsUser = async (req,res) => {
     }
 }
 
+const refreshToken = async (req,res) => {
+    try {
+        const token = req.headers.token?.split(' ')[1];
+        if (!token) {
+            return res.status(200).json({
+                status: 'Lỗi',
+                message: 'Token bị thiếu'
+            })
+        }
+        
+        const ketqua = await JwtService.refreshTokenJwtService(token)
+        return res.status(200).json(ketqua)
+    }
+    catch(e){
+        return res.status(404).json({
+            massage: e
+        })
+    }
+}
 
 module.exports = {
     createUser,
@@ -159,5 +179,6 @@ module.exports = {
     updateUser,
     deleteUser,
     getAllUser,
-    getDetailsUser
+    getDetailsUser,
+    refreshToken
 }
