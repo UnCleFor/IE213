@@ -19,6 +19,7 @@ const SliderComponent = ({ arrImages }) => {
         {arrImages.map((image, index) => (
           <div key={index} style={{ width: "100%", height: "500px", overflow: "hidden" }}>
             <Image
+            key={image}
               src={image}
               alt="Slider"
               preview={false}

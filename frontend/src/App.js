@@ -1,4 +1,6 @@
 import React, { Fragment } from 'react';
+import axios from 'axios'
+import { useEffect} from 'react'
 
 // Triển khai react router
 import { BrowserRouter as Router, Routes,Route} from 'react-router-dom'
@@ -10,8 +12,23 @@ import { routes } from './routes/index'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
-
+import { useQuery } from '@tanstack/react-query'
+//
 function App() {
+
+// 
+  // useEffect(() => {
+  //   fetchApi()
+  // }, [])
+  //console.log('process.env.REACT_API_URL_BACKEND', process.env.REACT_API_URL_BACKEND)
+  const fetchApi = async() => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`)
+    return res.data
+  }
+
+  const query = useQuery({ queryKey: ['todos'], queryFn: fetchApi })
+  console.log('query', query)
+
   return (
     <div>
       <Router> {/* BrowserRouter để quản lý đường dẫn */}
