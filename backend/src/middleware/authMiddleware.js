@@ -9,9 +9,9 @@ const authMiddleWare = (req, res, next) => {
     
     jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
         if (err) {
-           // console.log("JWT Error:", err.message); // In lỗi ra console
+           //console.log("JWT Error:", err.message); // In lỗi ra console
             return res.status(404).json({
-                message: "The authentication failed",
+                message: "loi chuoi token",
                 status: "ERROR",
             });
         }
@@ -37,7 +37,7 @@ const authUserMiddleWare = (req, res, next) => {
         if (err) {
            // console.log("JWT Error:", err.message); // In lỗi ra console
             return res.status(404).json({
-                message: "The authentication failed",
+                message: "giai ma token sai",
                 status: "ERROR",
             });
         }
