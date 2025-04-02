@@ -25,18 +25,23 @@ export const WrapperStylePriceProduct = styled.span`
 `
 
 export const SizeProduct = styled.div`
-    margin-bottom: 20px
+  margin-bottom: 20px
 `
 
 export const SizeBox = styled.span`
-    margin: 10px;
-    padding: 5px;
-    border: 1px solid black
+  margin: 10px;
+  padding: 5px;
+  border: 1px solid black
 `
 
 export const WrapperQuality = styled.div`
 
+`
 
+export const WrapperBtnBuy = styled.div`
+  display: flex;
+  justify-content: space-around;
+  max-width: 70%
 `
 
 export const WrapperBtnQualityProduct = styled.span`

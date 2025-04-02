@@ -170,7 +170,7 @@ const getAllProduct = (limit, page, sort, filter) => {
                 message: 'Tìm thành công',
                 data: allProduct,
                 total: totalProduct,
-                pageCurrent: page + 1,
+                pageCurrent: Number(page + 1),
                 totalPage: Math.ceil(totalProduct / limit)
             })
         } catch (e) {

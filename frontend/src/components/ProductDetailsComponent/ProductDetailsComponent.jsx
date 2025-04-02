@@ -2,8 +2,9 @@ import { Col, Image, Row } from 'antd'
 import React from 'react'
 import imageProduct from '../../assets/images/z6436857502524_b8df322fa070c2dd15fc904c2ee1c100.jpg'
 import imageProductSmall from '../../assets/images/z6436857450475_595921696663d0fe0f381a7c4efb9de6.jpg'
-import { DetailsCell, RowDetail, SizeBox, SizeProduct, TableProductDetails, TitleCell, WrapperStyleColImage, WrapperStyleImageSmall, WrapperStyleNameProduct, WrapperStylePriceProduct } from './style'
+import { DetailsCell, RowDetail, SizeBox, SizeProduct, TableProductDetails, TitleCell, WrapperBtnBuy, WrapperStyleColImage, WrapperStyleImageSmall, WrapperStyleNameProduct, WrapperStylePriceProduct } from './style'
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
+import ButtonComponent from '../ButtonComponent/ButtonComponent'
 
 const ProductDetailsComponent = () => {
     const product =
@@ -40,7 +41,7 @@ const ProductDetailsComponent = () => {
         <div>
             <Row style={{ padding: '16px 0px', background: 'white' }} gutter={[16, 16]}>
                 <Col xs={24} sm={12} md={10} lg={10}>
-                    <Image src={imageProduct} alt="image product" preview={false} style={{ width: '100%', padding:"10px 0px" }} />
+                    <Image src={imageProduct} alt="image product" preview={false} style={{ width: '100%', padding: "10px 0px" }} />
                     <Row gutter={[8, 8]} justify="center">
                         {[...Array(5)].map((_, index) => (
                             <Col key={index} xs={4} sm={4} md={4} lg={4}>
@@ -76,15 +77,38 @@ const ProductDetailsComponent = () => {
                         <Col span={12}></Col>
                     </Row>
 
-                    <div>
-                        <button>Thêm vào giỏ hàng</button>
-                    </div>
+                    <WrapperBtnBuy>
+                        <ButtonComponent
+                            size="large"
+                            styleButton={{
+                                backgroundColor: "brown",
+                                color: "white",
+                                border: "none",
+                                padding: "10px 20px",
+                                borderRadius: "0px",
+                                cursor: "pointer",
+                            }}
+                            textButton="Thêm vào giỏ hàng"
+                        />
+                        <ButtonComponent
+                            size="large"
+                            styleButton={{
+                                backgroundColor: "#AA896C",
+                                color: "white",
+                                border: "none",
+                                padding: "10px 20px",
+                                borderRadius: "0px",
+                                cursor: "pointer",
+                            }}
+                            textButton="Mua ngay"
+                        />
+                    </WrapperBtnBuy>
                 </Col>
             </Row>
 
 
             <h2>Mô tả sản phẩm</h2>
-            <div className="border border-gray-300 rounded-md" style={{ paddingBottom: "20px"}}>
+            <div className="border border-gray-300 rounded-md" style={{ paddingBottom: "20px" }}>
                 <TableProductDetails>
                     <tbody>
                         {product.details.map((item, index) => (

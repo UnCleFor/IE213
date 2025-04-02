@@ -20,7 +20,7 @@ const ProductDetailsPage = () => {
             </WrapperTypeProduct> */}
 
             <ContainerComponent>
-            <ProductDetailsComponent />
+                <ProductDetailsComponent />
             </ContainerComponent>
                
             
