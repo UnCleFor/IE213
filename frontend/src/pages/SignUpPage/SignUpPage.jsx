@@ -76,7 +76,7 @@ const SignUpPage = () => {
                             )
                         }
                         </span>
-                        <InputForm style={{marginBottom: '10px'}} placeholder='Xác nhận mật khẩu*' type={isShowPassword ? "text" : "password"}
+                        <InputForm style={{marginBottom: '10px'}} placeholder='Xác nhận mật khẩu*' type={isShowConfirmPassword ? "text" : "password"}
                             value={confirmPassword} onChange={handleOnchange(setConfirmPassword)}/>
                     </div>                                      
                     <ButtonComponent
