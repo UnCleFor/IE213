@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { Col, Row, Button, Grid, theme } from "antd";
 import {
@@ -54,6 +55,11 @@ const HeaderComponent = () => {
     },
   };
 
+  const navigate = useNavigate()
+  const handleNavigateLogin = () => {
+    navigate('/sign_in')
+  }
+
   return (
     <div style={{ position: "relative" }}>
       <div style={styles.header}>
@@ -87,7 +93,7 @@ const HeaderComponent = () => {
               <WrapperHeaderAccount>
                 <UserOutlined style={{ fontSize: "20px", color: "brown" }} />
                 {!screens.xs && (
-                  <div>
+                  <div onClick={handleNavigateLogin} style={{cursor: 'pointer'}}>
                     <WrapperTextHeaderSmall>Sign in/ Register</WrapperTextHeaderSmall>
                     <div>
                       <WrapperTextHeaderSmall>Account</WrapperTextHeaderSmall>
