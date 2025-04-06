@@ -12,7 +12,7 @@ const createUser = async (req,res) => {
         const isCheckEmail = validator.validate(email);
         
         // nếu thiếu 1 trường thì báo lỗi
-        if ( !name || !email || !password || !confirmPassword || !phone ) {
+        if ( !name || !email || !password || !confirmPassword ) {
             return res.status(200).json({
                 status: 'Lỗi',
                 message: 'Cần điền đầy đủ thông tin'
@@ -35,7 +35,7 @@ const createUser = async (req,res) => {
     }
     catch(e){
         return res.status(404).json({
-            massage: e
+            message: e
         })
     }
 }
@@ -43,13 +43,14 @@ const createUser = async (req,res) => {
 const loginUser = async (req,res) => {
     try {
         // lấy ra các thông tin cần thiết từ body của req đc gửi từ ui xuống để tạo user mới 
-        const {name, email, password, confirmPassword, phone } = req.body
+        const { email, password } = req.body
+        console.log('req.body')
         
         // check email có hợp lệ ko
         const isCheckEmail = validator.validate(email);
-        
+        console.log(email, password)
         // nếu thiếu 1 trường thì báo lỗi
-        if ( !name || !email || !password || !confirmPassword || !phone ) {
+        if ( !email || !password ) {
             return res.status(200).json({
                 status: 'Lỗi',
                 message: 'Cần điền đầy đủ thông tin'
@@ -59,12 +60,7 @@ const loginUser = async (req,res) => {
                 status: 'Lỗi',
                 message: 'Email bị lỗi'
             })
-        } else if (password !== confirmPassword) {
-            return res.status(200).json({
-                status: 'Lỗi',
-                message: 'Mật khẩu nhập lại không trùng khớp'
-            })
-        }
+        } 
         
         // thực hiện gọi dịch vụ tạo user mới
         const ketqua = await UserService.loginUser(req.body)
@@ -72,7 +68,7 @@ const loginUser = async (req,res) => {
     }
     catch(e){
         return res.status(404).json({
-            massage: e
+            message: e
         })
     }
 }
@@ -93,7 +89,7 @@ const updateUser = async (req,res) => {
     }
     catch(e){
         return res.status(404).json({
-            massage: e
+            message: e
         })
     }
 }
@@ -114,7 +110,7 @@ const deleteUser = async (req,res) => {
     }
     catch(e){
         return res.status(404).json({
-            massage: e
+            message: e
         })
     }
 }
@@ -127,7 +123,7 @@ const getAllUser = async (req,res) => {
     }
     catch(e){
         return res.status(404).json({
-            massage: e
+            message: e
         })
     }
 }
@@ -148,7 +144,7 @@ const getDetailsUser = async (req,res) => {
     }
     catch(e){
         return res.status(404).json({
-            massage: e
+            message: e
         })
     }
 }
@@ -168,7 +164,7 @@ const refreshToken = async (req,res) => {
     }
     catch(e){
         return res.status(404).json({
-            massage: e
+            message: e
         })
     }
 }

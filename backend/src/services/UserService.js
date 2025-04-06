@@ -2,6 +2,7 @@ const User = require('../models/UserModel')
 // bcrypt để mã hóa mật khẩu
 const bcrypt = require('bcrypt')
 const { generalAccessToken,generalRefreshToken } = require('./JwtService')
+
 const createUser = (newUser) => {
     return new Promise( async(resolve,reject) => {
         // lấy các trường ra từ input
@@ -14,7 +15,7 @@ const createUser = (newUser) => {
             // nếu khác null thì tức là đã có, == null tức là chưa có
             if (checkUser !== null){
                 resolve({
-                    status: 'Oki',
+                    status: 'ERR',
                     message: 'Email xài gòi á pà'
                 })
             }
@@ -22,18 +23,18 @@ const createUser = (newUser) => {
             const hash = bcrypt.hashSync(password,10)
             // console.log('hash',hash)
             // tạo user mới
-            const createUser = await User.create({
+            const createdUser = await User.create({
                 name, 
                 email, 
                 password: hash, 
                 phone
             })
             // thông báo khi tạo user thành công
-            if (createUser) {
+            if (createdUser) {
                 resolve({
                     status:"Oki",
                     message: "Tạo thành công",
-                    data: createUser
+                    data: createdUser
                 })
             }
             
@@ -46,7 +47,7 @@ const createUser = (newUser) => {
 const loginUser = (userLogin) => {
     return new Promise( async(resolve,reject) => {
         // lấy các trường ra từ input
-        const {name, email, password, confirmPassword, phone } = userLogin
+        const { email, password } = userLogin
         try {
             // biến kiểm tra coi mail có trong database ko
             const checkUser = await User.findOne({
@@ -55,7 +56,7 @@ const loginUser = (userLogin) => {
             // nếu === null thì chưa có => thông báo chưa có tài khoản
             if (checkUser === null){
                 resolve({
-                    status: 'Ô nô',
+                    status: 'ERR',
                     message: 'Tài khoản này chưa được đăng kí'
                 })
             }
@@ -65,7 +66,7 @@ const loginUser = (userLogin) => {
             // nếu so mật khẩu sai thì báo tk hoặc mk sai
             if (!comparePassword) {
                 resolve({
-                    status:"Ô nô",
+                    status:"ERR",
                     message: "Mật khẩu hoặc tài khoản sai",
                 })
             }
