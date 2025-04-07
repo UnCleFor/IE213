@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Row, Col } from "antd";
 import { WrapperContainerLeft, WrapperContainerRight, WrapperTextLight } from "./style"
 import InputForm from "../../components/InputForm/InputForm"
@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom"
 import * as UserService from '../../services/UserService'
 import { useMutationHooks } from "../../hooks/useMutationHook";
 import Loading from "../../components/LoadingComponent/Loading"
+import * as message from '../../components/Message/Message';
 
 const SignUpPage = () => {
     const navigate = useNavigate()
@@ -21,6 +22,7 @@ const SignUpPage = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    
 
     // Hàm dùng chung để cập nhật state
     const handleOnchange = (setter) => (value) => setter(value)
@@ -29,7 +31,25 @@ const SignUpPage = () => {
         data => UserService.signupUser(data)
     )
 
-    const { data } = mutation
+    const { data, isSuccess, isError } = mutation;
+
+    // lỗi ko in ra được thông báo, nhưng chuyển trang đc
+    useEffect(()=>{  
+        
+        if(isSuccess &&  data?.status !== 'ERR'){
+            
+            message.success({
+                content: "Đăng ký thành công!",
+              });
+            handleNavigateSignIn()
+        } else if (isError) {
+            message.error({
+                content: "Đăng ký thành công!",
+              });
+        }
+    },[isSuccess,isError])
+
+
     const isLoading = mutation.isPending
 
     const handleNavigateSignIn = () => {
@@ -37,6 +57,7 @@ const SignUpPage = () => {
     }
     const handleSignUp = () => {
         mutation.mutate({name, phone, email, password, confirmPassword})
+        
     }
 
     return (
@@ -152,10 +173,8 @@ const SignUpPage = () => {
                     </div>
 
                     {/* Hiển thị lỗi nếu có */}
-                    {data?.status === 'ERR' && (
-                        <span style={{ color: 'red' }}>{data?.message}</span>
-                    )}
-
+                    {data?.status === 'ERR' && <span style={{color:'red'}}>{data?.message}</span>}
+                    
                     <Loading isLoading={isLoading}>
                         <ButtonComponent
                             disabled={

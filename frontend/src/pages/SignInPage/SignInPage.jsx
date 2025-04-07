@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Image } from "antd";
 import { EyeFilled, EyeInvisibleFilled } from "@ant-design/icons";
 import { WrapperContainerLeft, WrapperContainerRight, WrapperTextLight } from "./style";
@@ -9,22 +9,46 @@ import { useNavigate } from "react-router-dom";
 import * as UserService from '../../services/UserService'
 import { useMutationHooks } from "../../hooks/useMutationHook";
 import Loading from "../../components/LoadingComponent/Loading";
-
+import * as message from '../../components/Message/Message';
+import { jwtDecode } from "jwt-decode";
+import { useDispatch} from 'react-redux'
+import { updateUser } from "../../redux/slices/userSlide";
 const SignInPage = () => {
     const [isShowPassword, setIsShowPassword] = useState(false);
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const dispatch = useDispatch()
     const navigate = useNavigate()
 
-//    const mutation = useMutationHooks(
-//        data => UserService.loginUser(data)
-//  )
-//    const {data, isLoading} = mutation
+    //    const mutation = useMutationHooks(
+    //        data => UserService.loginUser(data)
+    //  )
+    //    const {data, isLoading} = mutation
 
     const mutation = useMutationHooks(
         data => UserService.loginUser(data)
     )
-    const { data } = mutation
+    const { data,isSuccess,isError } = mutation
+    useEffect(()=>{
+        if(isSuccess &&  data?.status !== 'ERR'){
+            navigate('/')
+            localStorage.setItem('access_token',data?.access_token)
+            if(data?.access_token){
+                const decoded = jwtDecode(data?.access_token)
+                console.log('decoded',decoded)
+                if(decoded?.id){
+                    handleGetDetailUser(decoded?.id,data?.access_token)
+                }
+            }
+        }
+    },[isSuccess])
+
+    const handleGetDetailUser = async (id,token) => {
+        const res = await UserService.getDetailUser(id,token)
+        dispatch(updateUser({...res?.data,access_token: token}))
+        //console.log('res',res)
+    }
+
     const isLoading = mutation.isPending
 
 
@@ -36,7 +60,7 @@ const SignInPage = () => {
     const handleOnchange = (setter) => (value) => setter(value)
 
     const handleSignIn = () => {
-        mutation.mutate({ email, password})
+        mutation.mutate({ email, password })
         console.log('sign_in', email, password)
     }
     return (
@@ -48,8 +72,8 @@ const SignInPage = () => {
             height: '100vh',
             padding: '20px'
         }}>
-            <Row 
-                gutter={[16, 16]} 
+            <Row
+                gutter={[16, 16]}
                 style={{
                     width: '90%',
                     maxWidth: '800px',
@@ -57,7 +81,7 @@ const SignInPage = () => {
                     borderRadius: '6px',
                     overflow: 'hidden'
                 }}
-            >   
+            >
                 {/* logo */}
                 <Col xs={24} md={9} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
                     <Image src={logo} preview={false} alt="logo" width="100%" />
@@ -72,7 +96,7 @@ const SignInPage = () => {
 
                     {/* Input Mật khẩu + Icon hiển thị mật khẩu */}
                     <div style={{ position: 'relative', marginBottom: '10px' }}>
-                        <span 
+                        <span
                             onClick={() => setIsShowPassword(!isShowPassword)}
                             style={{
                                 position: 'absolute',
@@ -87,17 +111,21 @@ const SignInPage = () => {
                         >
                             {isShowPassword ? <EyeFilled /> : <EyeInvisibleFilled />}
                         </span>
-                        <InputForm 
-                            placeholder="Mật khẩu*" 
+                        <InputForm
+                            placeholder="Mật khẩu*"
                             type={isShowPassword ? "text" : "password"}
-                            value={password} onChange={handleOnchange(setPassword)} 
-                            style={{ width: '100%', paddingRight: '40px' }} 
+                            value={password} onChange={handleOnchange(setPassword)}
+                            style={{ width: '100%', paddingRight: '40px' }}
                         />
                     </div>
 
-                    {data?.status === 'ERR' && <span style={{color:'red'}}>{data?.message}</span>}        
+                    {data?.status === 'Lỗi' && (
+                        <span style={{ color: 'red' }}>{data?.message}</span>
+                    )}
+
+                    
                     <Loading isLoading={isLoading}>
-                    {/* Button Đăng nhập */}
+                        {/* Button Đăng nhập */}
                         <ButtonComponent
                             disabled={!email.length || !password.length}
                             onClick={handleSignIn}

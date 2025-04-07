@@ -25,7 +25,7 @@ const refreshTokenJwtService = async (token) => {
             jwt.verify(token, process.env.REFRESH_TOKEN, async (err, decoded) => {
                 if (err) {
                     return resolve({
-                        status: 'Lỗi',
+                        status: 'ERR',
                         message: 'Token không hợp lệ',
                     });
                 }
@@ -41,7 +41,7 @@ const refreshTokenJwtService = async (token) => {
                 console.log('access_token mới:', access_token);
 
                 resolve({
-                    status: 'Thành công',
+                    status: 'OK',
                     message: 'Refresh token thành công',
                     access_token
                 });

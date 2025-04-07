@@ -16,7 +16,7 @@ const createUser = (newUser) => {
             if (checkUser !== null){
                 resolve({
                     status: 'ERR',
-                    message: 'Email xài gòi á pà'
+                    message: 'Email đã được sử dụng'
                 })
             }
             // hàm băm mật khẩu thành các kí tự đặt biệt với key = 10
@@ -32,7 +32,7 @@ const createUser = (newUser) => {
             // thông báo khi tạo user thành công
             if (createdUser) {
                 resolve({
-                    status:"Oki",
+                    status:"OK",
                     message: "Tạo thành công",
                     data: createdUser
                 })
@@ -84,7 +84,7 @@ const loginUser = (userLogin) => {
             // nếu đúng thì báo đăng nhập thành công 
             // và trả về access_token chứa dữ liệu mã hóa của thông tin người đăng nhập
             resolve({
-                status:"Ố dè",
+                status:"OK",
                 message: "Đăng nhập thành công",
                 access_token,
                 refresh_token
@@ -106,7 +106,7 @@ const updateUser = (id, data) => {
             // nếu === null thì chưa có => thông báo chưa có tài khoản
             if (checkUser === null){
                 resolve({
-                    status: 'Ô nô',
+                    status: 'ERR',
                     message: 'Tài khoản này chưa được đăng kí'
                 })
             }
@@ -114,7 +114,7 @@ const updateUser = (id, data) => {
             const updatedUser = await User.findByIdAndUpdate(id, data, { new: true})
             console.log('updateUser',updateUser)
             resolve({
-                status:"Ố dè",
+                status:"OK",
                 message: "Cập nhật người dùng thành công"
             })
             
@@ -136,14 +136,14 @@ const deleteUser = (id) => {
             // nếu === null thì chưa có => thông báo chưa có tài khoản
             if (checkUser === null){
                 resolve({
-                    status: 'Ô nô',
+                    status: 'ERR',
                     message: 'Tài khoản này chưa được đăng kí'
                 })
             }
 
             await User.findByIdAndDelete(id)
             resolve({
-                status: 'Ố dè',
+                status: 'OK',
                 message: 'Xoá thông tin thành công'
             })
             

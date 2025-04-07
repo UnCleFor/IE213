@@ -19,6 +19,7 @@ import SearchButton from "../SearchButton/SearchButton";
 import beautihome from "./beautihome.png";
 
 import ContainerComponent from "../ContainerComponent/ContainerComponent";
+import { useSelector } from "react-redux";
 
 const { useBreakpoint } = Grid;
 const { useToken } = theme;
@@ -56,6 +57,7 @@ const HeaderComponent = () => {
   };
 
   const navigate = useNavigate()
+  const user = useSelector((state) => state.user)
   const handleNavigateLogin = () => {
     navigate('/sign_in')
   }
@@ -93,14 +95,19 @@ const HeaderComponent = () => {
               <WrapperHeaderAccount>
                 <UserOutlined style={{ fontSize: "20px", color: "brown" }} />
                 {!screens.xs && (
-                  <div onClick={handleNavigateLogin} style={{cursor: 'pointer'}}>
-                    <WrapperTextHeaderSmall>Sign in/ Register</WrapperTextHeaderSmall>
-                    <div>
-                      <WrapperTextHeaderSmall>Account</WrapperTextHeaderSmall>
-                      <CaretDownOutlined />
+                  user?.name ? (
+                    <div>{user.name}</div>
+                  ) : (
+                    <div onClick={handleNavigateLogin} style={{ cursor: 'pointer' }}>
+                      <WrapperTextHeaderSmall>Sign In / Sign Up</WrapperTextHeaderSmall>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <WrapperTextHeaderSmall>Account</WrapperTextHeaderSmall>
+                        <CaretDownOutlined />
+                      </div>
                     </div>
-                  </div>
+                  )
                 )}
+
               </WrapperHeaderAccount>
               <WrapperHeaderAccount>
                 <ShoppingCartOutlined style={{ fontSize: "20px", color: "brown" }} />

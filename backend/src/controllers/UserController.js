@@ -11,20 +11,20 @@ const createUser = async (req,res) => {
         // check email có hợp lệ ko
         const isCheckEmail = validator.validate(email);
         
-        // nếu thiếu 1 trường thì báo lỗi
+        // nếu thiếu 1 trường thì báo ERR
         if ( !name || !email || !password || !confirmPassword ) {
             return res.status(200).json({
-                status: 'Lỗi',
+                status: 'ERR',
                 message: 'Cần điền đầy đủ thông tin'
             })
         } else if (!isCheckEmail) {
             return res.status(200).json({
-                status: 'Lỗi',
+                status: 'ERR',
                 message: 'Email bị lỗi'
             })
         } else if (password !== confirmPassword) {
             return res.status(200).json({
-                status: 'Lỗi',
+                status: 'ERR',
                 message: 'Mật khẩu nhập lại không trùng khớp'
             })
         }
@@ -44,27 +44,34 @@ const loginUser = async (req,res) => {
     try {
         // lấy ra các thông tin cần thiết từ body của req đc gửi từ ui xuống để tạo user mới 
         const { email, password } = req.body
-        console.log('req.body')
+        
         
         // check email có hợp lệ ko
         const isCheckEmail = validator.validate(email);
-        console.log(email, password)
+        //console.log(email, password)
         // nếu thiếu 1 trường thì báo lỗi
         if ( !email || !password ) {
             return res.status(200).json({
-                status: 'Lỗi',
+                status: 'ERR',
                 message: 'Cần điền đầy đủ thông tin'
             })
         } else if (!isCheckEmail) {
             return res.status(200).json({
-                status: 'Lỗi',
+                status: 'ERR',
                 message: 'Email bị lỗi'
             })
         } 
         
         // thực hiện gọi dịch vụ tạo user mới
         const ketqua = await UserService.loginUser(req.body)
-        return res.status(200).json(ketqua)
+        //tách phần refresh token ra khỏi kết quả và tạo ra newResponse để lưu lại kết quả sau khi tách
+        const {refresh_token, ...newResponse} = ketqua
+        //bỏ refresn token vào cookie
+        res.cookie('refresh-token',refresh_token,{
+            HttpOnly: true,
+            Secure:true,
+        })
+        return res.status(200).json(newResponse)
     }
     catch(e){
         return res.status(404).json({
@@ -79,7 +86,7 @@ const updateUser = async (req,res) => {
         const data = req.body
         if (!userId) {
             return res.status(200).json({
-                status: 'Lỗi',
+                status: 'ERR',
                 message: 'Thiếu userId'
             })
         }
@@ -99,7 +106,7 @@ const deleteUser = async (req,res) => {
         const userId = req.params.id
         if (!userId) {
             return res.status(200).json({
-                status: 'Lỗi',
+                status: 'ERR',
                 message: 'Mật khẩu nhập lại không trùng khớp'
             })
         }
@@ -133,7 +140,7 @@ const getDetailsUser = async (req,res) => {
         const userId = req.params.id
         if (!userId) {
             return res.status(200).json({
-                status: 'Lỗi',
+                status: 'ERR',
                 message: 'Mật khẩu nhập lại không trùng khớp'
             })
         }
@@ -150,17 +157,20 @@ const getDetailsUser = async (req,res) => {
 }
 
 const refreshToken = async (req,res) => {
+    //console.log('req.cookies',req.cookies)
     try {
-        const token = req.headers.token?.split(' ')[1];
+        // lấy refresh token trong cookie
+        const token = req.cookies['refresh-token']; // ✅ đúng giá trị
         if (!token) {
             return res.status(200).json({
-                status: 'Lỗi',
+                status: 'ERR',
                 message: 'Token bị thiếu'
             })
         }
         
         const ketqua = await JwtService.refreshTokenJwtService(token)
         return res.status(200).json(ketqua)
+        return
     }
     catch(e){
         return res.status(404).json({
