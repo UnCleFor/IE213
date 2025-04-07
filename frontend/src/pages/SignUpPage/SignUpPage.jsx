@@ -1,4 +1,5 @@
 import React from "react"
+import { Row, Col } from "antd";
 import { WrapperContainerLeft, WrapperContainerRight, WrapperTextLight } from "./style"
 import InputForm from "../../components/InputForm/InputForm"
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent"
@@ -39,76 +40,151 @@ const SignUpPage = () => {
     }
 
     return (
-        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.53)', height: '100vh'}}>
-            <div style={{width:'800px', height:'500px', borderRadius:'6px', background: '#fff', display: 'flex'}}>
-                <WrapperContainerLeft>
-                    <Image src={logo} preview={false} alt="image-logo" width='300px' height='300px'/>
-                </WrapperContainerLeft>
-                <WrapperContainerRight>
+        <div
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(0,0,0,0.53)',
+                height: '100vh',
+                padding: '20px',
+            }}
+        >
+            <Row
+                gutter={[16, 16]}
+                style={{
+                    width: '90%',
+                    maxWidth: '800px',
+                    background: '#fff',
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                }}
+            >
+                {/* Logo bên trái */}
+                <Col
+                    xs={24}
+                    md={9}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '20px',
+                    }}
+                >
+                    <Image src={logo} preview={false} alt="image-logo" width="100%" />
+                </Col>
+
+                {/* Form đăng ký */}
+                <Col xs={24} md={15} style={{ padding: '20px' }}>
                     <p style={{ textAlign: 'center', fontSize: '20px' }}>ĐĂNG KÝ</p>
-                    <InputForm style={{margin: '20px 0 10px 0'}} placeholder="Họ và tên*" value={name} onChange={handleOnchange(setName)}/>
-                    <InputForm style={{marginBottom: '10px'}} placeholder='Số điện thoại' value={phone} onChange={handleOnchange(setPhone)}/>
-                    <InputForm style={{marginBottom: '10px'}} placeholder='Email*' value={email} onChange={handleOnchange(setEmail)}/>
-                    <div style={{ position: 'relative' }}>
-                        <span 
-                        onClick={() => setIsShowPassword(!isShowPassword)}
-                        style={{
-                            zIndex: 10,
-                            position: 'absolute',
-                            top: '4px',
-                            right: '8px'
-                        }}
-                        >{
-                            isShowPassword ? (
-                                <EyeFilled />
-                            ) : (
-                                <EyeInvisibleFilled />
-                            )
-                        }
+
+                    <InputForm
+                        style={{ marginBottom: '10px' }}
+                        placeholder="Họ và tên*"
+                        value={name}
+                        onChange={handleOnchange(setName)}
+                    />
+
+                    <InputForm
+                        style={{ marginBottom: '10px' }}
+                        placeholder="Số điện thoại"
+                        value={phone}
+                        onChange={handleOnchange(setPhone)}
+                    />
+
+                    <InputForm
+                        style={{ marginBottom: '10px' }}
+                        placeholder="Email*"
+                        value={email}
+                        onChange={handleOnchange(setEmail)}
+                    />
+
+                    {/* Mật khẩu */}
+                    <div style={{ position: 'relative', marginBottom: '10px' }}>
+                        <span
+                            onClick={() => setIsShowPassword(!isShowPassword)}
+                            style={{
+                                position: 'absolute',
+                                top: '50%',
+                                right: '10px',
+                                transform: 'translateY(-50%)',
+                                cursor: 'pointer',
+                                fontSize: '18px',
+                                color: '#666',
+                                zIndex: 2,
+                            }}
+                        >
+                            {isShowPassword ? <EyeFilled /> : <EyeInvisibleFilled />}
                         </span>
-                        <InputForm style={{marginBottom: '10px'}} placeholder='Mật khẩu*' type={isShowPassword ? "text" : "password"} 
-                            value={password} onChange={handleOnchange(setPassword)}/>
+                        <InputForm
+                            placeholder="Mật khẩu*"
+                            type={isShowPassword ? 'text' : 'password'}
+                            value={password}
+                            onChange={handleOnchange(setPassword)}
+                            style={{ paddingRight: '40px' }}
+                        />
                     </div>
-                    <div style={{ position: 'relative' }}>
-                        <span 
-                        onClick={() => setIsShowConfirmPassword(!isShowConfirmPassword)}
-                        style={{
-                            zIndex: 10,
-                            position: 'absolute',
-                            top: '4px',
-                            right: '8px'
-                        }}
-                        >{
-                            isShowConfirmPassword ? (
-                                <EyeFilled />
-                            ) : (
-                                <EyeInvisibleFilled />
-                            )
-                        }
+
+                    {/* Xác nhận mật khẩu */}
+                    <div style={{ position: 'relative', marginBottom: '10px' }}>
+                        <span
+                            onClick={() => setIsShowConfirmPassword(!isShowConfirmPassword)}
+                            style={{
+                                position: 'absolute',
+                                top: '50%',
+                                right: '10px',
+                                transform: 'translateY(-50%)',
+                                cursor: 'pointer',
+                                fontSize: '18px',
+                                color: '#666',
+                                zIndex: 2,
+                            }}
+                        >
+                            {isShowConfirmPassword ? <EyeFilled /> : <EyeInvisibleFilled />}
                         </span>
-                        <InputForm style={{marginBottom: '10px'}} placeholder='Xác nhận mật khẩu*' type={isShowConfirmPassword ? "text" : "password"}
-                            value={confirmPassword} onChange={handleOnchange(setConfirmPassword)}/>
+                        <InputForm
+                            placeholder="Xác nhận mật khẩu*"
+                            type={isShowConfirmPassword ? 'text' : 'password'}
+                            value={confirmPassword}
+                            onChange={handleOnchange(setConfirmPassword)}
+                            style={{ paddingRight: '40px' }}
+                        />
                     </div>
-                    
-                    {data?.status === 'ERR' && <span style={{color:'red'}}>{data?.message}</span>}
-                    <Loading isLoading={isLoading}>                                      
+
+                    {/* Hiển thị lỗi nếu có */}
+                    {data?.status === 'ERR' && (
+                        <span style={{ color: 'red' }}>{data?.message}</span>
+                    )}
+
+                    <Loading isLoading={isLoading}>
                         <ButtonComponent
-                            disabled={!name.length || !email.length || !password.length || !confirmPassword.length}
+                            disabled={
+                                !name.length ||
+                                !email.length ||
+                                !password.length ||
+                                !confirmPassword.length
+                            }
                             onClick={handleSignUp}
                             size="large"
-                            styleButton={{ 
+                            styleButton={{
                                 backgroundColor: 'brown',
                                 padding: '10px',
                                 width: '100%',
-                                margin: '13px 0 13px 0'
+                                margin: '13px 0',
                             }}
                             styleTextButton={{ color: 'white', fontSize: '16px' }}
-                            textButton="ĐĂNG KÝ"               
-                        ></ButtonComponent>
+                            textButton="ĐĂNG KÝ"
+                        />
                     </Loading>
-                    <p>Bạn đã có tài khoản? <span><WrapperTextLight onClick={handleNavigateSignIn}>Đăng nhập</WrapperTextLight></span></p>              
-                </WrapperContainerRight>
-            </div>            
+
+                    <p>
+                        Bạn đã có tài khoản?{' '}
+                        <WrapperTextLight onClick={handleNavigateSignIn}>
+                            Đăng nhập
+                        </WrapperTextLight>
+                    </p>
+                </Col>
+            </Row>
         </div>
     )
 }
