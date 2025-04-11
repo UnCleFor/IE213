@@ -46,3 +46,14 @@ export const SearchInputWrapper = styled.div`
   width: 80%; /* ✅ Giảm độ rộng thanh tìm kiếm */
   max-width: 400px; /* ✅ Giới hạn chiều rộng */
 `;
+
+export const WrapperContentPopup = styled.div`
+  cursor: pointer;
+  padding: 10px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background:rgba(255, 195, 180, 0.45); /* màu nâu sáng đẹp */
+    color: brown;
+  }
+`;

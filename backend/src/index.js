@@ -12,7 +12,10 @@ const app = express()
 const port = process.env.PORT || 3001
 
 //react-query
-app.use(cors())
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+  }));
 app.use(bodyParser.json())
 app.use(cookieParser())
 // định tuyến

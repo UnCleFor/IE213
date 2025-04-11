@@ -69,7 +69,8 @@ const loginUser = async (req,res) => {
         //bỏ refresn token vào cookie
         res.cookie('refresh-token',refresh_token,{
             HttpOnly: true,
-            Secure:true,
+            Secure:false,
+            sameSite: 'Strict',
         })
         return res.status(200).json(newResponse)
     }
@@ -157,7 +158,7 @@ const getDetailsUser = async (req,res) => {
 }
 
 const refreshToken = async (req,res) => {
-    //console.log('req.cookies',req.cookies)
+    console.log('req.cookies',req.cookies)
     try {
         // lấy refresh token trong cookie
         const token = req.cookies['refresh-token']; // ✅ đúng giá trị
@@ -179,6 +180,24 @@ const refreshToken = async (req,res) => {
     }
 }
 
+const logoutUser = async (req, res) => {
+    try {
+      res.clearCookie('refresh-token', {
+        httpOnly: true,
+        secure: false,      // true nếu dùng HTTPS (trên prod)
+        sameSite: 'lax',    // hoặc 'strict' nếu muốn an toàn hơn
+      });
+  
+      return res.status(200).json({
+        status: 'OK',
+        message: 'Đăng xuất thành công'
+      });
+    } catch (e) {
+      return res.status(500).json({ message: e.message });
+    }
+  };
+  
+
 module.exports = {
     createUser,
     loginUser,
@@ -186,5 +205,6 @@ module.exports = {
     deleteUser,
     getAllUser,
     getDetailsUser,
-    refreshToken
+    refreshToken,
+    logoutUser
 }

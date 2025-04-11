@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
-import { Col, Row, Button, Grid, theme } from "antd";
+import { Col, Row, Button, Grid, theme, Popover } from "antd";
 import {
   // WrapperHeader,
   WrapperHeaderAccount,
   WrapperTextHeaderSmall,
   SearchInputWrapper,
   WrapperSearchMobile,
+  WrapperContentPopup,
 } from "./style";
 import {
   UserOutlined,
@@ -19,8 +20,10 @@ import SearchButton from "../SearchButton/SearchButton";
 import beautihome from "./beautihome.png";
 
 import ContainerComponent from "../ContainerComponent/ContainerComponent";
-import { useSelector } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
+import * as UserService from '../../services/UserService'
+import {resetUser} from '../../redux/slices/userSlide'
+import Loading from "../../components/LoadingComponent/Loading";
 const { useBreakpoint } = Grid;
 const { useToken } = theme;
 
@@ -58,10 +61,32 @@ const HeaderComponent = () => {
 
   const navigate = useNavigate()
   const user = useSelector((state) => state.user)
+  const dispath = useDispatch()
+  const [ loading, setLoading] = useState(false)
   const handleNavigateLogin = () => {
     navigate('/sign_in')
   }
 
+  const handleLogOut = async () => {
+    try {
+      setLoading(true);
+      await UserService.logoutUser(); // Gọi API logout
+      localStorage.removeItem('access_token'); // Xoá token khỏi localStorage
+      dispath(resetUser()); // Reset user trong Redux
+      setLoading(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+      setLoading(false);
+    }
+  };
+  
+
+  const content = (
+    <div>
+      <WrapperContentPopup onClick={handleLogOut}>Đăng xuất</WrapperContentPopup>
+      <WrapperContentPopup>Thông tin người dùng</WrapperContentPopup>
+    </div>
+  )
   return (
     <div style={{ position: "relative" }}>
       <div style={styles.header}>
@@ -92,23 +117,29 @@ const HeaderComponent = () => {
                   onClick={() => setShowSearch(true)}
                 />
               )}
+              <Loading isLoading={loading}>
               <WrapperHeaderAccount>
                 <UserOutlined style={{ fontSize: "20px", color: "brown" }} />
                 {!screens.xs && (
                   user?.name ? (
-                    <div>{user.name}</div>
+                    <>
+                   
+                    <Popover placement="bottom" content={content}>
+                      <div>{user.name}</div>
+                    </Popover></>
                   ) : (
                     <div onClick={handleNavigateLogin} style={{ cursor: 'pointer' }}>
-                      <WrapperTextHeaderSmall>Sign In / Sign Up</WrapperTextHeaderSmall>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <WrapperTextHeaderSmall>Đăng nhập</WrapperTextHeaderSmall>
+                      {/* <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <WrapperTextHeaderSmall>Account</WrapperTextHeaderSmall>
                         <CaretDownOutlined />
-                      </div>
+                      </div> */}
                     </div>
                   )
                 )}
 
               </WrapperHeaderAccount>
+              </Loading>
               <WrapperHeaderAccount>
                 <ShoppingCartOutlined style={{ fontSize: "20px", color: "brown" }} />
                 {!screens.xs && <WrapperTextHeaderSmall>Cart</WrapperTextHeaderSmall>}
