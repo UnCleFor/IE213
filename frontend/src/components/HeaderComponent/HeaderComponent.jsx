@@ -85,6 +85,10 @@ const HeaderComponent = () => {
     <div>
       <WrapperContentPopup onClick={handleLogOut}>Đăng xuất</WrapperContentPopup>
       <WrapperContentPopup>Thông tin người dùng</WrapperContentPopup>
+      {user?.isAdmin && (
+        <WrapperContentPopup>Quản lý hệ thống</WrapperContentPopup>
+      )}
+      
     </div>
   )
   return (
