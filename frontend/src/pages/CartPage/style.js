@@ -238,7 +238,7 @@ export const TotalPrice = styled.div`
 `;
 
 export const OrderButton = styled.button`
-  background-color: #b5936f;
+  background-color: brown;
   color: white;
   padding: 12px 24px;
   border: none;

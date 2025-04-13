@@ -42,14 +42,14 @@ const OrderHistoryPage = () => {
                 <Row gutter={[16, 16]} align="middle">
                     {/* Thông tin sản phẩm đầu tiên */}
                     <Col xs={24} md={16} style={{ display: "flex", gap: 16 }}>
-                        {/* <Avatar
+                        <Avatar
                             shape="square"
                             size={64}
                             src={firstProduct?.image}
                             alt={firstProduct?.name}
                             style={{ marginTop: 11 }} // Điều chỉnh giá trị marginTop ở đây
-                        /> */}
-                         <ProductImage src={pic} alt="Sofa đơn" />
+                        />
+                         {/* <ProductImage src={pic} alt="Sofa đơn" /> */}
                         <div>
                             <p>
                                 <strong>Sản phẩm:</strong> {firstProduct?.name} (x{firstProduct.quantity})
@@ -122,7 +122,7 @@ const mockOrders = [
     {
         id: 1,
         products: [
-            { name: "Bàn inox", image: "https://via.placeholder.com/80", quantity: 2, price: 100000 },
+            { name: "Bàn inox", image: pic, quantity: 2, price: 100000 },
         ],
         total: 200000,
         status: "Đã đặt",
@@ -131,7 +131,7 @@ const mockOrders = [
     {
         id: 2,
         products: [
-            { name: "Sofa thanh lịch", image: "https://via.placeholder.com/80", quantity: 1, price: 450000 },
+            { name: "Sofa thanh lịch", image: pic, quantity: 1, price: 450000 },
         ],
         total: 450000,
         status: "Đã xác nhận",
@@ -140,7 +140,7 @@ const mockOrders = [
     {
         id: 3,
         products: [
-            { name: "Kệ sách quý tộc", image: "https://via.placeholder.com/80", quantity: 1, price: 700000 },
+            { name: "Kệ sách quý tộc", image: pic, quantity: 1, price: 700000 },
         ],
         total: 700000,
         status: "Đã hủy",
@@ -149,7 +149,7 @@ const mockOrders = [
     {
         id: 4,
         products: [
-            { name: "Thảm dát vàng", image: "https://via.placeholder.com/80", quantity: 1, price: 500000 },
+            { name: "Thảm dát vàng", image: pic, quantity: 1, price: 500000 },
         ],
         total: 500000,
         status: "Đã mua",
