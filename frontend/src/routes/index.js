@@ -10,6 +10,7 @@ import DieuKhoanDVPage from "../pages/DieuKhoanDVPage/DieuKhoanDVPage"
 import SignInPage from "../pages/SignInPage/SignInPage";
 import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import AdminPage from "../pages/AdminPage/AdminPage";
+import CartPage from "../pages/CartPage/CartPage";
 // Mảng routes trong file routes/index.js chứa các đường dẫn
 export const routes = [
     {
@@ -72,6 +73,11 @@ export const routes = [
         page: AdminPage,
         isShowHeader: false,
         isPrivate: true
+    },
+    {
+        path: '/cart',
+        page: CartPage,
+        isShowHeader: true
     }
     
 ]
