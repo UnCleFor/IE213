@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Menu } from 'antd';
 import { getItem } from '../../utils';
 import { UserOutlined, AppstoreOutlined } from '@ant-design/icons'
+import HeaderComponent from '../../components/HeaderComponent/HeaderComponent';
 
 const AdminPage = () => {
     const items = [
@@ -35,7 +36,9 @@ const AdminPage = () => {
   }
 
     return (
-        
+      <>
+        <HeaderComponent isHiddenSearch isHiddenCart />  
+
         <div style={{ display: 'flex,'}}>
             <Menu
             mode="inline"
@@ -52,7 +55,7 @@ const AdminPage = () => {
                 <span>test</span>
             </div>            
         </div>
-
+      </>
     )
 }
 

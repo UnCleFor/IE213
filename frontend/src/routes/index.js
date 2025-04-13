@@ -60,17 +60,17 @@ export const routes = [
     {
         path: '/sign_in',
         page: SignInPage,
-        inShowHeader: false
+        isShowHeader: false
     },
     {
         path: '/sign_up',
         page: SignUpPage,
-        inShowHeader: false
+        isShowHeader: false
     },
     {
         path: '/system/admin',
         page: AdminPage,
-        inShowHeader: true,
+        isShowHeader: false,
         isPrivate: true
     }
     

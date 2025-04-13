@@ -27,7 +27,7 @@ import Loading from "../../components/LoadingComponent/Loading";
 const { useBreakpoint } = Grid;
 const { useToken } = theme;
 
-const HeaderComponent = () => {
+const HeaderComponent = ({ isHiddenSearch=false, isHiddenCart=false}) => {
   const { token } = useToken();
   const screens = useBreakpoint();
   const [showSearch, setShowSearch] = useState(false);
@@ -89,11 +89,13 @@ const HeaderComponent = () => {
         <WrapperContentPopup>Quản lý hệ thống</WrapperContentPopup>
       )}
       
+      
     </div>
   )
   return (
     <div style={{ position: "relative" }}>
-      <div style={styles.header}>
+      {/* <div style= {styles.header}> */}
+      <div style ={isHiddenSearch && isHiddenCart ? styles.header : {justifyContent: 'space-between'}}>
         <ContainerComponent>
           <Row align="middle" style={{ width: "100%" }} gutter={[16, 16]}>
             {/* Logo */}
@@ -102,7 +104,7 @@ const HeaderComponent = () => {
             </Col>
 
             {/* Thanh tìm kiếm trên PC */}
-            {!screens.xs && (
+            {!screens.xs && !isHiddenSearch && (
               <Col sm={14} md={12} style={{ textAlign: "center" }}>
                 <SearchButton
                   size="large"
@@ -144,10 +146,13 @@ const HeaderComponent = () => {
 
               </WrapperHeaderAccount>
               </Loading>
-              <WrapperHeaderAccount>
-                <ShoppingCartOutlined style={{ fontSize: "20px", color: "brown" }} />
-                {!screens.xs && <WrapperTextHeaderSmall>Cart</WrapperTextHeaderSmall>}
-              </WrapperHeaderAccount>
+              {!isHiddenCart && (
+                <WrapperHeaderAccount>
+                  <ShoppingCartOutlined style={{ fontSize: "20px", color: "brown" }} />
+                  {!screens.xs && <WrapperTextHeaderSmall>Cart</WrapperTextHeaderSmall>}
+                </WrapperHeaderAccount>                
+              )}
+
             </Col>
           </Row>
         </ContainerComponent>
