@@ -73,18 +73,38 @@ const HeaderComponent = ({ isHiddenSearch=false, isHiddenCart=false}) => {
       await UserService.logoutUser(); // Gọi API logout
       localStorage.removeItem('access_token'); // Xoá token khỏi localStorage
       dispath(resetUser()); // Reset user trong Redux
+      navigate('/')
       setLoading(false);
     } catch (error) {
       console.error('Logout error:', error);
       setLoading(false);
     }
   };
-  
-
+  const handleOrderHistory = async()=>{
+    try {
+      setLoading(true)
+      navigate('/order_history')
+      setLoading(false)
+    } catch (error){
+      console.error('Truy cập vào ls mua hàng fail:', error);
+      setLoading(false);
+    }
+  }
+  const handleHome = async()=>{
+    try {
+      setLoading(true)
+      navigate('/')
+      setLoading(false)
+    } catch (error){
+      console.error('Truy cập vào trang chủ fail:', error);
+      setLoading(false);
+    }
+  }
   const content = (
     <div>
-      <WrapperContentPopup onClick={handleLogOut}>Đăng xuất</WrapperContentPopup>
       <WrapperContentPopup>Thông tin người dùng</WrapperContentPopup>
+      <WrapperContentPopup onClick={handleOrderHistory}>Lịch sử mua hàng</WrapperContentPopup>
+      <WrapperContentPopup onClick={handleLogOut}>Đăng xuất</WrapperContentPopup>
       {user?.isAdmin && (
         <WrapperContentPopup>Quản lý hệ thống</WrapperContentPopup>
       )}
@@ -100,7 +120,7 @@ const HeaderComponent = ({ isHiddenSearch=false, isHiddenCart=false}) => {
           <Row align="middle" style={{ width: "100%" }} gutter={[16, 16]}>
             {/* Logo */}
             <Col xs={6} sm={4}>
-              <img src={beautihome} alt="BeautiHome Logo" style={styles.logo} />
+              <img src={beautihome} alt="BeautiHome Logo" style={styles.logo} onClick={handleHome} />
             </Col>
 
             {/* Thanh tìm kiếm trên PC */}
