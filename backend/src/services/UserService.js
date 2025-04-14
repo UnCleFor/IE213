@@ -159,7 +159,7 @@ const getAllUser = () => {
         try {
             const allUser = await User.find()
             resolve({
-                status: 'Ố dè',
+                status: 'OK',
                 message: 'Thành công',
                 data: allUser
             })
@@ -181,13 +181,13 @@ const getDetailsUser = (id) => {
             // nếu === null thì chưa có => thông báo chưa có tài khoản
             if (user === null){
                 resolve({
-                    status: 'Ô nô',
+                    status: 'ERR',
                     message: 'Tài khoản này chưa được đăng kí'
                 })
             }
 
             resolve({
-                status: 'Ố dè',
+                status: 'OK',
                 message: 'Thành công',
                 data: user
             })

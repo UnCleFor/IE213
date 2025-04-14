@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Col, Row, Button, Grid, theme, Popover } from "antd";
 import {
   // WrapperHeader,
@@ -32,6 +32,9 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const screens = useBreakpoint();
   //const [showSearch, setShowSearch] = useState(false);
   const [showPopover, setShowPopover] = useState(false); // Khai báo state showPopover
+  const [userName, setUserName] = useState('')
+  const [userAvatar, setUserAvatar] = useState('')
+
   const styles = {
     container: {
       display: "flex",
@@ -100,9 +103,15 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       setLoading(false);
     }
   }
+  useEffect(() => {
+    setLoading(true)
+    setUserName(user?.name)
+    setUserAvatar(user?.avatar)
+    setLoading(false)
+  }, [user?.name, user?.avatar])
   const content = (
     <div>
-      <WrapperContentPopup>Thông tin người dùng</WrapperContentPopup>
+      <WrapperContentPopup onClick={() => navigate('/account')}>Thông tin người dùng</WrapperContentPopup>
       <WrapperContentPopup onClick={handleOrderHistory}>Lịch sử mua hàng</WrapperContentPopup>
       <WrapperContentPopup onClick={handleLogOut}>Đăng xuất</WrapperContentPopup>
       {user?.isAdmin && (
@@ -147,39 +156,44 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                 />
               )} */}
               <Loading isLoading={loading}>
-              <WrapperHeaderAccount>
-  <UserOutlined style={{ fontSize: "20px", color: "brown" }} />
-
-  {/* Trên PC: Hover để hiển thị Popover */}
-  {!screens.xs ? (
-    user?.name ? (
-      <Popover placement="bottom" content={content} trigger="hover">
-        <div>{user.name}</div>
-      </Popover>
-    ) : (
-      <div onClick={handleNavigateLogin} style={{ cursor: 'pointer' }}>
-        <WrapperTextHeaderSmall>Đăng nhập</WrapperTextHeaderSmall>
-      </div>
-    )
-  ) : (
-    // Trên Mobile: Click để hiển thị Popover
-    user?.name ? (
-      <Popover
-        placement="bottom"
-        content={content}
-        trigger="click"
-        visible={showPopover}
-        onVisibleChange={(visible) => setShowPopover(visible)}
-      >
-        <div>{user.name}</div>
-      </Popover>
-    ) : (
-      <div onClick={handleNavigateLogin} style={{ cursor: 'pointer' }}>
-        <WrapperTextHeaderSmall>Đăng nhập</WrapperTextHeaderSmall>
-      </div>
-    )
-  )}
-</WrapperHeaderAccount>
+                <WrapperHeaderAccount>
+                {userAvatar ? (
+                  <img src={userAvatar} 
+                      style = {{ height: '40px', width: '40px', borderRadius: '50%', objectFit: 'cover'}}
+                      alt="avatar"/>
+                ): (
+                  <UserOutlined style={{ fontSize: "20px", color: "brown" }} />
+                )}
+                  {/* Trên PC: Hover để hiển thị Popover */}
+                  {!screens.xs ? (
+                    user?.name ? (
+                      <Popover placement="bottom" content={content} trigger="hover">
+                        <div style={{ cursor: 'pointer'}}>{user.name}</div>
+                      </Popover>
+                    ) : (
+                      <div onClick={handleNavigateLogin} style={{ cursor: 'pointer' }}>
+                        <WrapperTextHeaderSmall>Đăng nhập</WrapperTextHeaderSmall>
+                      </div>
+                    )
+                  ) : (
+                    // Trên Mobile: Click để hiển thị Popover
+                    user?.name ? (
+                      <Popover
+                        placement="bottom"
+                        content={content}
+                        trigger="click"
+                        visible={showPopover}
+                        onVisibleChange={(visible) => setShowPopover(visible)}
+                      >
+                        <div>{user.name}</div>
+                      </Popover>
+                    ) : (
+                      <div onClick={handleNavigateLogin} style={{ cursor: 'pointer' }}>
+                        <WrapperTextHeaderSmall>Đăng nhập</WrapperTextHeaderSmall>
+                      </div>
+                    )
+                  )}
+                </WrapperHeaderAccount>
 
               </Loading>
               {!isHiddenCart && (
