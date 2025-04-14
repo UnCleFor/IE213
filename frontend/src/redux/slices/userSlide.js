@@ -35,6 +35,7 @@ export const userSlice = createSlice({
       state.address = '';
       state.id = '';
       state.isAdmin = false;
+      state.avatar = '';
   },
   },
 })

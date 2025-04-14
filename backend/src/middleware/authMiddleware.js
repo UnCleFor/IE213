@@ -36,10 +36,11 @@ const authUserMiddleWare = (req, res, next) => {
     jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
         if (err) {
            // console.log("JWT Error:", err.message); // In lỗi ra console
-            return res.status(404).json({
-                message: "giai ma token sai",
-                status: "ERROR",
-            });
+            // return res.status(401).json({
+            //     message: "giai ma token sai",
+            //     status: "ERROR",
+            // });
+            return next()
         }
     
         //const { payload } = user
