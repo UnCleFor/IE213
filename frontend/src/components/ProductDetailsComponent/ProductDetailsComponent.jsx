@@ -81,26 +81,38 @@ const ProductDetailsComponent = () => {
                         <ButtonComponent
                             size="large"
                             styleButton={{
-                                backgroundColor: "brown",
-                                color: "white",
-                                border: "none",
-                                padding: "10px 20px",
-                                borderRadius: "0px",
-                                cursor: "pointer",
+                                backgroundColor: 'brown',
+                                padding: '12px 28px',
+                                border: 'none',
+                                borderRadius: '0px',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                transition: 'all 0.3s ease',
+                                cursor: 'pointer',
                             }}
-                            textButton="Thêm vào giỏ hàng"
+                            styleTextButton={{
+                                color: 'white',
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                            }}
+                            textButton="Cập nhật thông tin"
                         />
                         <ButtonComponent
                             size="large"
                             styleButton={{
-                                backgroundColor: "#AA896C",
-                                color: "white",
-                                border: "none",
-                                padding: "10px 20px",
-                                borderRadius: "0px",
-                                cursor: "pointer",
+                                backgroundColor: '#AA896C',
+                                padding: '12px 28px',
+                                border: 'none',
+                                borderRadius: '0px',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                transition: 'all 0.3s ease',
+                                cursor: 'pointer',
                             }}
-                            textButton="Mua ngay"
+                            styleTextButton={{
+                                color: 'white',
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                            }}
+                            textButton="Cập nhật thông tin"
                         />
                     </WrapperBtnBuy>
                 </Col>

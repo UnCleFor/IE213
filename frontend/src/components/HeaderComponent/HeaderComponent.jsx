@@ -102,7 +102,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   }
   const content = (
     <div>
-      <WrapperContentPopup>Thông tin người dùng</WrapperContentPopup>
+      <WrapperContentPopup onClick={() => navigate('/account')}>Thông tin người dùng</WrapperContentPopup>
       <WrapperContentPopup onClick={handleOrderHistory}>Lịch sử mua hàng</WrapperContentPopup>
       <WrapperContentPopup onClick={handleLogOut}>Đăng xuất</WrapperContentPopup>
       {user?.isAdmin && (
