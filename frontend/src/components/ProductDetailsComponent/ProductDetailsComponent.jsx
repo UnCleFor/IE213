@@ -94,7 +94,7 @@ const ProductDetailsComponent = () => {
                                 fontSize: '16px',
                                 fontWeight: 'bold',
                             }}
-                            textButton="Cập nhật thông tin"
+                            textButton="Mua ngay"
                         />
                         <ButtonComponent
                             size="large"
@@ -112,7 +112,7 @@ const ProductDetailsComponent = () => {
                                 fontSize: '16px',
                                 fontWeight: 'bold',
                             }}
-                            textButton="Cập nhật thông tin"
+                            textButton="Thêm vào giỏ hàng"
                         />
                     </WrapperBtnBuy>
                 </Col>
