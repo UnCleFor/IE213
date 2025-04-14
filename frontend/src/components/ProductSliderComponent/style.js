@@ -2,11 +2,12 @@ import styled from "styled-components";
 
 export const ProductSliderWrapper = styled.div`
   width: 100%;
-  overflow: visible; /* ❗ Cho phép các phần tử như mũi tên hiển thị ra ngoài */
-  padding: 0  /* 👈 Tạo khoảng đệm hai bên để mũi tên không bị cắt */
-  box-sizing: border-box;
+  overflow: visible; // Quan trọng để không cắt mũi tên
   position: relative;
+  padding: 0 24px; // hoặc padding ngang nếu muốn có khoảng đệm cho nút
+  box-sizing: border-box;
 `;
+
 
 export const ProductSliderRow = styled.div`
   display: flex;
@@ -34,7 +35,7 @@ export const SliderContainer = styled.div`
 // Chuyển đổi mũi tên sang sử dụng cùng một style từ PromotionProductSliderComponent
 export const ArrowButton = styled.button`
   border: none;
-  background-color: transparent;
+  background-color: white;
   border-radius: 50%;
   width: 36px;
   height: 36px;
@@ -45,24 +46,44 @@ export const ArrowButton = styled.button`
   justify-content: center;
   align-items: center;
 
-  &:hover {
-    background-color: #eee;
-  }
-
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
 
-  ${(props) => props.direction === 'left' && `left: -40px;`}
-  ${(props) => props.direction === 'right' && `right: -40px;`}
+  ${(props) => props.direction === 'left' && `left: -48px;`}
+  ${(props) => props.direction === 'right' && `right: -48px;`}
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
 
   @media (max-width: 768px) {
-    ${(props) => props.direction === 'left' && `left: -20px;`}
-    ${(props) => props.direction === 'right' && `right: -20px;`}
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    ${(props) => props.direction === 'left' && `left: -24px;`}
+    ${(props) => props.direction === 'right' && `right: -24px;`}
+  }
+
+  @media (max-width: 480px) {
+    display: none; // Ẩn hoàn toàn nếu cần trên mobile
   }
 `;
 
+
 export const SlideItemWrapper = styled.div`
   padding: 16px 0px; // 👈 Thêm padding ngang giữa các card
+`;
+
+export const SwipeHint = styled.div`
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+  margin-top: 8px;
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
 `;

@@ -14,6 +14,7 @@ import CartPage from "../pages/CartPage/CartPage";
 import OrderHistoryPage from '../pages/OrderHistoryPage/OrderHistoryPage'
 import OrderDetailPage from "../pages/OrderDetailPage/OrderDetailPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
+import CheckOutPage from "../pages/CheckOutPage/CheckOutPage";
 // Mảng routes trong file routes/index.js chứa các đường dẫn
 export const routes = [
     {
@@ -95,6 +96,11 @@ export const routes = [
     {
         path: '/account',
         page: ProfilePage,
+        isShowHeader: true
+    },
+    {
+        path: '/checkout',
+        page: CheckOutPage,
         isShowHeader: true
     }
 ]

@@ -4,6 +4,7 @@ import { Avatar } from "antd";
 import ContainerComponent from "../../components/ContainerComponent/ContainerComponent.jsx";
 import {orderCardStyle,ProductImage} from "./style.js"; // Giả sử bạn đã thêm style trong file này.
 import pic from "./pic.png"
+import ButtonComponent from "../../components/ButtonComponent/ButtonComponent.jsx";
 const { TabPane } = Tabs;
 
 const OrderHistoryPage = () => {
@@ -37,7 +38,7 @@ const OrderHistoryPage = () => {
                 style={{ marginBottom: 16 }}
                 title={`Đơn hàng #${order.id}`}
                 extra={<Tag color={order.statusColor}>{order.status}</Tag>}
-                bordered
+            
             >
                 <Row gutter={[16, 16]} align="middle">
                     {/* Thông tin sản phẩm đầu tiên */}
@@ -71,16 +72,35 @@ const OrderHistoryPage = () => {
                             //marginTop: "16px", // Thêm khoảng cách khi màn hình nhỏ
                         }}
                     >
-                        <p style={{ fontWeight: "bold", marginBottom: 8,color:"brown" }}>
+                        <p style={{ fontWeight: "bold", marginBottom: 8,color:"black" }}>
                            Tổng cộng: {order.total.toLocaleString()}₫
                         </p>
                         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                            <Button>Xem chi tiết</Button>
-                            {order.status === "Đã đặt" && (
+                        {order.status === "Đã đặt" && (
                                 <Button danger onClick={() => cancelOrder(order.id)}>
                                     Hủy đơn
                                 </Button>
                             )}
+                        <ButtonComponent
+                            //onClick={handleUpdate}
+                            size="middle"
+                            styleButton={{
+                                backgroundColor: 'brown',
+                                //padding: '12px 28px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                marginBottom:'10px'
+                            }}
+                            styleTextButton={{
+                                color: 'white',
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                            }}
+                            textButton="Xem chi tiết"
+                            
+                        />
+                            
                         </div>
                     </Col>
                 </Row>

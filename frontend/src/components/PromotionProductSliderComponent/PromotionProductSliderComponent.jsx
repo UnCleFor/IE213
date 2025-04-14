@@ -8,7 +8,8 @@ import {
   InfoTable,
   ActionsWrapper,
   SliderWrapper,
-  ArrowButton
+  ArrowButton,
+  SwipeHint
 } from './style';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -82,7 +83,9 @@ const PromotionProductSliderComponent = () => {
           </div>
         ))}
       </Slider>
+      <SwipeHint>← Vuốt để xem thêm →</SwipeHint>
     </SliderWrapper>
+    
   );
 };
 

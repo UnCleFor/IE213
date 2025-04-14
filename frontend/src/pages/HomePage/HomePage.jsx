@@ -14,6 +14,7 @@ import {
 import slider1 from '../../assets/images/slide1.webp';
 import slider2 from '../../assets/images/slide2.webp';
 import slider3 from '../../assets/images/slide3.webp';
+import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 
 const HomePage = () => {
   return (
@@ -27,7 +28,25 @@ const HomePage = () => {
           <SectionTitle>Bộ sưu tập Ondine 2025</SectionTitle>
           <ProductSliderComponent />
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <ViewAllButton>Xem tất cả</ViewAllButton>
+          <ButtonComponent
+                            //onClick={handleUpdate}
+                            size="middle"
+                            styleButton={{
+                                backgroundColor: 'brown',
+                                //padding: '12px 28px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                marginBottom:'10px'
+                            }}
+                            styleTextButton={{
+                                color: 'white',
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                            }}
+                            textButton="Xem tất cả"
+                            
+                        />
           </div>
         </SectionWrapper>
       </ContainerComponent>
@@ -38,7 +57,25 @@ const HomePage = () => {
           <SectionTitle>Sản phẩm khuyến mãi</SectionTitle>
           <PromotionProductSliderComponent />
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <ViewAllButton>Xem tất cả</ViewAllButton>
+          <ButtonComponent
+                            //onClick={handleUpdate}
+                            size="middle"
+                            styleButton={{
+                                backgroundColor: 'brown',
+                                //padding: '12px 28px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                marginBottom:'10px'
+                            }}
+                            styleTextButton={{
+                                color: 'white',
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                            }}
+                            textButton="Xem tất cả"
+                            
+                        />
           </div>
         </PromotionSectionWrapper>
       </ContainerComponent>
@@ -49,7 +86,26 @@ const HomePage = () => {
           <SectionTitle>Sản phẩm nổi bật</SectionTitle>
           <ProductSliderComponent />
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <ViewAllButton>Xem tất cả</ViewAllButton>
+            {/* <ViewAllButton>Xem tất cả</ViewAllButton> */}
+            <ButtonComponent
+                            //onClick={handleUpdate}
+                            size="middle"
+                            styleButton={{
+                                backgroundColor: 'brown',
+                                //padding: '12px 28px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                marginBottom:'10px'
+                            }}
+                            styleTextButton={{
+                                color: 'white',
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                            }}
+                            textButton="Xem tất cả"
+                            
+                        />
           </div>
         </SectionWrapper>
       </ContainerComponent>

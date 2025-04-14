@@ -8,7 +8,8 @@ import {
   ProductSliderWrapper,
   ProductSliderRow,
   SliderContainer,
-  SlideItemWrapper
+  SlideItemWrapper,
+  SwipeHint
 } from "./style";
 
 const ProductSliderComponent = () => {
@@ -51,7 +52,10 @@ const ProductSliderComponent = () => {
         <ArrowButton direction="right" onClick={() => sliderRef.current?.slickNext()}>
           →
         </ArrowButton>
+        
+
       </ProductSliderRow>
+      <SwipeHint>← Vuốt để xem thêm →</SwipeHint>
     </ProductSliderWrapper>
   );
 };

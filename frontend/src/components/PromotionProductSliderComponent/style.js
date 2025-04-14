@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-
 export const PromotionWrapper = styled.div`
   display: flex;
   align-items: flex-start;
@@ -11,8 +10,11 @@ export const PromotionWrapper = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
+    padding: 24px 16px; // thêm padding ngang cho mobile
+    gap: 24px;
   }
 `;
+
 
 export const ProductImage = styled.img`
   width: 600px;
@@ -110,6 +112,7 @@ export const ActionsWrapper = styled.div`
 
 export const SliderWrapper = styled.div`
   position: relative;
+  overflow: visible; // Quan trọng để mũi tên không bị cắt
 
   .slick-slider {
     position: relative;
@@ -121,12 +124,13 @@ export const SliderWrapper = styled.div`
   }
 `;
 
+
 export const ArrowButton = styled.button`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-  background-color: rgba(255,255,255,0.8);
+  background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid #ccc;
   border-radius: 50%;
   width: 40px;
@@ -134,21 +138,43 @@ export const ArrowButton = styled.button`
   font-size: 20px;
   font-weight: bold;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 
-  ${(props) => props.direction === 'left' && `
-    left: -20px;
-  `}
+  ${(props) =>
+    props.direction === 'left' && `
+      left: -48px;
+    `}
+  ${(props) =>
+    props.direction === 'right' && `
+      right: -48px;
+    `}
 
-  ${(props) => props.direction === 'right' && `
-    right: -20px;
-  `}
+  &:hover {
+    background-color: #f0f0f0;
+  }
 
   @media (max-width: 768px) {
-    ${(props) => props.direction === 'left' && `
-      left: 0;
-    `}
-    ${(props) => props.direction === 'right' && `
-      right: 0;
-    `}
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+
+    ${(props) => props.direction === 'left' && `left: -24px;`}
+    ${(props) => props.direction === 'right' && `right: -24px;`}
+  }
+
+  @media (max-width: 480px) {
+    display: none;
+  }
+`;
+
+export const SwipeHint = styled.div`
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+  margin-top: 8px;
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
   }
 `;

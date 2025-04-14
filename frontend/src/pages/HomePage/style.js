@@ -5,11 +5,13 @@ import { Button } from "antd";
 export const SectionWrapper = styled.div`
   width: 100%;
   padding: 40px 0;
+  box-sizing: border-box; // ✅ Quan trọng
 
   @media (max-width: 768px) {
-    padding: 24px 16px;  // Điều chỉnh padding khi màn hình nhỏ hơn 768px
+    padding: 24px 16px;
   }
 `;
+
 
 // Wrapper riêng cho phần khuyến mãi để dễ tuỳ chỉnh thêm nếu cần
 export const PromotionSectionWrapper = styled(SectionWrapper)`
@@ -51,7 +53,7 @@ export const SectionTitle = styled.h2`
 
 // Nút "Xem tất cả"
 export const ViewAllButton = styled(Button)`
-  background-color: #a6836d;
+  background-color: brown;
   color: white;
   padding: 8px 24px;
   border-radius: 8px;
@@ -61,7 +63,7 @@ export const ViewAllButton = styled(Button)`
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: #a6836d !important;
+    background-color: brown !important;
     color: white !important;
     box-shadow: none !important;
     border-color: transparent !important;
