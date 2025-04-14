@@ -1,4 +1,6 @@
 import styled from "styled-components";
+import { Upload } from "antd";
+
 
 export const WrapperLabel = styled.label`
     color: black;
@@ -12,4 +14,15 @@ export const WrapperInput = styled.div`
     display: flex;
     align-items: center;
     gap: 10px 
+`
+
+export const WrapperUploadFile = styled(Upload)`
+    & .ant-upload.ant-upload-select.ant-upload-select-picture-card {
+        height: 30px; 
+        width: 60px;
+        borderRadius: 50%
+    }
+    & .ant-upload-list-item.ant-upload-list-item-error {
+        display: none
+    }
 `
