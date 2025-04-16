@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { WrapperInput, WrapperLabel, WrapperUploadFile } from './style.js'
-import { Input, Button, Upload } from 'antd'
+import { Input, Button } from 'antd'
 import InputForm from '../../components/InputForm/InputForm'
 import { useDispatch, useSelector } from 'react-redux'
 import * as UserService from '../../services/UserService'
@@ -73,6 +73,17 @@ const ProfilePage = () => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
         }
+
+        // const file = fileList[0]
+        // if(!file) return 
+        // const data = new FormData()
+        // data.append("file", file)
+        // data.append("upload_preset", "images")
+        // data.append("cloud_name", "dvmuk0u4e")
+        // const res = await fetch("https://api.cloudinary.com/v1_1/dvmuk0u4e/image/upload", {
+        //     method: "POST",
+        //     body: data
+        // })
         setAvatar(file.preview)
     }
 
@@ -118,7 +129,14 @@ const ProfilePage = () => {
                     <WrapperInput>
                         <WrapperLabel htmlFor="avatar">Ảnh đại diện</WrapperLabel>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                            <WrapperUploadFile onChange={handleOnchangeAvatar} maxCount={1}>
+                            <WrapperUploadFile 
+                                customRequest={({ file, onSuccess }) => {
+                                    setTimeout(() => {
+                                    onSuccess("ok")
+                                    }, 0)
+                                }} 
+                                onChange={handleOnchangeAvatar}
+                                maxCount={1}>
                                 <Button icon={<UploadOutlined />}>Chọn file</Button>
                             </WrapperUploadFile>
                             {avatar && (

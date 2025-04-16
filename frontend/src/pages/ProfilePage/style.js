@@ -22,7 +22,7 @@ export const WrapperUploadFile = styled(Upload)`
         width: 60px;
         borderRadius: 50%
     }
-    & .ant-upload-list-item.ant-upload-list-item-error {
+    & .ant-upload-list-item.ant-upload-list-item-done {
         display: none
     }
 `
