@@ -52,6 +52,10 @@ export const ProductItem = styled.div`
   padding-bottom: 16px;
   gap: 20px;
 
+  input[type="checkbox"] {
+    margin-top: 8px;
+  }
+
   &:last-child {
     border-bottom: none;
   }
@@ -62,6 +66,7 @@ export const ProductItem = styled.div`
     align-items: flex-start;
   }
 `;
+
 
 export const ProductImage = styled.img`
   width: 100px;
