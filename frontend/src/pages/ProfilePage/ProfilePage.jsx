@@ -69,27 +69,31 @@ const ProfilePage = () => {
         setAddress(value)
     }
     const handleOnchangeAvatar = async ({ fileList }) => {
-        const file = fileList[0]
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj);
-        }
-
         // const file = fileList[0]
-        // if(!file) return 
-        // const data = new FormData()
-        // data.append("file", file)
-        // data.append("upload_preset", "images")
-        // data.append("cloud_name", "dvmuk0u4e")
-        // const res = await fetch("https://api.cloudinary.com/v1_1/dvmuk0u4e/image/upload", {
-        //     method: "POST",
-        //     body: data
-        // })
-        setAvatar(file.preview)
+        // if (!file.url && !file.preview) {
+        //     file.preview = await getBase64(file.originFileObj);
+        // }
+
+        const file = fileList[0]
+        if(!file) return 
+        const data = new FormData()
+        data.append("file", file.originFileObj)
+        data.append("upload_preset", "images")
+        data.append("cloud_name", "dvmuk0u4e")
+        const res = await fetch("https://api.cloudinary.com/v1_1/dvmuk0u4e/image/upload", {
+            method: "POST",
+            body: data
+        })
+
+        const uploadedImageURL = await res.json()
+        console.log(uploadedImageURL.url)
+        setAvatar(uploadedImageURL.url)
     }
 
     const handleUpdate = () => {
         mutation.mutate({ id: user?.id, email, name, phone, address, avatar, access_token: user?.access_token })
     }
+
     return (
         <div
             style={{
