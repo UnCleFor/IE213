@@ -103,6 +103,16 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       setLoading(false);
     }
   }
+  const handleAdmin = async () => {
+    try {
+      setLoading(true)
+      navigate('/system/admin')
+      setLoading(false)
+    } catch (error) {
+      console.error('Truy cập vào trang chủ quản lý faild:', error);
+      setLoading(false);
+    }
+  }
   useEffect(() => {
     setLoading(true)
     setUserName(user?.name)
@@ -115,7 +125,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       <WrapperContentPopup onClick={handleOrderHistory}>Lịch sử mua hàng</WrapperContentPopup>
       <WrapperContentPopup onClick={handleLogOut}>Đăng xuất</WrapperContentPopup>
       {user?.isAdmin && (
-        <WrapperContentPopup>Quản lý hệ thống</WrapperContentPopup>
+        <WrapperContentPopup onClick={handleAdmin}>Quản lý hệ thống</WrapperContentPopup>
       )}
 
 

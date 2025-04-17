@@ -11,17 +11,17 @@ export const getAllProduct = async () => {
 // }
 
 export const createProduct = async (data) => {
-    const token = localStorage.getItem('access_token') // hoặc từ Redux
-    const res = await axios.post(
-      `${process.env.REACT_APP_API_URL}/product/create`,
-      data,
-      {
-        headers: {
-          token: `Bearer ${token}`
-        },
-        withCredentials: true
-      }
-    )
-    return res.data
-  }
-  
+  const token = localStorage.getItem('access_token');
+  console.log("Token gửi đi:", token);
+  const res = await axios.post(
+    `${process.env.REACT_APP_API_URL}/product/create`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      withCredentials: true
+    }
+  );
+  return res.data;
+}

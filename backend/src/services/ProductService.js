@@ -19,7 +19,7 @@ const createProduct = (newProduct) => {
             })
             if (checkProduct !== null) {
                 resolve({
-                    status: 'Oki',
+                    status: 'OK',
                     message: 'Tên sản phẩm đã tồn tại'
                 })
             }
@@ -34,7 +34,7 @@ const createProduct = (newProduct) => {
             })
             if (createProduct) {
                 resolve({
-                    status: "Oki",
+                    status: "OK",
                     message: "Tạo thành công",
                     data: createProduct
                 })
@@ -54,7 +54,7 @@ const updateProduct = (id, data) => {
             })
             if (checkProduct === null) {
                 resolve({
-                    status: 'Oki',
+                    status: 'OK',
                     message: 'Product không tồn tại'
                 })
             }
@@ -62,7 +62,7 @@ const updateProduct = (id, data) => {
                 new: true
             })
             resolve({
-                status: 'Oki',
+                status: 'OK',
                 message: 'Cập nhật thành công',
                 data: updatedProduct
             })
@@ -82,13 +82,13 @@ const getDetailsProduct = (id) => {
 
             if (product === null) {
                 resolve({
-                    status: 'Oki',
+                    status: 'OK',
                     message: 'Product không tồn tại'
                 })
             }
 
             resolve({
-                status: 'Oki',
+                status: 'OK',
                 message: 'Tìm thành công',
                 data: product
             })
@@ -108,13 +108,13 @@ const deleteProduct = (id) => {
 
             if (checkProduct === null) {
                 resolve({
-                    status: 'Oki',
+                    status: 'OK',
                     message: 'Product không tồn tại'
                 })
             }
             await Product.findByIdAndDelete(id)
             resolve({
-                status: 'Oki',
+                status: 'OK',
                 message: 'Xóa thành công'
             })
         } catch (e) {
@@ -139,7 +139,7 @@ const getAllProduct = (limit, page, sort, filter) => {
                     }
                 })
                 resolve({
-                    status: 'Oki',
+                    status: 'OK',
                     message: 'Lọc thành công',
                     data: allProductFilter,
                     pageCurrent: Number(page + 1),
@@ -155,7 +155,7 @@ const getAllProduct = (limit, page, sort, filter) => {
 
                 const allProductSort = await Product.find().limit(limit).skip(page * limit).sort(objectSort)
                 resolve({
-                    status: 'Oki',
+                    status: 'OK',
                     message: 'Tìm thành công',
                     data: allProductSort,
                     total: totalProduct,
@@ -166,7 +166,7 @@ const getAllProduct = (limit, page, sort, filter) => {
 
             const allProduct = await Product.find().limit(limit).skip(page * limit)
             resolve({
-                status: 'Oki',
+                status: 'OK',
                 message: 'Tìm thành công',
                 data: allProduct,
                 total: totalProduct,

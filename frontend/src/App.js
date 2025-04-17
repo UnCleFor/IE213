@@ -28,16 +28,18 @@ function App() {
   }, [])
 
   const handleDecoded = () => {
-    let storageData = localStorage.getItem('access_token')
+    const token = localStorage.getItem('access_token')
     let decoded = {}
-    if (storageData && isJsonString(storageData)) {
-      storageData = JSON.parse(storageData)
-       decoded = jwtDecode(storageData)
-      
+    if (token) {
+      try {
+        decoded = jwtDecode(token)
+      } catch (err) {
+        console.log('JWT decode error:', err)
       }
-      return {decoded, storageData}
-
+    }
+    return { decoded, storageData: token }
   }
+  
 
   // Add a request interceptor
   UserService.axiosJWT.interceptors.request.use(async function (config) {
@@ -57,7 +59,7 @@ function App() {
   const handleGetDetailUser = async (id, token) => {
     const res = await UserService.getDetailUser(id, token)
     dispatch(updateUser({ ...res?.data, access_token: token }))
-    //console.log('res',res)
+    console.log('res',res)
   }
 
 
