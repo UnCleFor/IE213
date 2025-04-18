@@ -1,4 +1,5 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import axios from 'axios';
 import Slider from "react-slick";
 import CardComponent from "../CardComponent/CardComponent";
 import { ArrowButton } from "../PromotionProductSliderComponent/style"; // Import ArrowButton
@@ -14,6 +15,33 @@ import {
 
 const ProductSliderComponent = () => {
   const sliderRef = useRef(null);
+  //
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`);
+        setProducts(res.data.data);
+      } catch (error) {
+        console.error('Lỗi khi lấy danh sách sản phẩm:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const items = products.map((item, index) => (
+    <SlideItemWrapper key={item._id || index}>
+      <CardComponent
+        name={item.name}
+        price={item.price}
+        image={item.image}
+        description={item.description}
+      />
+    </SlideItemWrapper>
+  ));
+
 
   const settings = {
     dots: false,
@@ -29,12 +57,12 @@ const ProductSliderComponent = () => {
       ],
   };
   
-  const data = [1, 2, 3, 4, 5, 6]; // demo
-  const items = data.map((item, index) => (
-    <SlideItemWrapper key={index}>
-      <CardComponent />
-    </SlideItemWrapper>
-  ));
+  // const data = [1, 2, 3, 4, 5, 6]; // demo
+  // const items = data.map((item, index) => (
+  //   <SlideItemWrapper key={index}>
+  //     <CardComponent />
+  //   </SlideItemWrapper>
+  // ));
 
   return (
     <ProductSliderWrapper>

@@ -154,7 +154,7 @@ const getAllProduct = (limit, page, sort, filter) => {
                 objectSort[sort[1]] = sort[0]
 
                 const allProductSort = await Product.find().limit(limit).skip(page * limit).sort(objectSort)
-                resolve({
+                return resolve({
                     status: 'OK',
                     message: 'Tìm thành công',
                     data: allProductSort,
@@ -165,7 +165,7 @@ const getAllProduct = (limit, page, sort, filter) => {
             }
 
             const allProduct = await Product.find().limit(limit).skip(page * limit)
-            resolve({
+            return resolve({
                 status: 'OK',
                 message: 'Tìm thành công',
                 data: allProduct,

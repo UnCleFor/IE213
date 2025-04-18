@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Row, Col, Pagination, Select, InputNumber, Button, Typography } from 'antd';
 import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 import CardComponent from "../../components/CardComponent/CardComponent";
@@ -22,6 +23,22 @@ const ProductsPage = () => {
     console.log("Page:", page);
     // TODO: xử lý phân trang thực tế
   };
+
+  //ds sản phẩm
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`);
+        setProducts(res.data.data);
+      } catch (error) {
+        console.error('Lỗi khi lấy danh sách sản phẩm:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <ContainerComponent>
@@ -81,33 +98,39 @@ const ProductsPage = () => {
               Lọc
             </Button> */}
             <ButtonComponent
-                            //onClick={handleUpdate}
-                            size="middle"
-                            styleButton={{
-                                backgroundColor: 'brown',
-                                //padding: '12px 28px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                marginBottom:'10px',
-                                width:'100%'
-                            }}
-                            styleTextButton={{
-                                color: 'white',
-                                fontSize: '16px',
-                                fontWeight: 'bold',
-                            }}
-                            textButton="Xem chi tiết"
-                            onClick={handleFilter}
-                        />
+              //onClick={handleUpdate}
+              size="middle"
+              styleButton={{
+                backgroundColor: 'brown',
+                //padding: '12px 28px',
+                borderRadius: '8px',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                marginBottom: '10px',
+                width: '100%'
+              }}
+              styleTextButton={{
+                color: 'white',
+                fontSize: '16px',
+                fontWeight: 'bold',
+              }}
+              textButton="Xem chi tiết"
+              onClick={handleFilter}
+            />
           </Col>
         </Row>
 
         {/* Lưới sản phẩm */}
         <Row gutter={[16, 24]}>
-          {Array.from({ length: 8 }).map((_, index) => (
-            <Col key={index} xs={12} sm={12} md={8} lg={6} xl={6}>
-              <CardComponent />
+          {products.map((product) => (
+          // {Array.from({ length: 8 }).map((_, index) => (
+            <Col key={product._id} xs={12} sm={12} md={8} lg={6} xl={6}>
+              <CardComponent
+                name={product.name}
+                price={product.price}
+                image={product.image}
+                description={product.description}
+              />
             </Col>
           ))}
         </Row>
