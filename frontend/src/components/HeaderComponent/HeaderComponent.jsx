@@ -139,7 +139,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
           <Row align="middle" style={{ width: "100%" }} gutter={[16, 16]}>
             {/* Logo */}
             <Col xs={6} sm={4}>
-              <img src={beautihome} alt="BeautiHome Logo" style={styles.logo} onClick={handleHome} />
+              <img src={beautihome} alt="BeautiHome Logo"  style={{ ...styles.logo, cursor: 'pointer' }} onClick={handleHome}/>
             </Col>
 
             {/* Thanh tìm kiếm luôn hiện ở mobile (ẩn ở md trở lên) */}

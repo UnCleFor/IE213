@@ -13,6 +13,7 @@ import Loading from '../LoadingComponent/Loading';
 import * as ProductService from '../../services/ProductService';
 import * as message from '../../components/Message/Message';
 import { getBase64 } from '../../utils';
+import ModalComponent from '../ModalComponent/ModalComponent';
 
 const AdminProduct = () => {
   const [form] = Form.useForm();
@@ -23,6 +24,7 @@ const AdminProduct = () => {
   const [rowSelected, setRowSelected] = useState('');
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
+  const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
 
   const [stateProduct, setStateProduct] = useState({
     name: '',
@@ -51,9 +53,13 @@ const AdminProduct = () => {
     return ProductService.updateProduct(id, rests, token);
   });
 
+  const mutationDelete = useMutationHooks(({ id, token }) => {
+    return ProductService.deleteProduct(id, token);
+  });
+
   const { data, isLoading, isSuccess, isError } = mutation;
   const { data: dataUpdated, isLoading: isLoadingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate;
-
+  const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
   const getAllProducts = async () => {
     const res = await ProductService.getAllProduct();
     return res;
@@ -136,6 +142,10 @@ const AdminProduct = () => {
     });
   };
 
+  const handleCancelDelete = () => {
+    setIsModalOpenDelete(false)
+  }
+
   const onFinish = () => {
     mutation.mutate(stateProduct);
   };
@@ -148,17 +158,39 @@ const AdminProduct = () => {
     });
   };
 
-  const renderAction = () => (
+  const handleDeleteProduct = () => {
+    mutationDelete.mutate({
+      id: rowSelected,
+      token: user.access_token,
+    });
+    // Đóng modal sau khi xóa thành công
+    
+  };
+
+
+
+
+  const renderAction = (record) => (
     <div>
       <EditOutlined
-        onClick={handleDetailsProduct}
+        onClick={(e) => {
+          e.stopPropagation(); // Chặn click lan tới onRow
+          setRowSelected(record._id); // Gán thủ công
+          setIsOpenDrawer(true);      // Mở Drawer tại đây
+        }}
         style={{ color: 'black', fontSize: '30px', paddingLeft: '10px', cursor: 'pointer' }}
       />
       <DeleteOutlined
+        onClick={(e) => {
+          e.stopPropagation(); // Chặn click lan tới onRow
+          setRowSelected(record._id);
+          setIsModalOpenDelete(true);
+        }}
         style={{ color: 'red', fontSize: '30px', paddingLeft: '10px', cursor: 'pointer' }}
       />
     </div>
   );
+
 
   const columns = [
     {
@@ -177,8 +209,8 @@ const AdminProduct = () => {
     {
       title: 'Hành động',
       dataIndex: 'action',
-      render: renderAction
-    },
+      render: (_, record) => renderAction(record),
+    }
   ];
 
   const dataTable = products?.data?.length && products?.data?.map((product) => ({
@@ -191,11 +223,12 @@ const AdminProduct = () => {
   }, [form, stateProductDetails]);
 
   useEffect(() => {
-    if (rowSelected) {
+    if (rowSelected && !isModalOpenDelete) {
       setIsLoadingUpdate(true);
       fetchGetDetailsProduct(rowSelected);
     }
   }, [rowSelected]);
+
 
   useEffect(() => {
     if (isSuccess && data?.status === 'OK') {
@@ -214,6 +247,16 @@ const AdminProduct = () => {
       message.error('Cập nhật thất bại!');
     }
   }, [isSuccessUpdated, isErrorUpdated]);
+
+  useEffect(() => {
+    if (isSuccessDeleted && dataDeleted?.status === 'OK') {
+      message.success('Xóa sản phẩm thành công!');
+      queryClient.invalidateQueries(['products']);
+      setIsModalOpenDelete(false);
+    } else if (isErrorUpdated) {
+      message.error('Xóa sản phẩm thất bại!');
+    }
+  }, [isSuccessDeleted, isErrorDeleted]);
 
   return (
     <div>
@@ -306,7 +349,7 @@ const AdminProduct = () => {
 
       {/* Drawer chi tiết sản phẩm */}
       <DrawerComponent title="Chi tiết sản phẩm" isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} width="90%">
-        <Loading isLoading={isLoadingUpdate}>
+        <Loading isLoading={isLoadingUpdate || isLoadingUpdated}>
           <Form
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
@@ -363,6 +406,20 @@ const AdminProduct = () => {
           </Form>
         </Loading>
       </DrawerComponent>
+
+      {/* Modal xoá sản phẩm */}
+      <ModalComponent
+        title="Xóa sản phẩm"
+        open={isModalOpenDelete}
+        onCancel={handleCancelDelete}
+        onOk={handleDeleteProduct}
+      >
+        <Loading isLoading={isLoadingDeleted}>
+          <div>Bạn có muốn xóa sản phẩm này không ?</div>
+        </Loading>
+      </ModalComponent>
+
+
     </div>
   );
 };
