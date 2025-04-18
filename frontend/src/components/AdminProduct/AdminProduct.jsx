@@ -164,10 +164,8 @@ const AdminProduct = () => {
       token: user.access_token,
     });
     // Đóng modal sau khi xóa thành công
-    
+
   };
-
-
 
 
   const renderAction = (record) => (
@@ -288,7 +286,7 @@ const AdminProduct = () => {
       </div>
 
       {/* Modal thêm sản phẩm */}
-      <Modal title="Tạo sản phẩm mới" open={isModalOpen} onCancel={handleCancel} footer={null}>
+      <Modal forceRender title="Tạo sản phẩm mới" open={isModalOpen} onCancel={handleCancel} footer={null}>
         <Loading isLoading={isLoading}>
           <Form
             labelCol={{ span: 8 }}
