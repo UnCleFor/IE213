@@ -15,8 +15,10 @@ import slider1 from '../../assets/images/slide1.webp';
 import slider2 from '../../assets/images/slide2.webp';
 import slider3 from '../../assets/images/slide3.webp';
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
+import { useQuery } from '@tanstack/react-query';
 
 const HomePage = () => {
+
   return (
     <div>
       {/* Slider banner đầu trang */}
@@ -45,7 +47,6 @@ const HomePage = () => {
                                 fontWeight: 'bold',
                             }}
                             textButton="Xem tất cả"
-                            
                         />
           </div>
         </SectionWrapper>

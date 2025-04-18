@@ -9,7 +9,6 @@ import * as message from '../../components/Message/Message';
 import Loading from '../../components/LoadingComponent/Loading'
 import { updateUser } from '../../redux/slices/userSlide'
 import { UploadOutlined } from '@ant-design/icons'
-import { getBase64 } from '../../utils'
 
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent.jsx'
 

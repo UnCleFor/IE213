@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 
 
 // Triển khai react router
@@ -14,13 +14,18 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import { isJsonString } from './utils';
 import { jwtDecode } from "jwt-decode";
 import * as UserService from './services/UserService'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from './redux/slices/userSlide';
 import axios from 'axios';
+import Loading from './components/LoadingComponent/Loading';
 //
 function App() {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false)
+  const user = useSelector((state) => state.user)
+
   useEffect(() => {
+    setIsLoading(true)
     const {storageData,decoded} = handleDecoded()
       if (decoded?.id) {
         handleGetDetailUser(decoded?.id, storageData)
@@ -60,6 +65,7 @@ function App() {
     const res = await UserService.getDetailUser(id, token)
     dispatch(updateUser({ ...res?.data, access_token: token }))
     console.log('res',res)
+    setIsLoading(false)
   }
 
 
@@ -77,23 +83,28 @@ function App() {
 
   return (
     <div>
-      <Router> {/* BrowserRouter để quản lý đường dẫn */}
-        <Routes> {/* Routes chứa danh sách các đường dẫn */}
-          {routes.map((route) => { // Lặp qua mảng routes và tạo ra một phần tử route tương ứng
-            const Page = route.page; // Lấy page tương ứng với từng route
+      <Loading isLoading={isLoading}>
+        <Router> {/* BrowserRouter để quản lý đường dẫn */}
+          <Routes> {/* Routes chứa danh sách các đường dẫn */}
+            {routes.map((route) => { // Lặp qua mảng routes và tạo ra một phần tử route tương ứng
+              const Page = route.page; // Lấy page tương ứng với từng route
 
-            // Nếu route.isShowHeader true thì sử dụng DefaultComponent (trong đó có Header), ngược lại sử dụng Fragment
-            // Layout sẽ chứa header,... của trang
-            const Layout = route.isShowHeader ? DefaultComponent : Fragment;
+              const ischeckAuth = !route.isPrivate || user.isAdmin
 
-            return (
-              // Layout sẽ được bọc quanh nội dung của trang nhằm hiển thị Header
-              <Route key={route.path} path={route.path} element={<Layout><Page /></Layout>} /> // Tạo Route với path và page
-            );
-          })}
-        </Routes>
-      </Router>
+              // Nếu route.isShowHeader true thì sử dụng DefaultComponent (trong đó có Header), ngược lại sử dụng Fragment
+              // Layout sẽ chứa header,... của trang
+              const Layout = route.isShowHeader ? DefaultComponent : Fragment;
 
+              if (!ischeckAuth) return null; // không render nếu route là private
+
+              return (
+                // Layout sẽ được bọc quanh nội dung của trang nhằm hiển thị Header
+                <Route key={route.path} path={ route.path } element={<Layout><Page /></Layout>} /> // Tạo Route với path và page
+              );
+            })}
+          </Routes>
+        </Router>
+      </Loading>
     </div>
   )
 }
