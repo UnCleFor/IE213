@@ -8,7 +8,7 @@ const authMiddleWare = (req, res, next) => {
   
     jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
       if (err) {
-        //console.log("JWT Error:", err.message);
+        console.log("JWT Error:", err.message);
         return res.status(401).json({
           message: "Token không hợp lệ",
           status: "ERROR"

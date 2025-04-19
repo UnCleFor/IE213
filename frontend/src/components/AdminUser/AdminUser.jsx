@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { WrapperHeader } from './style'
-import { Form, Button, Modal } from 'antd';
+import { Form, Button, Modal, Switch, Input } from 'antd';
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
 import DrawerComponent from '../DrawerComponent/DrawerComponent'
@@ -32,20 +32,26 @@ const AdminUser = () => {
     name: '',
     email: '',
     phone: '',
-    avatar: ''
+    avatar: '',
+    isAdmin: false,
+    password: '', // Đảm bảo có password
+    confirmPassword: '', // Thêm confirmPassword vào state
   });
 
   const [stateUserDetails, setStateUserDetails] = useState({
     name: '',
     email: '',
     phone: '',
-    avatar: ''
+    avatar: '',
+    isAdmin: false, // Thêm
   });
 
+
   const mutation = useMutationHooks((data) => {
-    const { name, email, phone, avatar } = data;
-    return UserService.signupUser({ name, email, phone, avatar });
+    const { name, email, phone, avatar, password, confirmPassword } = data;
+    return UserService.signupUser({ name, email, phone, avatar, password, confirmPassword });
   });
+
 
   const mutationUpdate = useMutationHooks(({ id, token, ...rests }) => {
     return UserService.updateUser(id, rests, token);
@@ -60,13 +66,13 @@ const AdminUser = () => {
   const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
 
   const getAllUsers = async () => {
-    const res = await UserService.getAllUser();
+    const res = await UserService.getAllUser(user.access_token);
     return res;
   };
 
   const { isLoading: isLoadingUser, data: users } = useQuery({
-    queryKey: ['users'],
-    queryFn: getAllUsers,
+    queryKey: ['users', user.access_token], // queryKey thêm token để theo dõi thay đổi
+    queryFn: () => UserService.getAllUser(user.access_token),
   });
 
   const fetchGetDetailsUser = async (rowSelected) => {
@@ -76,7 +82,8 @@ const AdminUser = () => {
         name: res?.data?.name,
         email: res?.data?.email,
         phone: res?.data?.phone,
-        avatar: res?.data?.avatar
+        avatar: res?.data?.avatar,
+        isAdmin: res?.data?.isAdmin, // ✅ THÊM DÒNG NÀY
       });
       setIsOpenDrawer(true);
     }
@@ -138,10 +145,16 @@ const AdminUser = () => {
   };
 
   const onFinish = () => {
-    mutation.mutate(stateUser);
+    // Gửi payload đầy đủ bao gồm confirmPassword
+    mutation.mutate({
+      ...stateUser, // Bao gồm confirmPassword vào đây
+    });
   };
 
+
   const onUpdateUser = () => {
+    //console.log('onUpdateUser called'); // Đảm bảo sự kiện này được gọi
+
     mutationUpdate.mutate({
       id: rowSelected,
       token: user.access_token,
@@ -173,7 +186,7 @@ const AdminUser = () => {
   const columns = [
     { title: 'Name', dataIndex: 'name' },
     { title: 'Email', dataIndex: 'email' },
-    { title: 'Admin', dataIndex: 'isAdmin' },
+    { title: 'Admin', dataIndex: 'isAdmin', render: (isAdmin) => isAdmin ? '✅' : '❌' },
     { title: 'Phone', dataIndex: 'phone' },
     { title: 'Hành động', dataIndex: 'action', render: (_, record) => renderAction(record) }
   ];
@@ -213,7 +226,6 @@ const AdminUser = () => {
       message.error('Xóa người dùng thất bại!');
     }
   }, [isSuccessDeleted, isErrorDeleted]);
-
   return (
     <div>
       <WrapperHeader>Quản lý người dùng</WrapperHeader>
@@ -240,49 +252,158 @@ const AdminUser = () => {
         <Loading isLoading={isLoading}>
           <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} form={form} onFinish={onFinish}>
             {['name', 'email', 'phone'].map((field) => (
-              <Form.Item key={field} label={field} name={field} rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}>
+              <Form.Item
+                key={field}
+                label={field}
+                name={field}
+                rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}
+              >
                 <InputComponent value={stateUser[field]} onChange={handleOnchange} name={field} />
               </Form.Item>
             ))}
+
+            {/* Trường mật khẩu */}
+            <Form.Item
+              label="Mật khẩu"
+              name="password"
+              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}
+            >
+              <Input.Password
+                value={stateUser.password}
+                onChange={(e) => setStateUser({ ...stateUser, password: e.target.value })}
+              />
+            </Form.Item>
+
+            {/* Trường xác nhận mật khẩu */}
+            <Form.Item
+              label="Xác nhận mật khẩu"
+              name="confirmPassword"
+              rules={[
+                { required: true, message: 'Vui lòng xác nhận mật khẩu' },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('password') === value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error('Mật khẩu và xác nhận mật khẩu không khớp'));
+                  },
+                }),
+              ]}
+            >
+              <Input.Password
+                value={stateUser.confirmPassword}
+                onChange={(e) => setStateUser({ ...stateUser, confirmPassword: e.target.value })}
+              />
+            </Form.Item>
+
+
+
             <Form.Item label="Avatar" name="avatar">
-              <WrapperUploadFile onChange={handleOnchangeAvatar} maxCount={1} beforeUpload={() => false}
-                customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}>
+              <WrapperUploadFile
+                onChange={handleOnchangeAvatar}
+                maxCount={1}
+                beforeUpload={() => false}
+                customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
+              >
                 <Button>Chọn ảnh</Button>
                 {stateUser?.avatar && (
-                  <img src={stateUser.avatar} style={{ height: '60px', width: '60px', borderRadius: '50%', objectFit: 'cover', marginLeft: '10px' }} alt="" />
+                  <img
+                    src={stateUser.avatar}
+                    style={{
+                      height: '60px',
+                      width: '60px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      marginLeft: '10px',
+                    }}
+                    alt=""
+                  />
                 )}
               </WrapperUploadFile>
             </Form.Item>
+
             <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
-              <Button type="primary" htmlType="submit">Tạo</Button>
+              <Button type="primary" htmlType="submit">
+                Tạo
+              </Button>
             </Form.Item>
           </Form>
+
         </Loading>
       </Modal>
 
-      <DrawerComponent title="Chi tiết người dùng" isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} width="90%">
-        <Loading isLoading={isLoadingUpdate || isLoadingUpdated}>
-          <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} form={form} onFinish={onUpdateUser}>
-            {['name', 'email', 'phone'].map((field) => (
-              <Form.Item key={field} label={field} name={field} rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}>
-                <InputComponent value={stateUserDetails[field]} onChange={handleOnchangeDetails} name={field} />
-              </Form.Item>
-            ))}
-            <Form.Item label="Avatar" name="avatar">
-              <WrapperUploadFile onChange={handleOnchangeAvatarDetails} maxCount={1} beforeUpload={() => false}
-                customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}>
-                <Button>Chọn ảnh</Button>
-                {stateUserDetails?.avatar && (
-                  <img src={stateUserDetails.avatar} style={{ height: '60px', width: '60px', borderRadius: '50%', objectFit: 'cover', marginLeft: '10px' }} alt="" />
-                )}
-              </WrapperUploadFile>
-            </Form.Item>
-            <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
-              <Button type="primary" htmlType="submit">Cập nhật</Button>
-            </Form.Item>
-          </Form>
-        </Loading>
-      </DrawerComponent>
+      <DrawerComponent
+  title="Chi tiết người dùng"
+  isOpen={isOpenDrawer}
+  onClose={() => setIsOpenDrawer(false)}
+  width="90%"
+>
+  <Loading isLoading={isLoadingUpdate || isLoadingUpdated}>
+    <Form
+      labelCol={{ span: 6 }}
+      wrapperCol={{ span: 18 }}
+      form={form}
+      onFinish={onUpdateUser}  // Vẫn giữ onFinish nếu bạn muốn form submit qua button submit
+    >
+      {['name', 'email', 'phone'].map((field) => (
+        <Form.Item
+          key={field}
+          label={field}
+          name={field}
+          rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}
+        >
+          <InputComponent value={stateUserDetails[field]} onChange={handleOnchangeDetails} name={field} />
+        </Form.Item>
+      ))}
+
+      <Form.Item label="Quản trị viên" name="isAdmin" valuePropName="checked">
+        <Switch
+          checked={stateUserDetails.isAdmin}
+          onChange={(checked) => setStateUserDetails({ ...stateUserDetails, isAdmin: checked })}
+        />
+      </Form.Item>
+
+      <Form.Item label="Avatar" name="avatar">
+        <WrapperUploadFile
+          onChange={handleOnchangeAvatarDetails}
+          maxCount={1}
+          beforeUpload={() => false}
+          customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
+        >
+          <Button>Chọn ảnh</Button>
+          {stateUserDetails?.avatar && (
+            <img
+              src={stateUserDetails.avatar}
+              style={{
+                height: '60px',
+                width: '60px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                marginLeft: '10px',
+              }}
+              alt=""
+            />
+          )}
+        </WrapperUploadFile>
+      </Form.Item>
+
+      {/* Nút Cập nhật thủ công */}
+      <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
+        <Button
+          type="primary"
+          onClick={() => {
+            // Gọi hàm cập nhật thủ công
+            //console.log('Cập nhật người dùng');
+            onUpdateUser();
+          }}
+        >
+          Cập nhật
+        </Button>
+      </Form.Item>
+    </Form>
+  </Loading>
+</DrawerComponent>
+
 
       <ModalComponent
         title="Xóa người dùng"
