@@ -133,12 +133,42 @@ const getAllProduct = (limit, page, sort, filter) => {
             if (filter) {
                 const label = filter[0]
                 const value = filter[1]
-                const allProductFilter = await Product.find({
-                    [label]: {
-                        '$regex': value,
-                        '$options': 'i' //không phân biệt hoa thường
-                    }
-                })
+
+                const allProductFilter = await Product.aggregate([
+                    {
+                        $search: {
+                            index: "default",
+                            text: {
+                                query: value,
+                                path: label,
+                            }
+                        }
+                    },
+                    { $skip: page * limit },
+                    { $limit: limit }
+                ]);
+                  
+                // const allProductFilter = await Product.find({
+                //     [label]: {
+                //         '$regex': value,
+                //         '$options': 'i' //không phân biệt hoa thường
+                //     }
+                // })
+
+                const totalFiltered = await Product.aggregate([
+                    {
+                        $search: {
+                            index: "default",
+                            text: {
+                                query: value,
+                                path: label,
+                            }
+                        }
+                        },
+                    { $count: "total" }
+                ]);
+                const totalProduct = totalFiltered[0]?.total || 0;
+                
                 resolve({
                     status: 'OK',
                     message: 'Lọc thành công',

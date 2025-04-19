@@ -14,25 +14,65 @@ import {
 } from "./style";
 import { useSelector } from 'react-redux';
 import { getAllProduct } from "../../services/ProductService";
+import { useDebounce } from "../../hooks/useDebounce";
+import { useQuery } from "@tanstack/react-query";
 
 const ProductSliderComponent = () => {
   const sliderRef = useRef(null);
   //
-  const [products, setProducts] = useState([]);
-  const search = useSelector((state) => state.product.search);
+  //const [products, setProducts] = useState([]);
+  const searchProduct = useSelector((state) => state.product.search);
+  const searchDebounce = useDebounce(searchProduct, 1000)
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await getAllProduct(search);
-        setProducts(res.data);
-      } catch (error) {
-        console.error('Lỗi khi lấy danh sách sản phẩm:', error);
-      }
-    };
+////////////////////////
+  const fetchProducts = async () => {
+    const res = await getAllProduct(searchDebounce)
+    return res.data
+  }
 
-    fetchProducts();
-  }, [search]);
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const res = await getAllProduct(searchDebounce);
+  //       setProducts(res.data);
+  //     } catch (error) {
+  //       console.error('Lỗi khi lấy danh sách sản phẩm:', error);
+  //     }
+  //   };
+
+  //   fetchProducts();
+  // }, [searchDebounce]);
+
+  const { isLoading, data: products = [], error } = useQuery({
+    queryKey: ['products', searchDebounce],
+    queryFn: fetchProducts,
+    retry: 3,
+    retryDelay: 1000,
+  });
+
+  if (error) {
+    return <div>Lỗi khi tải sản phẩm.</div>;
+  }
+  if (isLoading) { //đang tìmtìm
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center'
+      }}>
+        Đang tải sản phẩm...
+      </div>
+    );
+  }
+  if (!isLoading && products.length === 0) { // tìm không ra
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+      }}>
+        Không tìm thấy sản phẩm phù hợp.
+      </div>
+    );
+  }
 
   const items = products.map((item, index) => (
     <SlideItemWrapper key={item._id || index}>
