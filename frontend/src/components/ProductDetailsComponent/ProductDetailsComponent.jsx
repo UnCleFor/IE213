@@ -2,12 +2,22 @@ import { Col, Image, Row } from 'antd'
 import React, { useState } from 'react'
 import imageProduct from '../../assets/images/z6436857502524_b8df322fa070c2dd15fc904c2ee1c100.jpg'
 import imageProductSmall from '../../assets/images/z6436857450475_595921696663d0fe0f381a7c4efb9de6.jpg'
-import { DetailsCell, RowDetail, SizeBox, SizeProduct, TableProductDetails, TitleCell, WrapperBtnBuy, WrapperStyleColImage, WrapperStyleImageSmall, WrapperStyleNameProduct, WrapperStylePriceProduct, WrapperQuality } from './style'
+import { DetailsCell, RowDetail, SizeBox, SizeProduct, TableProductDetails, TitleCell, WrapperBtnBuy, WrapperStyleColImage, WrapperStyleImageSmall, WrapperStyleNameProduct, WrapperStylePriceProduct, WrapperQuantity } from './style'
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import ButtonComponent from '../ButtonComponent/ButtonComponent'
 
 const ProductDetailsComponent = () => {
     const [quantity, setQuantity] = useState(1);
+
+    const handleIncrease = () => {
+        setQuantity(prev => prev + 1);
+    };
+    
+    const handleDecrease = () => {
+        if (quantity > 1) {
+            setQuantity(prev => prev - 1);
+        }
+    };
 
     const product =
     {
@@ -74,7 +84,7 @@ const ProductDetailsComponent = () => {
 
                     <p><strong>Màu sắc</strong></p>
 
-                    <WrapperQuality>
+                    <WrapperQuantity>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '20px 0' }}>
                             <ButtonComponent
                                 size="middle"
@@ -91,10 +101,12 @@ const ProductDetailsComponent = () => {
                                     color: '#000',
                                     fontSize: '15px',
                                 }}
+                                onClick={handleDecrease}
                             />
                             <div style={{ fontSize: '18px', minWidth: '32px', textAlign: 'center' }}>{quantity}</div>
                             <ButtonComponent
                                 size="middle"
+                                onClick={handleIncrease}
                                 textButton={<PlusOutlined />}
                                 styleButton={{
                                     width: 40,
@@ -110,7 +122,7 @@ const ProductDetailsComponent = () => {
                                 }}
                             />
                         </div>
-                    </WrapperQuality>
+                    </WrapperQuantity>
 
                     {/* <Row>
                         <Col span={12}></Col>
@@ -135,6 +147,7 @@ const ProductDetailsComponent = () => {
                                 fontWeight: 'bold',
                             }}
                             textButton="Mua ngay"
+                            // onChange = {handleAddOrderProduct}
                         />
                         <ButtonComponent
                             size="large"

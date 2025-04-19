@@ -34,7 +34,7 @@ export const SizeBox = styled.span`
   border: 1px solid black
 `
 
-export const WrapperQuality = styled.div`
+export const WrapperQuantity = styled.div`
 
 `
 
