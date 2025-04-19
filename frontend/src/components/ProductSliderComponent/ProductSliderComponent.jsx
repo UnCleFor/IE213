@@ -12,24 +12,27 @@ import {
   SlideItemWrapper,
   SwipeHint
 } from "./style";
+import { useSelector } from 'react-redux';
+import { getAllProduct } from "../../services/ProductService";
 
 const ProductSliderComponent = () => {
   const sliderRef = useRef(null);
   //
   const [products, setProducts] = useState([]);
+  const search = useSelector((state) => state.product.search);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`);
-        setProducts(res.data.data);
+        const res = await getAllProduct(search);
+        setProducts(res.data);
       } catch (error) {
         console.error('Lỗi khi lấy danh sách sản phẩm:', error);
       }
     };
 
     fetchProducts();
-  }, []);
+  }, [search]);
 
   const items = products.map((item, index) => (
     <SlideItemWrapper key={item._id || index}>

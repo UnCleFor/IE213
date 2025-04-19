@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from "react-redux";
 import * as UserService from '../../services/UserService'
 import { resetUser } from '../../redux/slices/userSlide'
 import Loading from "../../components/LoadingComponent/Loading";
+import { searchProduct } from "../../redux/slices/productSlide";
 const { useBreakpoint } = Grid;
 const { useToken } = theme;
 
@@ -64,7 +65,8 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
 
   const navigate = useNavigate()
   const user = useSelector((state) => state.user)
-  const dispath = useDispatch()
+  const dispatch = useDispatch()
+  const [search, setSearch] = useState()
   const [loading, setLoading] = useState(false)
   const handleNavigateLogin = () => {
     navigate('/sign_in')
@@ -75,7 +77,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       setLoading(true);
       await UserService.logoutUser(); // Gọi API logout
       localStorage.removeItem('access_token'); // Xoá token khỏi localStorage
-      dispath(resetUser()); // Reset user trong Redux
+      dispatch(resetUser()); // Reset user trong Redux
       navigate('/')
       setLoading(false);
     } catch (error) {
@@ -123,14 +125,18 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     <div>
       <WrapperContentPopup onClick={() => navigate('/account')}>Thông tin người dùng</WrapperContentPopup>
       <WrapperContentPopup onClick={handleOrderHistory}>Lịch sử mua hàng</WrapperContentPopup>
-      <WrapperContentPopup onClick={handleLogOut}>Đăng xuất</WrapperContentPopup>
       {user?.isAdmin && (
         <WrapperContentPopup onClick={handleAdmin}>Quản lý hệ thống</WrapperContentPopup>
-      )}
-
-
+      )}      
+      <WrapperContentPopup onClick={handleLogOut}>Đăng xuất</WrapperContentPopup>
     </div>
   )
+
+  const onSearch = (e) => { /*handleSearch*/
+    setSearch(e.target.value)
+    dispatch(searchProduct(e.target.value))
+  }
+
   return (
     <div style={{ position: "relative" }}>
       {/* <div style= {styles.header}> */}
@@ -152,6 +158,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                   size="large"
                   placeholder="What you want to buy?"
                   textButton="Search"
+                  onChange={onSearch}
                 />
               </Col>
             )}

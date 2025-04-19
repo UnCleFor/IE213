@@ -135,7 +135,8 @@ const getAllProduct = (limit, page, sort, filter) => {
                 const value = filter[1]
                 const allProductFilter = await Product.find({
                     [label]: {
-                        '$regex': value
+                        '$regex': value,
+                        '$options': 'i' //không phân biệt hoa thường
                     }
                 })
                 resolve({

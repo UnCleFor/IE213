@@ -23,6 +23,7 @@ const SearchButton = (props) => {
             outline: "none", // ✅ Tắt hiệu ứng focus mặc định
             boxShadow: "none", // ✅ Xóa viền sáng khi click vào
           }}
+        {...props}
       />
       <ButtonComponent
         size={size}
