@@ -1,35 +1,27 @@
 import React, { Fragment, useEffect, useState } from 'react';
-
-
-// Triển khai react router
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-
-// Lấy ra mảng routes chứa các đường dẫn
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { routes } from './routes/index'
-
-// Thêm default vào tất cả trang trừ trang NotFound
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
-
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { isJsonString } from './utils';
 import { jwtDecode } from "jwt-decode";
 import * as UserService from './services/UserService'
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from './redux/slices/userSlide';
-import axios from 'axios';
 import Loading from './components/LoadingComponent/Loading';
-//
+
 function App() {
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const user = useSelector((state) => state.user)
 
   useEffect(() => {
-    setIsLoading(true)
-    const {storageData,decoded} = handleDecoded()
-      if (decoded?.id) {
-        handleGetDetailUser(decoded?.id, storageData)
-      }
+    const { storageData, decoded } = handleDecoded()
+    if (decoded?.id) {
+      handleGetDetailUser(decoded?.id, storageData)
+    } else {
+      setIsLoading(false) // Nếu không có token thì dừng loading luôn
+    }
   }, [])
 
   const handleDecoded = () => {
@@ -44,68 +36,54 @@ function App() {
     }
     return { decoded, storageData: token }
   }
-  
 
   // Add a request interceptor
   UserService.axiosJWT.interceptors.request.use(async function (config) {
-    // Do something before request is sent
     const currentTime = new Date()
-    const {storageData,decoded} = handleDecoded()
-    if(decoded?.exp < currentTime.getTime()/1000) {
+    const { storageData, decoded } = handleDecoded()
+    if (decoded?.exp < currentTime.getTime() / 1000) {
       const data = await UserService.refreshToken()
       config.headers['token'] = `Bearer ${data?.access_token}`
     }
-    return config;
+    return config
   }, function (error) {
-    // Do something with request error
-    return Promise.reject(error);
-  });
+    return Promise.reject(error)
+  })
 
   const handleGetDetailUser = async (id, token) => {
     const res = await UserService.getDetailUser(id, token)
     dispatch(updateUser({ ...res?.data, access_token: token }))
-    console.log('res',res)
     setIsLoading(false)
   }
 
-
-  // useEffect(() => {
-  //   fetchApi()
-  // }, [])
-  //console.log('process.env.REACT_API_URL_BACKEND', process.env.REACT_API_URL_BACKEND)
-  //const fetchApi = async() => {
-  //  const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`)
-  //  return res.data
-  // }
-
-  // const query = useQuery({ queryKey: ['todos'], queryFn: fetchApi })
-  // console.log('query', query)
-
   return (
     <div>
-      <Loading isLoading={isLoading}>
-        <Router> {/* BrowserRouter để quản lý đường dẫn */}
-          <Routes> {/* Routes chứa danh sách các đường dẫn */}
-            {routes.map((route) => { // Lặp qua mảng routes và tạo ra một phần tử route tương ứng
-              const Page = route.page; // Lấy page tương ứng với từng route
-
-              const ischeckAuth = !route.isPrivate || user.isAdmin
-
-              // Nếu route.isShowHeader true thì sử dụng DefaultComponent (trong đó có Header), ngược lại sử dụng Fragment
-              // Layout sẽ chứa header,... của trang
+      <Loading isLoading={isLoading} />
+      {!isLoading && (
+        <Router>
+          <Routes>
+            {routes.map((route) => {
+              const Page = route.page;
               const Layout = route.isShowHeader ? DefaultComponent : Fragment;
-
-              if (!ischeckAuth) return null; // không render nếu route là private
+              const ischeckAuth = !route.isPrivate || user?.isAdmin;
 
               return (
-                // Layout sẽ được bọc quanh nội dung của trang nhằm hiển thị Header
-                <Route key={route.path} path={ route.path } element={<Layout><Page /></Layout>} /> // Tạo Route với path và page
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={
+                    ischeckAuth
+                      ? <Layout><Page /></Layout>
+                      : <Navigate to="/login" replace />
+                  }
+                />
               );
             })}
           </Routes>
         </Router>
-      </Loading>
+      )}
     </div>
   )
 }
-export default App
+
+export default App;

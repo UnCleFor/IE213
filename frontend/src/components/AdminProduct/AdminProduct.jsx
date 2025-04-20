@@ -61,7 +61,7 @@ const AdminProduct = () => {
   const { data: dataUpdated, isLoading: isLoadingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate;
   const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
   const getAllProducts = async () => {
-    const res = await ProductService.getAllProduct();
+    const res = await ProductService.getAllProductAdmin();
     return res;
   };
 

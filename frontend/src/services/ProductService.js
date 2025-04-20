@@ -1,6 +1,6 @@
 import axios from "axios"
 export const axiosJWT = axios.create()
-export const getAllProduct = async (search, limit) => {
+export const getAllProduct = async (search , limit) => {
     let res = {}
     if (search.length > 0) {
       res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all?filter=name&filter=${search}?limit=${limit}`)
@@ -9,6 +9,24 @@ export const getAllProduct = async (search, limit) => {
     }
     return res.data
 }
+
+// gán cơ bản search = 0 và ko gắn limit vào url để khi gọi getAllProduct() ko tham số bên admin thì nó lấy ra đc
+// export const getAllProduct = async (search = 0 , limit) => {
+//   let res = {}
+//   if (search.length > 0) {
+//     res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all?filter=name&filter=${search}?limit=${limit}`)
+//   } else {
+//     res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`)
+//   }
+//   return res.data
+// }
+
+export const getAllProductAdmin = async () => {
+   const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`)
+  return res.data
+}
+
+
 
 // export const createProduct = async (data) => {
 //     const res = await axios.post(`${process.env.REACT_APP_API_URL}/product/create`, data)
