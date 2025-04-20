@@ -42,17 +42,27 @@ const TableComponent = (props) => {
     };
     return (
         <Loading isLoading={isLoading}>
-        <Table
-            rowSelection={{
+          <div
+            style={{
+              width: '100%',
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch', // giúp cuộn mượt trên iOS
+            }}
+          >
+            <Table
+              rowSelection={{
                 type: selectionType,
                 ...rowSelection,
-            }}
-            columns={columns}
-            dataSource={data}
-            {...props}
-        />
+              }}
+              columns={columns}
+              dataSource={data}
+              scroll={{ x: 'max-content' }} // auto scroll ngang khi bảng quá rộng
+              pagination={false}
+              {...props}
+            />
+          </div>
         </Loading>
-    )
-}
+      );
+    };
 
 export default TableComponent

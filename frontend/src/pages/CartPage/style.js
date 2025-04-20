@@ -1,293 +1,215 @@
 import styled from "styled-components";
 
-// Layout chính giữa
 export const Container = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  margin: 40px auto;
-  padding: 20px 16px;
-  width: 100%;
+  flex-direction: row;
+  gap: 24px;
+  margin: 24px auto;
+  padding: 0 16px;
   max-width: 1200px;
-  box-sizing: border-box;
-  gap: 32px;
+  flex-wrap: nowrap; 
+  align-items: flex-start;
+  overflow-x: hidden; 
 
-  @media (max-width: 992px) {
-    gap: 24px;
+  @media (max-width: 1024px) {
+    gap: 20px;
   }
 
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: 16px;
-    padding: 16px;
-  }
-
-  @media (max-width: 576px) {
-    gap: 8px;
-    padding: 12px;
-  }
-`;
-
-// Khung chứa danh sách sản phẩm
-export const ProductList = styled.div`
-  flex: 2;
-  background: white;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-sizing: border-box;
-  width: 100%;
-
-  @media (max-width: 768px) {
-    padding: 15px;
-  }
-`;
-
-// Từng sản phẩm trong danh sách
-export const ProductItem = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  margin-bottom: 24px;
-  border-bottom: 1px dashed #ccc;
-  padding-bottom: 16px;
-  gap: 20px;
-
-  input[type="checkbox"] {
-    margin-top: 8px;
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: row;
     flex-wrap: wrap;
-    align-items: flex-start;
+    gap: 16px;
+    padding: 0 8px;
   }
 `;
 
-
-export const ProductImage = styled.img`
-  width: 100px;
-  height: auto;
-  margin-right: 16px;
-  flex-shrink: 0;
-
-  @media (max-width: 768px) {
-    width: 80px;
-    margin-right: 0;
-  }
-
-  @media (max-width: 480px) {
-    width: 70px;
-  }
-`;
-
-export const ProductInfo = styled.div`
-  flex: 1;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  p {
-    margin: 0;
-  }
-
-  a {
-    color: #b00;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 4px;
-  }
-
-  @media (max-width: 768px) {
-    flex: 1;
-  }
-`;
-
-export const ProductName = styled.h4`
-  font-size: 16px;
-  margin: 4px 0;
-`;
-
-export const ProductSKU = styled.div`
-  color: gray;
-  font-size: 13px;
-`;
-
-export const ProductPrice = styled.div`
-  color: #b00;
-  font-size: 18px;
-  font-weight: bold;
-  margin: 0 20px;
-  white-space: nowrap;
-
-  @media (max-width: 768px) {
-  margin-left: auto;
-  margin-right: 0;
-}
-`;
-
-export const QuantityControl = styled.div`
-  display: flex;
-  align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  overflow: hidden;
-  height: 28px;
-
-  button {
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
-    background-color: white;
-    border: none;
-    border-right: 1px solid #ccc;
-    cursor: pointer;
-
-    &:last-of-type {
-      border-right: none;
-      border-left: 1px solid #ccc;
-    }
-  }
-
-  input {
-    width: 40px;
-    height: 100%;
-    text-align: center;
-    border: none;
-    font-size: 12px;
-    pointer-events: none;
-  }
-
-  @media (max-width: 768px) {
-    height: 26px;
-
-    button {
-      width: 26px;
-      height: 26px;
-      font-size: 14px;
-    }
-
-    input {
-      width: 36px;
-      font-size: 11px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    height: 24px;
-
-    button {
-      width: 24px;
-      height: 24px;
-      font-size: 12px;
-    }
-
-    input {
-      width: 32px;
-      font-size: 10px;
-    }
-  }
-`;
-
-// Khung thông tin đơn hàng bên phải
-export const OrderSummary = styled.div`
-  flex: 1;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 24px;
+export const TableWrapper = styled.div`
+  flex: 1 1 70%;
+  min-width: 0;
   background-color: #fff;
-  box-sizing: border-box;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   width: 100%;
+
+  table {
+    min-width: 600px;
+  }
+
+  @media (max-width: 768px) {
+    flex: 1 1 100%;
+    margin-bottom: 16px;
+  }
+`;
+
+export const OrderSummary = styled.div`
+  flex: 1 1 30%;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 8px;
+
+  @media (max-width: 768px) {
+    flex: 1 1 100%;
+    margin-top: 16px;
+  }
 
   h3 {
-    font-size: 18px;
+    font-size: 1.25rem;
+    font-weight: bold;
     margin-bottom: 16px;
   }
 
   p {
-    color: gray;
-    font-size: 13px;
-    margin: 12px 0;
-  }
-
-  @media (max-width: 768px) {
-    margin-top: 20px;
-    padding: 16px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 12px;
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 16px;
   }
 `;
 
 export const OrderRow = styled.div`
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
   margin-bottom: 8px;
 `;
 
 export const TotalPrice = styled.div`
   display: flex;
   justify-content: space-between;
-  font-size: 18px;
+  font-size: 1.25rem;
   font-weight: bold;
-  color: #b00;
-  border-top: 1px solid #ccc;
   margin-top: 16px;
-  padding-top: 16px;
 `;
 
 export const OrderButton = styled.button`
-  background-color: brown;
-  color: white;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
+  display: block;
   width: 100%;
-  margin-top: 16px;
+  padding: 12px;
+  font-size: 1rem;
+  background-color: rgb(149, 33, 33);
+  color: white;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
+  margin-top: 16px;
+
+  &:hover {
+    background-color: rgb(179, 36, 36);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.875rem;
+    padding: 10px;
+  }
 `;
 
 export const InvoiceCheckbox = styled.div`
-  margin-top: 12px;
-  font-size: 14px;
+  margin-top: 16px;
+  font-size: 0.875rem;
+  color: #666;
 
-  label {
-    margin-left: 8px;
+  input {
+    margin-right: 8px;
   }
 `;
 
-export const PriceQuantityWrapper = styled.div`
+export const QuantityWrapper = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 10px;
+  justify-content: center;
+  gap: 8px;
+`;
 
-  @media (max-width: 480px) {
-    flex-wrap: wrap;
-    gap: 8px;
+export const QuantityButton = styled.button`
+  padding: 6px 12px;
+  font-size: 1.0rem;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 36px;
+  height: 30px;
+
+  &:disabled {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
   }
 `;
 
-export const ProductContent = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
+export const QuantityInput = styled.input`
+  width: 48px;
+  text-align: center;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  padding: 6px;
+  border-radius: 8px;
+  background-color: #fff;
+  font-weight: bold;
+  color: #333;
+
+  -moz-appearance: textfield;
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`;
+
+export const ScrollHint = styled.div`
+  display: none;
+  font-size: 12px;
+  color: #999;
+  text-align: center;
+  margin-top: 8px;
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 8px;
+    display: block;
   }
 `;
 
+export const EmptyCartWrapper = styled.div`
+  text-align: center;
+  padding: 80px 20px;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+  }
+`;
+
+export const ContinueButton = styled.button`
+  background-color:rgb(149, 33, 33);
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 24px;
+
+  &:hover {
+    background-color:rgb(179, 36, 36);
+  }
+`;
+
+export const DeleteText = styled.span`
+  display: inline-block;
+  margin-top: 8px;
+  color: #f5222d;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #cf1322;
+    text-decoration: underline;
+  }
+`;
 

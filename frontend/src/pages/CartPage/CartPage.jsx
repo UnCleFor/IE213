@@ -1,26 +1,27 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Container,
-  ProductList,
-  ProductItem,
-  ProductInfo,
-  ProductName,
-  ProductSKU,
-  ProductPrice,
-  QuantityControl,
+  TableWrapper,
   OrderSummary,
   OrderRow,
   TotalPrice,
   OrderButton,
   InvoiceCheckbox,
-  ProductImage,
-  PriceQuantityWrapper,
-  ProductContent
+  QuantityWrapper,
+  QuantityButton,
+  QuantityInput,
+  ScrollHint,
+  EmptyCartWrapper,
+  ContinueButton,
+  DeleteText
 } from "./style";
-
 import pic from "./pic.png";
+import TableComponent from "../../components/TableComponent/TableComponent";
 
 const CartPage = () => {
+  const navigate = useNavigate();
+
   const initialProducts = [
     {
       id: 1,
@@ -30,7 +31,6 @@ const CartPage = () => {
       size: "800x750x750mm / Taupe Canvas",
       price: 4600000,
       quantity: 1,
-      checked: false
     },
     {
       id: 2,
@@ -40,21 +40,148 @@ const CartPage = () => {
       size: "800x750x750mm / Taupe Canvas",
       price: 4600000,
       quantity: 1,
-      checked: false
-    }
+    },
   ];
 
   const [products, setProducts] = useState(initialProducts);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [quantityInput, setQuantityInput] = useState({});
 
-  const handleCheckboxChange = (id) => {
+  const handleQuantityChange = (id, delta) => {
     setProducts((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, checked: !item.checked } : item
+      prev.map((p) =>
+        p.id === id
+          ? { ...p, quantity: Math.max(1, p.quantity + delta) }
+          : p
       )
     );
   };
 
-  const selectedProducts = products.filter((p) => p.checked);
+  const handleDelete = (id) => {
+    setProducts((prev) => prev.filter((p) => p.id !== id));
+    setSelectedRowKeys((prev) => prev.filter((key) => key !== id));
+    setQuantityInput((prev) => {
+      const updated = { ...prev };
+      delete updated[id];
+      return updated;
+    });
+  };
+
+  const handleContinueShopping = () => {
+    navigate("/");
+  };
+
+  if (products.length === 0) {
+    return (
+      <EmptyCartWrapper>
+        <h2>🛒 Giỏ hàng của bạn đang trống</h2>
+        <p style={{ marginTop: "12px", color: "#888" }}>
+          Hãy thêm sản phẩm để bắt đầu mua sắm!
+        </p>
+        <ContinueButton onClick={handleContinueShopping}>
+          Tiếp tục mua sắm
+        </ContinueButton>
+      </EmptyCartWrapper>
+    );
+  }
+
+  const columns = [
+    {
+      title: "Sản phẩm",
+      dataIndex: "name",
+      align: "center",
+      render: (_, record) => (
+        <div style={{ textAlign: "left" }}>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <img
+              src={pic}
+              alt={record.name}
+              style={{ width: "80px", height: "80px", objectFit: "cover" }}
+            />
+            <div>
+              <p style={{ margin: 0, fontWeight: "bold" }}>{record.brand}</p>
+              <div>{record.name}</div>
+              <div style={{ fontSize: "13px", color: "#666" }}>
+                SKU: {record.sku}
+                <br />
+                {record.size}
+              </div>
+              <DeleteText onClick={() => handleDelete(record.id)}>
+                  Xoá
+              </DeleteText>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Số lượng",
+      dataIndex: "quantity",
+      align: "center",
+      render: (_, record) => (
+        <QuantityWrapper>
+          <QuantityButton
+            onClick={() => handleQuantityChange(record.id, -1)}
+            disabled={record.quantity <= 1}
+          >
+            −
+          </QuantityButton>
+          <QuantityInput
+            type="number"
+            value={
+              quantityInput[record.id] !== undefined
+                ? quantityInput[record.id]
+                : record.quantity
+            }
+            onChange={(e) => {
+              const value = e.target.value;
+              // Allow empty string for typing
+              setQuantityInput((prev) => ({ ...prev, [record.id]: value }));
+            }}
+            onBlur={() => {
+              const raw = quantityInput[record.id];
+              const parsed = parseInt(raw, 10);
+
+              if (!isNaN(parsed) && parsed > 0) {
+                setProducts((prev) =>
+                  prev.map((p) =>
+                    p.id === record.id ? { ...p, quantity: parsed } : p
+                  )
+                );
+              } else if (parsed === 0) {
+                handleDelete(record.id);
+              }
+
+              setQuantityInput((prev) => {
+                const updated = { ...prev };
+                delete updated[record.id];
+                return updated;
+              });
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.target.blur();
+              }
+            }}
+          />
+          <QuantityButton onClick={() => handleQuantityChange(record.id, 1)}>
+            +
+          </QuantityButton>
+        </QuantityWrapper>
+      ),
+    },
+    {
+      title: "Đơn giá",
+      dataIndex: "price",
+      align: "center",
+      render: (price) => `${price.toLocaleString("vi-VN")}₫`,
+    },
+  ];
+
+  const selectedProducts = products.filter((p) =>
+    selectedRowKeys.includes(p.id)
+  );
+
   const total = selectedProducts.reduce(
     (sum, p) => sum + p.price * p.quantity,
     0
@@ -62,42 +189,19 @@ const CartPage = () => {
 
   return (
     <Container>
-      <ProductList>
-        {products.map((product) => (
-          <ProductItem key={product.id}>
-            <input
-              type="checkbox"
-              checked={product.checked}
-              onChange={() => handleCheckboxChange(product.id)}
-              style={{ marginRight: "8px", marginTop: "10px" }}
-            />
-            <ProductImage src={pic} alt={product.name} />
-            <ProductContent>
-              <ProductInfo>
-                <p>{product.brand}</p>
-                <ProductName>{product.name}</ProductName>
-                <ProductSKU>
-                  SKU: {product.sku}
-                  <br />
-                  {product.size}
-                </ProductSKU>
-                <a href="#">Xoá</a>
-              </ProductInfo>
-
-              <PriceQuantityWrapper>
-                <QuantityControl>
-                  <button>-</button>
-                  <input type="text" value={product.quantity} readOnly />
-                  <button>+</button>
-                </QuantityControl>
-                <ProductPrice>
-                  {product.price.toLocaleString("vi-VN")}₫
-                </ProductPrice>
-              </PriceQuantityWrapper>
-            </ProductContent>
-          </ProductItem>
-        ))}
-      </ProductList>
+      <TableWrapper>
+        <TableComponent
+          columns={columns}
+          data={products.map((p) => ({ ...p, key: p.id }))}
+          rowSelection={{
+            type: "checkbox",
+            selectedRowKeys,
+            onChange: (selectedKeys) => setSelectedRowKeys(selectedKeys),
+          }}
+          pagination={false}
+        />
+        <ScrollHint>Vuốt sang trái/phải để xem →</ScrollHint>
+      </TableWrapper>
 
       <OrderSummary>
         <h3>Thông tin đơn hàng</h3>
@@ -109,7 +213,7 @@ const CartPage = () => {
             </OrderRow>
             <p>
               Phí vận chuyển được tính ở trang thanh toán và bạn có thể nhập mã
-              khuyến mãi ở trang thanh toán
+              khuyến mãi ở trang thanh toán.
             </p>
             <TotalPrice>
               <span>Tổng cộng</span>
