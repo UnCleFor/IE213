@@ -5,19 +5,53 @@ import imageProductSmall from '../../assets/images/z6436857450475_595921696663d0
 import { DetailsCell, RowDetail, SizeBox, SizeProduct, TableProductDetails, TitleCell, WrapperBtnBuy, WrapperStyleColImage, WrapperStyleImageSmall, WrapperStyleNameProduct, WrapperStylePriceProduct, WrapperQuantity } from './style'
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import ButtonComponent from '../ButtonComponent/ButtonComponent'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { addOrderProduct } from '../../redux/slices/orderSlide'
 
 const ProductDetailsComponent = () => {
     const [quantity, setQuantity] = useState(1);
+    const user = useSelector((state) => state.user)
+    const navigate = useNavigate()
+    const location = useLocation()
+    const dispatch = useDispatch()
 
     const handleIncrease = () => {
         setQuantity(prev => prev + 1);
     };
-    
+
+    console.log('location', location)
+
     const handleDecrease = () => {
         if (quantity > 1) {
             setQuantity(prev => prev - 1);
         }
     };
+
+    const handleAddOrderProduct = () => {
+        if (!user?.id) {
+            navigate('/sign_in', { state: location?.pathname })
+        } else {
+            // {
+            //     name: { type: String, required: true },
+            //     amount: { type: Number, required: true },
+            //     image: { type: String, required: true },
+            //     price: { type: Number, required: true },
+            //     // tham chiếu đến bảng Product
+            //     product: {
+            //         type: mongoose.Schema.Types.ObjectId,
+            //         ref: 'Product',
+            //         required: true,
+            //     },
+            // },
+            dispatch(addOrderProduct({
+                orderItem: {
+                    
+                }
+            }))
+        }
+    }
+    // console.log('productDetails', productDetails, user)
 
     const product =
     {
@@ -92,7 +126,7 @@ const ProductDetailsComponent = () => {
                                 styleButton={{
                                     width: 40,
                                     height: 40,
-                                    backgroundColor: 'white',
+                                    backgroundColor: 'transparent',
                                     borderRadius: '0px',
                                     border: '1px solid black',
                                     boxShadow: 'none'
@@ -111,7 +145,7 @@ const ProductDetailsComponent = () => {
                                 styleButton={{
                                     width: 40,
                                     height: 40,
-                                    backgroundColor: 'white',
+                                    backgroundColor: 'transparent',
                                     borderRadius: '0px',
                                     border: '1px solid black',
                                     boxShadow: 'none'
@@ -147,7 +181,7 @@ const ProductDetailsComponent = () => {
                                 fontWeight: 'bold',
                             }}
                             textButton="Mua ngay"
-                            // onChange = {handleAddOrderProduct}
+                            onClick={handleAddOrderProduct}
                         />
                         <ButtonComponent
                             size="large"
