@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import SliderComponent from '../../components/SliderComponent/SliderComponent';
 import ContainerComponent from '../../components/ContainerComponent/ContainerComponent';
 import ProductSliderComponent from '../../components/ProductSliderComponent/ProductSliderComponent';
@@ -18,6 +18,7 @@ import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 import { useQuery } from '@tanstack/react-query';
 
 const HomePage = () => {
+  const [limit, setLimit] = useState(10)
 
   return (
     <div>
@@ -28,7 +29,7 @@ const HomePage = () => {
       <ContainerComponent>
         <SectionWrapper>
           <SectionTitle>Bộ sưu tập Ondine 2025</SectionTitle>
-          <ProductSliderComponent />
+          <ProductSliderComponent limit={limit}/>
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
           <ButtonComponent
                             //onClick={handleUpdate}
@@ -47,6 +48,7 @@ const HomePage = () => {
                                 fontWeight: 'bold',
                             }}
                             textButton="Xem tất cả"
+                            onClick={() => setLimit((prev) => prev+6)}
                         />
           </div>
         </SectionWrapper>

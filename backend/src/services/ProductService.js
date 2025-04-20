@@ -210,11 +210,27 @@ const getAllProduct = (limit, page, sort, filter) => {
     })
 }
 
+const getAllType = () => {
+    // Tạo xử lý bất đồng bộ
+    return new Promise(async (resolve, reject) => {
+        try {  
+            const allType = await Product.distinct('type')
+            return resolve({
+                status: 'OK',
+                message: 'Tìm thành công',
+                data: allType, 
+            })
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
 
 module.exports = {
     createProduct,
     updateProduct,
     getDetailsProduct,
     deleteProduct,
-    getAllProduct
+    getAllProduct,
+    getAllType
 }

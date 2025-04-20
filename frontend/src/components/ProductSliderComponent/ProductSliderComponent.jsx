@@ -17,43 +17,33 @@ import { getAllProduct } from "../../services/ProductService";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useQuery } from "@tanstack/react-query";
 
-const ProductSliderComponent = () => {
+const ProductSliderComponent = ({limit}) => {
   const sliderRef = useRef(null);
-  //
+  
   //const [products, setProducts] = useState([]);
   const searchProduct = useSelector((state) => state.product.search);
   const searchDebounce = useDebounce(searchProduct, 1000)
 
-////////////////////////
-  const fetchProducts = async () => {
-    const res = await getAllProduct(searchDebounce)
+  const fetchProducts = async (context) => {
+    //console.log('context', context)
+    const limit = context?.queryKey && context?.queryKey[1]
+    const search = context?.queryKey && context?.queryKey[2]
+    const res = await getAllProduct(search, limit)
     return res.data
   }
 
-  // useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     try {
-  //       const res = await getAllProduct(searchDebounce);
-  //       setProducts(res.data);
-  //     } catch (error) {
-  //       console.error('Lỗi khi lấy danh sách sản phẩm:', error);
-  //     }
-  //   };
-
-  //   fetchProducts();
-  // }, [searchDebounce]);
-
   const { isLoading, data: products = [], error } = useQuery({
-    queryKey: ['products', searchDebounce],
+    queryKey: ['products', limit, searchDebounce],
     queryFn: fetchProducts,
     retry: 3,
     retryDelay: 1000,
+    keepPreviousDate: true
   });
 
   if (error) {
     return <div>Lỗi khi tải sản phẩm.</div>;
   }
-  if (isLoading) { //đang tìmtìm
+  if (isLoading) { //đang tìm
     return (
       <div style={{
         display: 'flex',
@@ -90,7 +80,7 @@ const ProductSliderComponent = () => {
     dots: false,
     infinite: false,
     slidesToShow: 4,
-    slidesToScroll: 1,
+    slidesToScroll: 4,
     arrows: false,
     responsive: [
         { breakpoint: 1024, settings: { slidesToShow: 3 } },

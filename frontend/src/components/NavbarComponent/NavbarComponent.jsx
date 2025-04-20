@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Grid, Menu, Drawer, theme } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import ContainerComponent from "../ContainerComponent/ContainerComponent";
+import TypeProduct from "../TypeProduct/TypeProduct";
 
 const { useToken } = theme;
 const { useBreakpoint } = Grid;
@@ -11,10 +12,41 @@ export default function NavbarComponent() {
   const screens = useBreakpoint();
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("");
+  const [currentType, setCurrentType] = useState(null);
+
+  const typeLabels = {
+    // Phòng khách
+    sofa: "Sofa",
+    bantra: "Bàn trà",
+  
+    // Phòng ăn
+    banan: "Bàn ăn",
+    ghean: "Ghế ăn",
+  
+    // Phòng ngủ
+    giuong: "Giường",
+    tuquanao: "Tu",
+  
+    // Phòng làm việc
+    ghevanphong: "Ghế văn phòng",
+    banlamviec: "Bàn làm việc",
+  
+    // Trang trí nhà cửa
+    thamtraisan: "Thảm trải sàn",
+    tranhcanvas: "Tranh canvas",
+  };
 
   const handleClick = (e) => {
     console.log("Bấm vào: ", e.key);
     setCurrent(e.key);
+
+    const mappedType = typeLabels[e.key]; //lấy type của sản phẩm
+    if (mappedType) {
+      setCurrentType(mappedType);
+    } else {
+      setCurrentType(null);
+    }
+
     setOpen(false); // Đóng menu khi chọn item trên mobile
   };
 
@@ -22,6 +54,7 @@ export default function NavbarComponent() {
   const handleParentClick = (key) => {
     console.log("Bấm vào parent: ", key);
     setCurrent(key);
+    setCurrentType(null);
     setOpen(false);
   };
 
@@ -100,7 +133,11 @@ export default function NavbarComponent() {
     },
   };
 
+
+  
+
   return (
+    <>
     <nav style={styles.header}>
       <ContainerComponent>
         <div style={styles.menuContainer}>
@@ -135,5 +172,14 @@ export default function NavbarComponent() {
         </div>
       </ContainerComponent>
     </nav>
-  );
+
+    {currentType && (
+      <TypeProduct
+        type={currentType}
+        title={`Sản phẩm: ${typeLabels[currentType] || currentType}`}
+        showFilter={true}
+      />
+    )}
+  </>
+);
 }
