@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useMutationHooks } from "../../hooks/useMutationHook";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Form, Button, Modal } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Form, Button, Modal, Space, Select } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 
 import { WrapperHeader, WrapperUploadFile } from './style';
 import TableComponent from '../TableComponent/TableComponent';
@@ -14,7 +14,7 @@ import * as ProductService from '../../services/ProductService';
 import * as message from '../../components/Message/Message';
 import { getBase64 } from '../../utils';
 import ModalComponent from '../ModalComponent/ModalComponent';
-
+import numeral from 'numeral';
 const AdminProduct = () => {
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
@@ -25,6 +25,10 @@ const AdminProduct = () => {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
+
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
 
   const [stateProduct, setStateProduct] = useState({
     name: '',
@@ -172,10 +176,11 @@ const AdminProduct = () => {
     <div>
       <EditOutlined
         onClick={(e) => {
-          e.stopPropagation(); // Chặn click lan tới onRow
-          setRowSelected(record._id); // Gán thủ công
-          setIsOpenDrawer(true);      // Mở Drawer tại đây
+          e.stopPropagation(); // Ngăn click lan lên dòng
+          setRowSelected(record._id);
+          fetchGetDetailsProduct(record._id); // Gọi fetch chi tiết ở đây
         }}
+
         style={{ color: 'black', fontSize: '30px', paddingLeft: '10px', cursor: 'pointer' }}
       />
       <DeleteOutlined
@@ -189,16 +194,141 @@ const AdminProduct = () => {
     </div>
   );
 
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+  const handleReset = (clearFilters, confirm) => {
+    clearFilters();          // Xóa bộ lọc hiện tại
+    setSearchText('');       // Reset từ khóa tìm kiếm
+    confirm();               // Kích hoạt lại lọc (với từ khóa rỗng)
+  };
+
+  const getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+      <div style={{ padding: 8 }} onKeyDown={e => e.stopPropagation()}>
+        <InputComponent
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Tìm
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters, confirm)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Đặt lại
+          </Button>
+          {/* <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({ closeDropdown: false });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
+          </Button> */}
+          {/* <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            Đóng
+          </Button> */}
+        </Space>
+      </div>
+    ),
+    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    filterDropdownProps: {
+      onOpenChange(open) {
+        if (open) {
+          setTimeout(() => {
+            var _a;
+            return (_a = searchInput.current) === null || _a === void 0 ? void 0 : _a.select();
+          }, 100);
+        }
+      },
+    },
+    // render: text =>
+    //   searchedColumn === dataIndex ? (
+    //     <Highlighter
+    //       highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+    //       searchWords={[searchText]}
+    //       autoEscape
+    //       textToHighlight={text ? text.toString() : ''}
+    //     />
+    //   ) : (
+    //     text
+    //   ),
+  });
 
   const columns = [
     {
       title: 'Tên sản phẩm',
       dataIndex: 'name',
-      render: (text) => <a>{text}</a>,
+      //render: (text) => <a>{text}</a>,
+      sorter: (a, b) => a.name.length - b.name.length,
+      ...getColumnSearchProps('name'),
     },
     {
       title: 'Giá',
       dataIndex: 'price',
+      sorter: (a, b) => a.price - b.price,
+      render: (price) => `${numeral(price).format('0,0').replace(/,/g, '.')} đ`,
+      filters: [
+        {
+          text: 'Dưới 1.000.000đ',
+          value: 'under1tr',
+        },
+        {
+          text: '1.000.000đ - 5.000.000đ',
+          value: '1to5tr',
+        },
+        {
+          text: '5.000.000đ - 10.000.000đ',
+          value: '5to10tr',
+        },
+        {
+          text: 'Trên 10.000.000đ',
+          value: 'above10tr',
+        },
+      ],
+      onFilter: (value, record) => {
+        const price = record.price;
+        switch (value) {
+          case 'under1tr':
+            return price < 1000000;
+          case '1to5tr':
+            return price >= 1000000 && price <= 5000000;
+          case '5to10tr':
+            return price > 5000000 && price <= 10000000;
+          case 'above10tr':
+            return price > 10000000;
+          default:
+            return true;
+        }
+      },
+      width: '30%',
     },
     {
       title: 'Loại',
@@ -221,14 +351,6 @@ const AdminProduct = () => {
   }, [form, stateProductDetails]);
 
   useEffect(() => {
-    if (rowSelected && !isModalOpenDelete) {
-      setIsLoadingUpdate(true);
-      fetchGetDetailsProduct(rowSelected);
-    }
-  }, [rowSelected]);
-
-
-  useEffect(() => {
     if (isSuccess && data?.status === 'OK') {
       message.success('Thêm sản phẩm thành công!');
       handleCancel();
@@ -241,6 +363,7 @@ const AdminProduct = () => {
     if (isSuccessUpdated && dataUpdated?.status === 'OK') {
       message.success('Cập nhật thành công!');
       queryClient.invalidateQueries(['products']);
+      setIsOpenDrawer(false);
     } else if (isErrorUpdated) {
       message.error('Cập nhật thất bại!');
     }
@@ -256,6 +379,12 @@ const AdminProduct = () => {
     }
   }, [isSuccessDeleted, isErrorDeleted]);
 
+  const productTypes = [
+    "Sofa", "Bàn trà", "Kệ tivi", "Ghế đơn", "Tủ trang trí", "Giường", "Tủ quần áo",
+    "Tab đầu giường", "Bàn trang điểm", "Chăn ga gối", "Bàn ăn", "Ghế ăn", "Tủ bếp",
+    "Tủ rượu", "Phụ kiện bàn ăn", "Bàn làm việc", "Ghế làm việc", "Kệ sách", "Tủ hồ sơ",
+    "Đèn bàn", "Tranh treo tường", "Đèn trang trí", "Thảm", "Cây giả", "Đồng hồ trang trí"
+  ];
   return (
     <div>
       <WrapperHeader>Quản lý sản phẩm</WrapperHeader>
@@ -276,12 +405,18 @@ const AdminProduct = () => {
 
       <div style={{ marginTop: '20px' }}>
         <TableComponent
+          forceRender
           columns={columns}
           isLoading={isLoadingProduct}
           data={dataTable}
           onRow={(record) => ({
             onClick: () => setRowSelected(record._id)
           })}
+          // phân trang tượng trưng
+          pagination={{
+            pageSize: 5,
+            showTotal: (total, range) => `${range[0]}-${range[1]} trong ${total} sản phẩm`
+          }}
         />
       </div>
 
@@ -302,11 +437,24 @@ const AdminProduct = () => {
                 name={field}
                 rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}
               >
-                <InputComponent
-                  value={stateProduct[field]}
-                  onChange={handleOnchange}
-                  name={field}
-                />
+                {field === 'type' ? (
+                  <Select
+                    value={stateProduct[field]}
+                    onChange={(value) => handleOnchange({ target: { name: field, value } })}
+                  >
+                    {productTypes.map((type) => (
+                      <Select.Option key={type} value={type}>
+                        {type}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                ) : (
+                  <InputComponent
+                    value={stateProduct[field]}
+                    onChange={handleOnchange}
+                    name={field}
+                  />
+                )}
               </Form.Item>
             ))}
 
@@ -362,11 +510,25 @@ const AdminProduct = () => {
                 name={field}
                 rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}
               >
-                <InputComponent
-                  value={stateProductDetails[field]}
-                  onChange={handleOnchangeDetails}
-                  name={field}
-                />
+                {field === 'type' ? (
+                  <Select
+                    value={stateProductDetails[field]}
+                    onChange={(value) => handleOnchangeDetails({ target: { name: field, value } })}
+                  >
+                    {productTypes.map((type) => (
+                      <Select.Option key={type} value={type}>
+                        {type}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                ) : (
+                  <InputComponent
+                    value={stateProductDetails[field]}
+                    onChange={handleOnchangeDetails}
+                    name={field}
+                  />
+                )}
+
               </Form.Item>
             ))}
 

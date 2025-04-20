@@ -6,7 +6,7 @@ dotenv.config()
 // tạo access_token để mã hóa dữ liệu gửi đi
 const generalAccessToken = async (payload) => {
     //console.log('ASTPayload:', payload);
-    const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN , { expiresIn: '1h' });
+    const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN , { expiresIn: '1d' });
     return access_token;
 };
 

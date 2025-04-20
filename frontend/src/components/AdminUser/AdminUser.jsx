@@ -1,9 +1,9 @@
 // [PHẦN ĐẦU GIỮ NGUYÊN]
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { WrapperHeader } from './style'
-import { Form, Button, Modal, Switch, Input } from 'antd';
+import { Form, Button, Modal, Switch, Input, Space } from 'antd';
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
 import DrawerComponent from '../DrawerComponent/DrawerComponent'
@@ -15,7 +15,7 @@ import * as message from '../../components/Message/Message';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import * as UserService from '../../services/UserService';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 
 const AdminUser = () => {
   const [form] = Form.useForm();
@@ -27,6 +27,11 @@ const AdminUser = () => {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
+
+  const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef(null);
+    
 
   const [stateUser, setStateUser] = useState({
     name: '',
@@ -183,13 +188,129 @@ const AdminUser = () => {
     </div>
   );
 
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+  const handleReset = (clearFilters, confirm) => {
+    clearFilters();          // Xóa bộ lọc hiện tại
+    setSearchText('');       // Reset từ khóa tìm kiếm
+    confirm();               // Kích hoạt lại lọc (với từ khóa rỗng)
+  };  
+
+  const getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+      <div style={{ padding: 8 }} onKeyDown={e => e.stopPropagation()}>
+        <InputComponent
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Tìm
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters,confirm)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Đặt lại
+          </Button>
+          {/* <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({ closeDropdown: false });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
+          </Button> */}
+          {/* <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            Đóng
+          </Button> */}
+        </Space>
+      </div>
+    ),
+    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    filterDropdownProps: {
+      onOpenChange(open) {
+        if (open) {
+          setTimeout(() => {
+            var _a;
+            return (_a = searchInput.current) === null || _a === void 0 ? void 0 : _a.select();
+          }, 100);
+        }
+      },
+    },
+    // render: text =>
+    //   searchedColumn === dataIndex ? (
+    //     <Highlighter
+    //       highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+    //       searchWords={[searchText]}
+    //       autoEscape
+    //       textToHighlight={text ? text.toString() : ''}
+    //     />
+    //   ) : (
+    //     text
+    //   ),
+  });
+
   const columns = [
-    { title: 'Name', dataIndex: 'name' },
-    { title: 'Email', dataIndex: 'email' },
-    { title: 'Admin', dataIndex: 'isAdmin', render: (isAdmin) => isAdmin ? '✅' : '❌' },
-    { title: 'Phone', dataIndex: 'phone' },
-    { title: 'Hành động', dataIndex: 'action', render: (_, record) => renderAction(record) }
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      sorter: (a, b) => a.name.length - b.name.length,
+      ...getColumnSearchProps('name'),
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      sorter: (a, b) => a.email.length - b.email.length,
+      ...getColumnSearchProps('email'),
+    },
+    {
+      title: 'Admin',
+      dataIndex: 'isAdmin',
+      filters: [
+        { text: 'Admin', value: true },
+        { text: 'User', value: false },
+      ],
+      onFilter: (value, record) => record.isAdmin === value,
+      render: (isAdmin) => (isAdmin ? '✅' : '❌'),
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'phone',
+      ...getColumnSearchProps('phone'),
+    },
+    {
+      title: 'Hành động',
+      dataIndex: 'action',
+      render: (_, record) => renderAction(record),
+    },
   ];
+  
 
   const dataTable = users?.data?.map((user) => ({ ...user, key: user._id }));
 
@@ -239,12 +360,18 @@ const AdminUser = () => {
       </div>
       <div style={{ marginTop: '20px' }}>
         <TableComponent
+          forceRender
           columns={columns}
           isLoading={isLoadingUser}
           data={dataTable}
           onRow={(record) => ({
             onClick: () => setRowSelected(record._id)
           })}
+          // phân trang tượng trưng
+          pagination={{
+            pageSize: 5,
+            showTotal: (total, range) => `${range[0]}-${range[1]} trong ${total} sản phẩm`
+          }}
         />
       </div>
 
@@ -333,76 +460,76 @@ const AdminUser = () => {
       </Modal>
 
       <DrawerComponent
-  title="Chi tiết người dùng"
-  isOpen={isOpenDrawer}
-  onClose={() => setIsOpenDrawer(false)}
-  width="90%"
->
-  <Loading isLoading={isLoadingUpdate || isLoadingUpdated}>
-    <Form
-      labelCol={{ span: 6 }}
-      wrapperCol={{ span: 18 }}
-      form={form}
-      onFinish={onUpdateUser}  // Vẫn giữ onFinish nếu bạn muốn form submit qua button submit
-    >
-      {['name', 'email', 'phone'].map((field) => (
-        <Form.Item
-          key={field}
-          label={field}
-          name={field}
-          rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}
-        >
-          <InputComponent value={stateUserDetails[field]} onChange={handleOnchangeDetails} name={field} />
-        </Form.Item>
-      ))}
+        title="Chi tiết người dùng"
+        isOpen={isOpenDrawer}
+        onClose={() => setIsOpenDrawer(false)}
+        width="90%"
+      >
+        <Loading isLoading={isLoadingUpdate || isLoadingUpdated}>
+          <Form
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 18 }}
+            form={form}
+            onFinish={onUpdateUser}  // Vẫn giữ onFinish nếu bạn muốn form submit qua button submit
+          >
+            {['name', 'email', 'phone'].map((field) => (
+              <Form.Item
+                key={field}
+                label={field}
+                name={field}
+                rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}
+              >
+                <InputComponent value={stateUserDetails[field]} onChange={handleOnchangeDetails} name={field} />
+              </Form.Item>
+            ))}
 
-      <Form.Item label="Quản trị viên" name="isAdmin" valuePropName="checked">
-        <Switch
-          checked={stateUserDetails.isAdmin}
-          onChange={(checked) => setStateUserDetails({ ...stateUserDetails, isAdmin: checked })}
-        />
-      </Form.Item>
+            <Form.Item label="Quản trị viên" name="isAdmin" valuePropName="checked">
+              <Switch
+                checked={stateUserDetails.isAdmin}
+                onChange={(checked) => setStateUserDetails({ ...stateUserDetails, isAdmin: checked })}
+              />
+            </Form.Item>
 
-      <Form.Item label="Avatar" name="avatar">
-        <WrapperUploadFile
-          onChange={handleOnchangeAvatarDetails}
-          maxCount={1}
-          beforeUpload={() => false}
-          customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
-        >
-          <Button>Chọn ảnh</Button>
-          {stateUserDetails?.avatar && (
-            <img
-              src={stateUserDetails.avatar}
-              style={{
-                height: '60px',
-                width: '60px',
-                borderRadius: '50%',
-                objectFit: 'cover',
-                marginLeft: '10px',
-              }}
-              alt=""
-            />
-          )}
-        </WrapperUploadFile>
-      </Form.Item>
+            <Form.Item label="Avatar" name="avatar">
+              <WrapperUploadFile
+                onChange={handleOnchangeAvatarDetails}
+                maxCount={1}
+                beforeUpload={() => false}
+                customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
+              >
+                <Button>Chọn ảnh</Button>
+                {stateUserDetails?.avatar && (
+                  <img
+                    src={stateUserDetails.avatar}
+                    style={{
+                      height: '60px',
+                      width: '60px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      marginLeft: '10px',
+                    }}
+                    alt=""
+                  />
+                )}
+              </WrapperUploadFile>
+            </Form.Item>
 
-      {/* Nút Cập nhật thủ công */}
-      <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
-        <Button
-          type="primary"
-          onClick={() => {
-            // Gọi hàm cập nhật thủ công
-            //console.log('Cập nhật người dùng');
-            onUpdateUser();
-          }}
-        >
-          Cập nhật
-        </Button>
-      </Form.Item>
-    </Form>
-  </Loading>
-</DrawerComponent>
+            {/* Nút Cập nhật thủ công */}
+            <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
+              <Button
+                type="primary"
+                onClick={() => {
+                  // Gọi hàm cập nhật thủ công
+                  //console.log('Cập nhật người dùng');
+                  onUpdateUser();
+                }}
+              >
+                Cập nhật
+              </Button>
+            </Form.Item>
+          </Form>
+        </Loading>
+      </DrawerComponent>
 
 
       <ModalComponent
