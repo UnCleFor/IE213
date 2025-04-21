@@ -8,6 +8,7 @@
     "jwt-decode": "^4.0.0",
     "numeral": "^2.0.6",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "redux-persist": "^6.0.0"
   }
 }
