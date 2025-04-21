@@ -30,7 +30,7 @@ const ProductDetailsComponent = ({idProduct}) => {
         queryKey: ['product-details', idProduct],
         queryFn: fetchGetDetailsProduct,
         enabled: !!idProduct
-      });
+    });
     console.log('productDetails',productDetails)
     
     const handleIncrease = () => {
@@ -63,12 +63,16 @@ const ProductDetailsComponent = ({idProduct}) => {
             // },
             dispatch(addOrderProduct({
                 orderItem: {
-                    
+                    name: productDetails?.name,
+                    amount: quantity,
+                    image: productDetails?.image,
+                    price: productDetails?.price,
+                    product: productDetails?._id
                 }
             }))
         }
     }
-    // console.log('productDetails', productDetails, user)
+    console.log('productDetails', productDetails, user)
 
     const product =
     {

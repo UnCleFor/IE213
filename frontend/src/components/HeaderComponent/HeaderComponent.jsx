@@ -35,6 +35,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const [showPopover, setShowPopover] = useState(false); // Khai báo state showPopover
   const [userName, setUserName] = useState('')
   const [userAvatar, setUserAvatar] = useState('')
+  const order = useSelector((state) => state.order)
 
   const styles = {
     container: {
@@ -211,7 +212,8 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                     )
                   )}
                 </WrapperHeaderAccount>
-
+              
+              {/* video 52 21:20 */}
               </Loading>
               {!isHiddenCart && (
                 <WrapperHeaderAccount>
