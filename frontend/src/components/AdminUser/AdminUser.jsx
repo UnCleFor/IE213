@@ -26,6 +26,7 @@ const AdminUser = () => {
   const [rowSelected, setRowSelected] = useState('');
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
+  const [isFinishUpdated, setIsFinishUpdated] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
 
   const [searchText, setSearchText] = useState('');
@@ -159,7 +160,7 @@ const AdminUser = () => {
 
   const onUpdateUser = () => {
     //console.log('onUpdateUser called'); // Đảm bảo sự kiện này được gọi
-
+    setIsFinishUpdated(true);
     mutationUpdate.mutate({
       id: rowSelected,
       token: user.access_token,
@@ -315,6 +316,12 @@ const AdminUser = () => {
   const dataTable = users?.data?.map((user) => ({ ...user, key: user._id }));
 
   useEffect(() => {
+      if (isModalOpen) {
+        form.setFieldsValue(stateUser); // Đồng bộ state vào form mỗi khi mở lại
+      }
+    }, [isModalOpen]);
+    
+  useEffect(() => {
     form.setFieldsValue(stateUserDetails);
   }, [form, stateUserDetails]);
 
@@ -332,6 +339,7 @@ const AdminUser = () => {
     if (isSuccessUpdated && dataUpdated?.status === 'OK') {
       message.success('Cập nhật thành công!');
       queryClient.invalidateQueries(['users']);
+      setIsFinishUpdated(false);
       setIsOpenDrawer(false);
     } else if (isErrorUpdated) {
       message.error('Cập nhật thất bại!');
@@ -465,7 +473,7 @@ const AdminUser = () => {
         onClose={() => setIsOpenDrawer(false)}
         width="90%"
       >
-        <Loading isLoading={isLoadingUpdate || isLoadingUpdated}>
+        <Loading isLoading={isLoadingUpdate || isFinishUpdated}>
           <Form
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 18 }}

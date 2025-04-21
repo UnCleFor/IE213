@@ -1,50 +1,72 @@
 const Product = require('../models/ProductModel')
 
 const createProduct = (newProduct) => {
-    // Tạo xử lý bất đồng bộ
     return new Promise(async (resolve, reject) => {
-        // Lấy ra các giá trị của product
-        const {
-            name,
-            image,
-            type,
-            price,
-            countInStock,
-            description
-        } = newProduct
-        try {
-            // Kiểm tra product đã tồn tại
-            const checkProduct = await Product.findOne({
-                name: name
-            })
-            if (checkProduct !== null) {
-                resolve({
-                    status: 'OK',
-                    message: 'Tên sản phẩm đã tồn tại'
-                })
-            }
-            // Tạo product mới
-            const createProduct = await Product.create({
-                name,
-                image,
-                type,
-                price,
-                countInStock,
-                description
-            })
-            if (createProduct) {
-                resolve({
-                    status: "OK",
-                    message: "Tạo thành công",
-                    data: createProduct
-                })
-            }
-        } catch (e) {
-            reject(e)
+      const {
+        // 🧾 Thông tin cơ bản
+        name,
+        image,
+        images=[],
+        description = '',
+  
+        // 🏷️ Phân loại sản phẩm
+        room = '',
+        type,
+        brand = '',
+        origin = '',
+  
+        // 📦 Tồn kho và giá
+        price,
+        countInStock,
+        discount = 0,
+        selled = 0,
+  
+        // 🎨 Thuộc tính chi tiết
+        colors = [],
+        size = {}
+      } = newProduct;
+  
+      try {
+        const checkProduct = await Product.findOne({ name });
+  
+        if (checkProduct !== null) {
+          return resolve({
+            status: 'OK',
+            message: 'Tên sản phẩm đã tồn tại'
+          });
         }
-    })
-}
-
+  
+        const createdProduct = await Product.create({
+          name,
+          image,
+          images,
+          description,
+  
+          room,
+          type,
+          brand,
+          origin,
+  
+          price,
+          countInStock,
+          discount,
+          selled,
+  
+          colors,
+          size
+        });
+  
+        resolve({
+          status: "OK",
+          message: "Tạo sản phẩm thành công",
+          data: createdProduct
+        });
+  
+      } catch (e) {
+        reject(e);
+      }
+    });
+  };
 const updateProduct = (id, data) => {
     // Tạo xử lý bất đồng bộ
     return new Promise(async (resolve, reject) => {
