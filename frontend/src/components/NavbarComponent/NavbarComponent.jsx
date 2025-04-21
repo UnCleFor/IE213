@@ -25,7 +25,7 @@ export default function NavbarComponent() {
   
     // Phòng ngủ
     giuong: "Giường",
-    tuquanao: "Tu",
+    tuquanao: "Tủ",
   
     // Phòng làm việc
     ghevanphong: "Ghế văn phòng",

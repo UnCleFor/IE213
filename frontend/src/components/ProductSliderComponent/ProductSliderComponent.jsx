@@ -71,6 +71,7 @@ const ProductSliderComponent = ({limit}) => {
         price={item.price}
         image={item.image}
         description={item.description}
+        id={item._id}
       />
     </SlideItemWrapper>
   ));

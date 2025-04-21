@@ -3,7 +3,7 @@ import { Button, Tooltip, Modal } from "antd";
 import { ShoppingCartOutlined, EyeOutlined, HeartOutlined } from "@ant-design/icons";
 import { StyledCard, CardWrapper, ImageWrapper, HoverActions, WrapperTitle, WrapperPrice } from "./style";
 import tu_giay from "./tu_giay.webp";
-
+import { useNavigate } from 'react-router-dom'
 
 // const CardComponent = () => {
 //   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -68,11 +68,16 @@ import tu_giay from "./tu_giay.webp";
 //   );
 // };
 
-const CardComponent = ({ name, price, image, description }) => {
+const CardComponent = ({ name, price, image, description, id }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const showQuickView = () => setIsModalVisible(true);
   const handleClose = () => setIsModalVisible(false);
+
+  const navigate = useNavigate()
+  const handleDetailsProduct = (id) => {
+    navigate(`/product_details/${id}`)
+  }
 
   return (
     <CardWrapper>
@@ -88,17 +93,28 @@ const CardComponent = ({ name, price, image, description }) => {
             />
             <HoverActions className="hover-actions">
               <Tooltip title="Thêm vào giỏ hàng" placement="left">
-                <Button shape="circle" icon={<ShoppingCartOutlined />} />
+                <Button 
+                  shape="circle" 
+                  icon={<ShoppingCartOutlined />} />
               </Tooltip>
               <Tooltip title="Xem nhanh" placement="left">
-                <Button shape="circle" icon={<EyeOutlined />} onClick={showQuickView} />
+                <Button 
+                  shape="circle" 
+                  icon={<EyeOutlined />} 
+                  onClick={(e) => {
+                    e.stopPropagation();  //ưu tiên sự kiện xam nhanh, tương tự button thêm vào giỏ và yêu thích
+                    showQuickView();
+                  }} />
               </Tooltip>
               <Tooltip title="Yêu thích" placement="left">
-                <Button shape="circle" icon={<HeartOutlined />} />
+                <Button 
+                  shape="circle" 
+                  icon={<HeartOutlined />} />
               </Tooltip>
             </HoverActions>
           </ImageWrapper>
         }
+        onClick= {() => handleDetailsProduct(id)}
       >
         <WrapperTitle>{name}</WrapperTitle>
         <WrapperPrice>{price.toLocaleString('vi-VN')}đ</WrapperPrice>

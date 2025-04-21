@@ -8,14 +8,31 @@ import ButtonComponent from '../ButtonComponent/ButtonComponent'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { addOrderProduct } from '../../redux/slices/orderSlide'
+import * as ProductService from '../../services/ProductService'
+import { useQuery } from '@tanstack/react-query'
 
-const ProductDetailsComponent = () => {
+const ProductDetailsComponent = ({idProduct}) => {
     const [quantity, setQuantity] = useState(1);
     const user = useSelector((state) => state.user)
     const navigate = useNavigate()
     const location = useLocation()
     const dispatch = useDispatch()
 
+    const fetchGetDetailsProduct = async (context) => {
+        const id = context?.queryKey && context?.queryKey[1]
+        if (id) {
+            const res = await ProductService.getDetailsProduct(id);
+                return res.data            
+        }
+
+    };    
+    const { isLoading, data: productDetails } = useQuery({
+        queryKey: ['product-details', idProduct],
+        queryFn: fetchGetDetailsProduct,
+        enabled: !!idProduct
+      });
+    console.log('productDetails',productDetails)
+    
     const handleIncrease = () => {
         setQuantity(prev => prev + 1);
     };
@@ -84,10 +101,11 @@ const ProductDetailsComponent = () => {
     }
 
     return (
+        <isLoading isLoading={isLoading}>
         <div>
             <Row style={{ padding: '16px 0px', background: 'white' }} gutter={[16, 16]}>
                 <Col xs={24} sm={12} md={10} lg={10}>
-                    <Image src={imageProduct} alt="image product" preview={false} style={{ width: '100%', padding: "10px 0px" }} />
+                    <Image src={productDetails?.image} alt="image product" preview={false} style={{ width: '100%', padding: "10px 0px" }} />
                     <Row gutter={[8, 8]} justify="center">
                         {[...Array(5)].map((_, index) => (
                             <Col key={index} xs={4} sm={4} md={4} lg={4}>
@@ -98,7 +116,7 @@ const ProductDetailsComponent = () => {
                 </Col>
 
                 <Col xs={24} sm={12} md={14} lg={14} style={{ padding: '0px 20px' }}>
-                    <WrapperStyleNameProduct>{product.name}</WrapperStyleNameProduct>
+                    <WrapperStyleNameProduct>{productDetails?.name}</WrapperStyleNameProduct>
                     <p><strong>Mã sản phẩm:</strong> {product.code}</p>
                     <p><strong>Tình trạng:</strong> {product.status}</p>
                     <p><strong>Thương hiệu:</strong> {product.brand}</p>
@@ -106,7 +124,7 @@ const ProductDetailsComponent = () => {
                     <p><strong>Nhóm sản phẩm:</strong> {product.tags.join(", ")}</p>
 
                     <WrapperStylePriceProduct>
-                        {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(product.price)}
+                        {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(productDetails?.price)}
                     </WrapperStylePriceProduct>
 
                     <SizeProduct>
@@ -209,6 +227,7 @@ const ProductDetailsComponent = () => {
             <h2>Mô tả sản phẩm</h2>
             <div className="border border-gray-300 rounded-md" style={{ paddingBottom: "20px" }}>
                 <TableProductDetails>
+                    
                     <tbody>
                         {product.details.map((item, index) => (
                             <RowDetail key={index} even={index % 2 === 0}>
@@ -224,6 +243,7 @@ const ProductDetailsComponent = () => {
                 </TableProductDetails>
             </div>
         </div>
+    </isLoading>     
     )
 }
 
