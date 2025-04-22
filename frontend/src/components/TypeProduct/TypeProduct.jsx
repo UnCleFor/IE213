@@ -5,10 +5,10 @@ import CardComponent from '../CardComponent/CardComponent';
 import ContainerComponent from '../ContainerComponent/ContainerComponent';
 import ButtonComponent from '../ButtonComponent/ButtonComponent';
 
-const { Option } = Select;
+const { Option  } = Select;
 const { Title } = Typography;
 
-const TypeProduct = ({ title = 'Sản phẩm', type = null }) => {
+const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
   const [products, setProducts] = useState([]);
 
   const fetchProducts = async () => {
@@ -40,7 +40,7 @@ const TypeProduct = ({ title = 'Sản phẩm', type = null }) => {
   return (
     <ContainerComponent>
       <div style={{ padding: "16px 0" }}>
-        <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>{title}</Title>
+        <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>{name}</Title>
 
       {/* Bộ lọc + sắp xếp */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }} justify="start">

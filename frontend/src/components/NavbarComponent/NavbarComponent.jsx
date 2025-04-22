@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Grid, Menu, Drawer, theme } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import ContainerComponent from "../ContainerComponent/ContainerComponent";
 import TypeProduct from "../TypeProduct/TypeProduct";
+import { getAllTypeProduct } from "../../services/ProductService";
 
 const { useToken } = theme;
 const { useBreakpoint } = Grid;
@@ -14,7 +15,7 @@ export default function NavbarComponent() {
   const [current, setCurrent] = useState("");
   const [currentType, setCurrentType] = useState(null);
 
-  const typeLabels = {
+  const typeLabels = {    // chuyển hướng trang dssp
     // Phòng khách
     sofa: "Sofa",
     bantra: "Bàn trà",
@@ -58,13 +59,16 @@ export default function NavbarComponent() {
     setOpen(false);
   };
 
-  const menuItems = [
+  const menuItems = [   //thể hiện trên navbar
     {
       label: <span onClick={() => handleParentClick("PhongKhach")}>Phòng khách</span>,
       key: "PhongKhach",
       children: [
         { label: "Sofa", key: "sofa" },
         { label: "Bàn trà", key: "bantra" },
+        { label: "Kệ tivi", key: "ketivi" },
+        { label: "Ghế đơn", key: "ghedon" },
+        { label: "Tủ trang trí", key: "tutrangtri" },
       ],
     },
     {
@@ -73,6 +77,9 @@ export default function NavbarComponent() {
       children: [
         { label: "Bàn ăn", key: "banan" },
         { label: "Ghế ăn", key: "ghean" },
+        { label: "Tủ bếp", key: "tubep" },
+        { label: "Tủ rượu", key: "turuou" },
+        { label: "Phụ kiện bàn ăn", key: "phukienbanan" },
       ],
     },
     {
@@ -81,22 +88,31 @@ export default function NavbarComponent() {
       children: [
         { label: "Giường", key: "giuong" },
         { label: "Tủ quần áo", key: "tuquanao" },
+        { label: "Tab đầu giường", key: "tabdaugiuong" },
+        { label: "Bàn trang điểm", key: "bantrangdiem" },
+        { label: "Chăn ga gối", key: "changagoi" },
       ],
     },
     {
       label: <span onClick={() => handleParentClick("PhongLamViec")}>Phòng làm việc</span>,
       key: "PhongLamViec",
       children: [
-        { label: "Ghế văn phòng", key: "ghevanphong" },
         { label: "Bàn làm việc", key: "banlamviec" },
+        { label: "Ghế làm việc", key: "ghelamviec" },
+        { label: "Kệ sách", key: "kesach" },
+        { label: "Tủ hồ sơ", key: "tuhoso" },
+        { label: "Đèn bàn", key: "denban" },
       ],
     },
     {
       label: <span onClick={() => handleParentClick("TrangTriNhaCua")}>Trang trí nhà cửa</span>,
       key: "TrangTriNhaCua",
       children: [
-        { label: "Thảm trải sàn", key: "thamtraisan" },
-        { label: "Tranh canvas", key: "tranhcanvas" },
+        { label: "Tranh treo tường", key: "tranhtreotuong" },
+        { label: "Đèn trang trí", key: "dentrangtri" },
+        { label: "Thảm", key: "tham" },
+        { label: "Cây giả", key: "caygia" },
+        { label: "Đồng hồ trang trí", key: "donghotrangtri" },       
       ],
     },
   ];
@@ -176,7 +192,7 @@ export default function NavbarComponent() {
     {currentType && (
       <TypeProduct
         type={currentType}
-        title={`Sản phẩm: ${typeLabels[currentType] || currentType}`}
+        name={`Sản phẩm: ${typeLabels[currentType] || currentType}`}
         showFilter={true}
       />
     )}
