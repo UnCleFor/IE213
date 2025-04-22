@@ -10,6 +10,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { addOrderProduct } from '../../redux/slices/orderSlide'
 import * as ProductService from '../../services/ProductService'
 import { useQuery } from '@tanstack/react-query'
+import LikeButtonComponent from '../LikeButtonComponent/LikeButtonComponent'
 
 const ProductDetailsComponent = ({idProduct}) => {
     const [quantity, setQuantity] = useState(1);
@@ -137,6 +138,8 @@ const ProductDetailsComponent = ({idProduct}) => {
                             <SizeBox key={index}>{size}</SizeBox>
                         ))}
                     </SizeProduct>
+                    
+                    <LikeButtonComponent dataHref={"https://developers.facebook.com/docs/plugins/"} />
 
                     <p><strong>Màu sắc</strong></p>
 
