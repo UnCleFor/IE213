@@ -208,7 +208,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                     fontWeight: 'bold',
                                 }}
                                 textButton="Mua ngay"
-                                onClick={handleAddOrderProduct}
+
                             />
                             <ButtonComponent
                                 size="large"
@@ -227,6 +227,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                     fontWeight: 'bold',
                                 }}
                                 textButton="Thêm vào giỏ hàng"
+                                onClick={handleAddOrderProduct}
                             />
                         </WrapperBtnBuy>
                     </Col>
