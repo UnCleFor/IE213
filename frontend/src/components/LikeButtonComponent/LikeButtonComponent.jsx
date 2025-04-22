@@ -1,22 +1,15 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 const LikeButtonComponent = (props) => {
     const { dataHref } = props
-
-    useEffect(() => {
-        if (window.FB) {
-            window.FB.XFBML.parse()
-        }
-    }, [])
-
     return (
         <div
             className="fb-like"
             data-href={dataHref}
             data-width=""
-            data-layout="standard"
-            data-action="like"
-            data-size="small"
+            data-layout=""
+            data-action=""
+            data-size=""
             data-share="true"
         ></div>
     )
