@@ -197,6 +197,27 @@ const logoutUser = async (req, res) => {
     }
   };
   
+  const deleteManyUser = async (req,res) => {
+    try {
+        const ids = req.body.ids
+        if (!ids) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Thiếu ds id của user'
+            })
+        }
+        
+        // thực hiện xóa user
+        const ketqua = await UserService.deleteManyUser(ids)
+        return res.status(200).json(ketqua)
+    }
+    catch(e){
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 
 module.exports = {
     createUser,
@@ -206,5 +227,6 @@ module.exports = {
     getAllUser,
     getDetailsUser,
     refreshToken,
-    logoutUser
+    logoutUser,
+    deleteManyUser
 }

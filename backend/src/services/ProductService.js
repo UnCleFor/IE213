@@ -31,7 +31,7 @@ const createProduct = (newProduct) => {
   
         if (checkProduct !== null) {
           return resolve({
-            status: 'OK',
+            status: 'ERR',
             message: 'Tên sản phẩm đã tồn tại'
           });
         }
@@ -79,6 +79,17 @@ const updateProduct = (id, data) => {
                     status: 'OK',
                     message: 'Product không tồn tại'
                 })
+            }
+
+            if (data.name) {
+                const checkProduct = await Product.findOne({ name: data.name });
+                if (checkProduct && checkProduct._id.toString() !== id) {
+                    resolve({
+                        status: 'ERR',
+                        message: 'Tên sản phẩm trùng'
+                    });
+                    return;
+                }
             }
             const updatedProduct = await Product.findByIdAndUpdate(id, data, {
                 new: true
@@ -248,11 +259,28 @@ const getAllType = () => {
     })
 }
 
+const deleteManyProduct = (ids) => {
+    // Tạo xử lý bât đồng bộ
+    return new Promise(async (resolve, reject) => {
+        try {
+            await Product.deleteMany({_id: ids})
+            resolve({
+                status: 'OK',
+                message: 'Xóa các sản phẩm thành công'
+            })
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
+
 module.exports = {
     createProduct,
     updateProduct,
     getDetailsProduct,
     deleteProduct,
     getAllProduct,
-    getAllType
+    getAllType,
+    deleteManyProduct
 }

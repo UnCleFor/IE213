@@ -1,5 +1,3 @@
-// [PHẦN ĐẦU GIỮ NGUYÊN]
-
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { WrapperHeader } from './style'
@@ -27,6 +25,7 @@ const AdminUser = () => {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isFinishUpdated, setIsFinishUpdated] = useState(false);
+  const [isFinishDeletedMany,setIsFinishDeletedMany] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
 
   const [searchText, setSearchText] = useState('');
@@ -67,9 +66,14 @@ const AdminUser = () => {
     return UserService.deleteUser(id, token);
   });
 
+  const mutationDeleteMany = useMutationHooks(({token,...ids }) => {
+      return UserService.deleteManyUser(ids, token);
+    });
+
   const { data, isLoading, isSuccess, isError } = mutation;
   const { data: dataUpdated, isLoading: isLoadingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate;
   const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
+  const { data: dataDeletedMany, isLoading: isLoadingDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeleteMany;
 
   const getAllUsers = async () => {
     const res = await UserService.getAllUser(user.access_token);
@@ -105,6 +109,7 @@ const AdminUser = () => {
       avatar: ''
     });
     form.resetFields();
+    mutation.reset();
   };
 
   const handleOnchange = (e) => {
@@ -150,6 +155,13 @@ const AdminUser = () => {
     });
   };
 
+  const handleDeleteManyUsers = (ids) => {
+    setIsFinishDeletedMany(true)
+    mutationDeleteMany.mutate({
+      ids:ids,
+      token: user.access_token})
+  }
+
   const onFinish = () => {
     // Gửi payload đầy đủ bao gồm confirmPassword
     mutation.mutate({
@@ -157,10 +169,9 @@ const AdminUser = () => {
     });
   };
 
-
   const onUpdateUser = () => {
     //console.log('onUpdateUser called'); // Đảm bảo sự kiện này được gọi
-    setIsFinishUpdated(true);
+    setIsFinishUpdated(true)
     mutationUpdate.mutate({
       id: rowSelected,
       token: user.access_token,
@@ -228,26 +239,6 @@ const AdminUser = () => {
           >
             Đặt lại
           </Button>
-          {/* <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              confirm({ closeDropdown: false });
-              setSearchText(selectedKeys[0]);
-              setSearchedColumn(dataIndex);
-            }}
-          >
-            Filter
-          </Button> */}
-          {/* <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              close();
-            }}
-          >
-            Đóng
-          </Button> */}
         </Space>
       </div>
     ),
@@ -264,17 +255,6 @@ const AdminUser = () => {
         }
       },
     },
-    // render: text =>
-    //   searchedColumn === dataIndex ? (
-    //     <Highlighter
-    //       highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-    //       searchWords={[searchText]}
-    //       autoEscape
-    //       textToHighlight={text ? text.toString() : ''}
-    //     />
-    //   ) : (
-    //     text
-    //   ),
   });
 
   const columns = [
@@ -330,7 +310,7 @@ const AdminUser = () => {
       message.success('Thêm người dùng thành công!');
       handleCancel();
       queryClient.invalidateQueries(['users']);
-    } else if (isError) {
+    } else if(data?.status === 'ERR') {
       message.error('Thêm người dùng thất bại!');
     }
   }, [isSuccess, isError]);
@@ -341,7 +321,8 @@ const AdminUser = () => {
       queryClient.invalidateQueries(['users']);
       setIsFinishUpdated(false);
       setIsOpenDrawer(false);
-    } else if (isErrorUpdated) {
+    } else if (dataUpdated?.status === 'ERR'){
+      setIsFinishUpdated(false);
       message.error('Cập nhật thất bại!');
     }
   }, [isSuccessUpdated, isErrorUpdated]);
@@ -355,6 +336,17 @@ const AdminUser = () => {
       message.error('Xóa người dùng thất bại!');
     }
   }, [isSuccessDeleted, isErrorDeleted]);
+
+  useEffect(() => {
+      if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
+        message.success('Xóa các người dùng thành công!');
+        queryClient.invalidateQueries(['user']);
+        setIsFinishDeletedMany(false);
+      } else if (isErrorDeletedMany) {
+        message.error('Xóa các người dùng thất bại!');
+      }
+    }, [isSuccessDeletedMany, isErrorDeletedMany]);
+
   return (
     <div>
       <WrapperHeader>Quản lý người dùng</WrapperHeader>
@@ -368,9 +360,10 @@ const AdminUser = () => {
       </div>
       <div style={{ marginTop: '20px' }}>
         <TableComponent
+        deleteAll={handleDeleteManyUsers}
           forceRender
           columns={columns}
-          isLoading={isLoadingUser}
+          isLoading={isLoadingUser || isFinishDeletedMany}
           data={dataTable}
           onRow={(record) => ({
             onClick: () => setRowSelected(record._id)
@@ -385,11 +378,11 @@ const AdminUser = () => {
 
       <Modal forceRender title="Tạo người dùng mới" open={isModalOpen} onCancel={handleCancel} footer={null}>
         <Loading isLoading={isLoading}>
-          <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} form={form} onFinish={onFinish}>
+          <Form labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} form={form} onFinish={onFinish}>
             {['name', 'email', 'phone'].map((field) => (
               <Form.Item
                 key={field}
-                label={field}
+                label={field.charAt(0).toUpperCase() + field.slice(1)}
                 name={field}
                 rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}
               >
@@ -399,7 +392,7 @@ const AdminUser = () => {
 
             {/* Trường mật khẩu */}
             <Form.Item
-              label="Mật khẩu"
+              label="Password"
               name="password"
               rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}
             >
@@ -411,7 +404,7 @@ const AdminUser = () => {
 
             {/* Trường xác nhận mật khẩu */}
             <Form.Item
-              label="Xác nhận mật khẩu"
+              label="Confirm Password"
               name="confirmPassword"
               rules={[
                 { required: true, message: 'Vui lòng xác nhận mật khẩu' },
@@ -431,8 +424,6 @@ const AdminUser = () => {
               />
             </Form.Item>
 
-
-
             <Form.Item label="Avatar" name="avatar">
               <WrapperUploadFile
                 onChange={handleOnchangeAvatar}
@@ -440,7 +431,9 @@ const AdminUser = () => {
                 beforeUpload={() => false}
                 customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
               >
-                <Button>Chọn ảnh</Button>
+                <Button>Select Avatar</Button>
+                </WrapperUploadFile>
+                <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {stateUser?.avatar && (
                   <img
                     src={stateUser.avatar}
@@ -454,10 +447,10 @@ const AdminUser = () => {
                     alt=""
                   />
                 )}
-              </WrapperUploadFile>
+              </div>
             </Form.Item>
-
-            <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
+            {data?.status === 'ERR' && <span style={{color:'red'}}>{data?.message}</span>}
+            <Form.Item wrapperCol={{ offset: 21, span: 3 }}>
               <Button type="primary" htmlType="submit">
                 Tạo
               </Button>
@@ -470,8 +463,12 @@ const AdminUser = () => {
       <DrawerComponent
         title="Chi tiết người dùng"
         isOpen={isOpenDrawer}
-        onClose={() => setIsOpenDrawer(false)}
-        width="90%"
+        onClose={() => {
+          setIsOpenDrawer(false);
+          mutationUpdate.reset();  // Reset mutation khi đóng drawer
+        }}
+        
+        width="30%"
       >
         <Loading isLoading={isLoadingUpdate || isFinishUpdated}>
           <Form
@@ -506,6 +503,8 @@ const AdminUser = () => {
                 customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
               >
                 <Button>Chọn ảnh</Button>
+                </WrapperUploadFile>
+                <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {stateUserDetails?.avatar && (
                   <img
                     src={stateUserDetails.avatar}
@@ -519,9 +518,9 @@ const AdminUser = () => {
                     alt=""
                   />
                 )}
-              </WrapperUploadFile>
+              </div>
             </Form.Item>
-
+            {dataUpdated?.status === 'ERR' && <span style={{color:'red'}}>{dataUpdated?.message}</span>}
             {/* Nút Cập nhật thủ công */}
             <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
               <Button

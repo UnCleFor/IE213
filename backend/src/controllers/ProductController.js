@@ -108,11 +108,32 @@ const getAllType = async (req, res) => {
     }
 }
 
+const deleteManyProduct = async (req, res) => {
+    try {
+        const ids = req.body.ids
+        if(!ids) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Thiếu danh sách id'
+            })
+        }
+        const ketqua = await ProductService.deleteManyProduct(ids)
+        return res.status(200).json(ketqua)
+    }
+    catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
+
 module.exports = {
     createProduct,
     updateProduct,
     getDetailsProduct,
     deleteProduct,
     getAllProduct,
-    getAllType
+    getAllType,
+    deleteManyProduct
 }

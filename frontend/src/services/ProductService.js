@@ -81,3 +81,16 @@ export const getAllTypeProduct = async () => {
     `${process.env.REACT_APP_API_URL}/product/get-all-type`)
   return res.data;
 };
+
+export const deleteManyProduct = async (data, access_token) => {
+  const res = await axiosJWT.post(
+    `${process.env.REACT_APP_API_URL}/product/delete-many`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    }
+  );
+  return res.data;
+};

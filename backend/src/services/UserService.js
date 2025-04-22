@@ -97,33 +97,47 @@ const loginUser = (userLogin) => {
     })
 }
 const updateUser = (id, data) => {
-    return new Promise( async(resolve,reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            // biến kiểm tra coi mail có trong database ko
-            const checkUser = await User.findOne({
-                _id: id
-            })
-            // nếu === null thì chưa có => thông báo chưa có tài khoản
-            if (checkUser === null){
+            // Kiểm tra xem người dùng có tồn tại không
+            const checkUser = await User.findOne({ _id: id });
+
+            if (checkUser === null) {
                 resolve({
                     status: 'ERR',
-                    message: 'Tài khoản này chưa được đăng kí'
-                })
+                    message: 'Tài khoản này chưa được đăng ký'
+                });
+                return;
             }
 
-            const updatedUser = await User.findByIdAndUpdate(id, data, { new: true})
-            console.log('updateUser',updateUser)
+            // Kiểm tra xem email mới có trùng với email của người dùng khác không
+            if (data.email) {
+                const checkEmail = await User.findOne({ email: data.email });
+                // Nếu email khác với email cũ và email này đã tồn tại, trả về lỗi
+                if (checkEmail && checkEmail._id.toString() !== id) {
+                    resolve({
+                        status: 'ERR',
+                        message: 'Email đã được sử dụng bởi tài khoản khác'
+                    });
+                    return;
+                }
+            }
+
+            // Cập nhật thông tin người dùng
+            const updatedUser = await User.findByIdAndUpdate(id, data, { new: true });
+            console.log('updateUser', updatedUser);
+
             resolve({
-                status:"OK",
-                message: "Cập nhật người dùng thành công"
-            })
-            
+                status: 'OK',
+                message: 'Cập nhật người dùng thành công'
+            });
+
+        } catch (e) {
+            reject(e);
         }
-        catch(e) {
-            reject(e)
-        }
-    })
-}
+    });
+};
+
 
 const deleteUser = (id) => {
     return new Promise( async(resolve,reject) => {
@@ -199,6 +213,21 @@ const getDetailsUser = (id) => {
     })
 }
 
+const deleteManyUser = (ids) => {
+    return new Promise( async(resolve,reject) => {
+        try {
+            await User.deleteMany({_id:ids})
+            resolve({
+                status: 'OK',
+                message: 'Xoá thông tin thành công'
+            })
+            
+        }
+        catch(e) {
+            reject(e)
+        }
+    })
+}
 
 module.exports = {
     createUser,
@@ -207,5 +236,5 @@ module.exports = {
     deleteUser,
     getAllUser,
     getDetailsUser,
-
+    deleteManyUser
 }

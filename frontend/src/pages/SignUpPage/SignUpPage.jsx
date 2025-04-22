@@ -44,7 +44,7 @@ const SignUpPage = () => {
             handleNavigateSignIn()
         } else if (isError) {
             message.error({
-                content: "Đăng ký thành công!",
+                content: "Đăng ký thất bại!",
               });
         }
     },[isSuccess,isError])
