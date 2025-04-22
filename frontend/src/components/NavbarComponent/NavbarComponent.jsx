@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Button, Grid, Menu, Drawer, theme } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import ContainerComponent from "../ContainerComponent/ContainerComponent";
-import TypeProduct from "../TypeProduct/TypeProduct";
 import { getAllTypeProduct } from "../../services/ProductService";
+import { useNavigate } from 'react-router-dom'
 
 const { useToken } = theme;
 const { useBreakpoint } = Grid;
@@ -14,52 +14,62 @@ export default function NavbarComponent() {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("");
   const [currentType, setCurrentType] = useState(null);
-
-  const typeLabels = {    // chuyển hướng trang dssp
-    // Phòng khách
-    sofa: "Sofa",
-    bantra: "Bàn trà",
+  const navigate = useNavigate()
   
-    // Phòng ăn
-    banan: "Bàn ăn",
-    ghean: "Ghế ăn",
+  // const category = {
+  //   // Phòng khách
+  //   sofa: "Sofa",
+  //   bantra: "Bàn trà",
+  //   ketivi: "Kệ tivi",
+  //   ghedon: "Ghế đơn",
+  //   tutrangtri: "Tủ trang trí",
   
-    // Phòng ngủ
-    giuong: "Giường",
-    tuquanao: "Tủ",
+  //   // Phòng ăn
+  //   banan: "Bàn ăn",
+  //   ghean: "Ghế ăn",
+  //   tubep: "Tủ bếp",
+  //   turuou: "Tủ rượu",
+  //   phukienbanan: "Phụ kiện bàn ăn",
   
-    // Phòng làm việc
-    ghevanphong: "Ghế văn phòng",
-    banlamviec: "Bàn làm việc",
+  //   // Phòng ngủ
+  //   giuong: "Giường",
+  //   tuquanao: "Tủ quần áo",
+  //   tabdaugiuong: "Tab đầu giường",
+  //   bantrangdiem: "Bàn trang điểm",
+  //   changagoi: "Chăn ga gối",
   
-    // Trang trí nhà cửa
-    thamtraisan: "Thảm trải sàn",
-    tranhcanvas: "Tranh canvas",
-  };
-
+  //   // Phòng làm việc
+  //   banlamviec: "Bàn làm việc",
+  //   ghelamviec: "Ghế làm việc",
+  //   kesach: "Kệ sách",
+  //   tuhoso: "Tủ hồ sơ",
+  //   denban: "Đèn bàn",
+  
+  //   // Trang trí nhà cửa
+  //   tranhtreotuong: "Tranh treo tường",
+  //   dentrangtri: "Đèn trang trí",
+  //   tham: "Thảm",
+  //   caygia: "Cây giả",
+  //   donghotrangtri: "Đồng hồ trang trí",
+  // };
   const handleClick = (e) => {
-    console.log("Bấm vào: ", e.key);
-    setCurrent(e.key);
-
-    const mappedType = typeLabels[e.key]; //lấy type của sản phẩm
-    if (mappedType) {
-      setCurrentType(mappedType);
-    } else {
-      setCurrentType(null);
-    }
+    // const mappedType = typeLabels[e.key]; //lấy type của sản phẩm
+    // if (mappedType) {
+    //   setCurrentType(mappedType);
+    // } else {
+    //   setCurrentType(null);
+    // }
 
     setOpen(false); // Đóng menu khi chọn item trên mobile
   };
 
   // Xử lý khi click vào parent item
   const handleParentClick = (key) => {
-    console.log("Bấm vào parent: ", key);
-    setCurrent(key);
-    setCurrentType(null);
+    navigate(`/product/${key}`);
     setOpen(false);
   };
 
-  const menuItems = [   //thể hiện trên navbar
+  const productTypesByRoom = [   //thể hiện trên navbar
     {
       label: <span onClick={() => handleParentClick("PhongKhach")}>Phòng khách</span>,
       key: "PhongKhach",
@@ -117,6 +127,68 @@ export default function NavbarComponent() {
     },
   ];
 
+  const handleNavigatetype = (e) => {
+    const { key } = e;
+  
+    // Tìm label tương ứng từ menuItems
+    const findLabel = (items, key) => {
+      for (const item of items) {
+        if (item.key === key) return item.label;
+        if (item.children) {
+          const child = item.children.find(c => c.key === key);
+          if (child) return child.label;
+        }
+      }
+      return null;
+    };
+  
+
+    
+    const label = findLabel(menuItems, key);
+  
+    console.log("Đi tới:", key, "Label:", label?.props?.children || label);
+  
+    const normalizedKey = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ /g, '_');
+    navigate(`/product/${normalizedKey}`);
+  };
+  
+  // const categories = [
+  //   {
+  //     label: "Phòng khách",
+  //     key: "PhongKhach",
+  //     children: ["sofa", "bantra", "ketivi", "ghedon", "tutrangtri"],
+  //   },
+  //   {
+  //     label: "Phòng ăn",
+  //     key: "PhongAn",
+  //     children: ["banan", "ghean", "tubep", "turuou", "phukienbanan"],
+  //   },
+  //   {
+  //     label: "Phòng ngủ",
+  //     key: "PhongNgu",
+  //     children: ["giuong", "tuquanao", "tabdaugiuong", "bantrangdiem", "changagoi"],
+  //   },
+  //   {
+  //     label: "Phòng làm việc",
+  //     key: "PhongLamViec",
+  //     children: ["banlamviec", "ghelamviec", "kesach", "tuhoso", "denban"],
+  //   },
+  //   {
+  //     label: "Trang trí nhà cửa",
+  //     key: "TrangTriNhaCua",
+  //     children: ["tranhtreotuong", "dentrangtri", "tham", "caygia", "donghotrangtri"],
+  //   },
+  // ];
+  
+  const menuItems = productTypesByRoom.map((category) => ({
+    label: <span>{category.label}</span>, // không cần onClick ở đây nữa
+    key: category.key,
+    children: category.children.map((child) => ({
+      label: <span>{child.label}</span>,
+      key: child.key,
+    })),
+  }));
+    
   const styles = {
     header: {
       backgroundColor: "brown",
@@ -163,7 +235,7 @@ export default function NavbarComponent() {
               style={styles.menu}
               mode="horizontal"
               items={menuItems}
-              onClick={handleClick}
+              onClick={handleNavigatetype}
               selectedKeys={[current]}
             />
           ) : (
@@ -181,7 +253,7 @@ export default function NavbarComponent() {
                 onClose={() => setOpen(false)}
                 open={open}
               >
-                <Menu mode="inline" items={menuItems} onClick={handleClick} selectedKeys={[current]} />
+                <Menu mode="inline" items={menuItems} onClick={handleNavigatetype} selectedKeys={[current]} />
               </Drawer>
             </>
           )}
@@ -189,13 +261,13 @@ export default function NavbarComponent() {
       </ContainerComponent>
     </nav>
 
-    {currentType && (
+    {/* {currentType && (
       <TypeProduct
         type={currentType}
         name={`Sản phẩm: ${typeLabels[currentType] || currentType}`}
         showFilter={true}
       />
-    )}
+    )} */}
   </>
 );
 }

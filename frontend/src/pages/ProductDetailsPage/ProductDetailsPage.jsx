@@ -1,7 +1,6 @@
 import React from "react";
 import ProductDetailsComponent from "../../components/ProductDetailsComponent/ProductDetailsComponent";
 import { WrapperTypeProduct } from "../HomePage/style";
-import TypeProduct from "../../components/TypeProduct/TypeProduct";
 import NavbarComponent from "../../components/NavbarComponent/NavbarComponent";
 import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 import { useNavigate, useParams } from "react-router-dom";

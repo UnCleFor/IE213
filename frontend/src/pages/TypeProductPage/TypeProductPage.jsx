@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Typography, Select, InputNumber, Pagination } from 'antd';
 import axios from 'axios';
-import CardComponent from '../CardComponent/CardComponent';
-import ContainerComponent from '../ContainerComponent/ContainerComponent';
-import ButtonComponent from '../ButtonComponent/ButtonComponent';
+import CardComponent from '../../components/CardComponent/CardComponent';
+import ContainerComponent from '../../components/ContainerComponent/ContainerComponent';
+import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
+import { useLocation } from 'react-router-dom';
 
 const { Option  } = Select;
 const { Title } = Typography;
 
 const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
   const [products, setProducts] = useState([]);
-
+  const location = useLocation()
+  console.log('location', location)
   const fetchProducts = async () => {
     try {
       let url = `${process.env.REACT_APP_API_URL}/product/get-all`;
@@ -117,7 +119,7 @@ const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
           </Col>
         </Row>
 
-        {/* Lưới sản phẩm & */}
+        {/* Lưới sản phẩm */}
         <Row gutter={[16, 24]}>
           {products.length > 0 ? (
             products.map((product) => (
@@ -137,7 +139,7 @@ const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
           )}
         </Row>
 
-        {/* Phân trang  */}
+        {/* Phân trang */}
         <Pagination
           defaultCurrent={1}
           total={products.length}

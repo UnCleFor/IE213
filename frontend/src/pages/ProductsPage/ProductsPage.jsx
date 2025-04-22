@@ -3,7 +3,6 @@ import axios from 'axios';
 import { Row, Col, Pagination, Select, InputNumber, Button, Typography } from 'antd';
 import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
-import TypeProduct from '../../components/TypeProduct/TypeProduct';
 
 const { Option } = Select;
 const { Title } = Typography;
