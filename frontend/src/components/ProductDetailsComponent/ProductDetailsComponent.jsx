@@ -1,5 +1,5 @@
 import { Col, Image, Row } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import imageProduct from '../../assets/images/z6436857502524_b8df322fa070c2dd15fc904c2ee1c100.jpg'
 import imageProductSmall from '../../assets/images/z6436857450475_595921696663d0fe0f381a7c4efb9de6.jpg'
 import { DetailsCell, RowDetail, SizeBox, SizeProduct, TableProductDetails, TitleCell, WrapperBtnBuy, WrapperStyleColImage, WrapperStyleImageSmall, WrapperStyleNameProduct, WrapperStylePriceProduct, WrapperQuantity } from './style'
@@ -11,6 +11,8 @@ import { addOrderProduct } from '../../redux/slices/orderSlide'
 import * as ProductService from '../../services/ProductService'
 import { useQuery } from '@tanstack/react-query'
 import LikeButtonComponent from '../LikeButtonComponent/LikeButtonComponent'
+import CommentComponent from '../CommentComponent/CommentComponent'
+import { initFacebookSDK } from '../../utils'
 
 const ProductDetailsComponent = ({ idProduct }) => {
     const [quantity, setQuantity] = useState(1);
@@ -206,7 +208,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                     fontWeight: 'bold',
                                 }}
                                 textButton="Mua ngay"
-
+                                onClick={handleAddOrderProduct}
                             />
                             <ButtonComponent
                                 size="large"
@@ -224,7 +226,6 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                     fontSize: '16px',
                                     fontWeight: 'bold',
                                 }}
-                                onClick={handleAddOrderProduct}
                                 textButton="Thêm vào giỏ hàng"
                             />
                         </WrapperBtnBuy>
