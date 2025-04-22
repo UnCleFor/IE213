@@ -26,6 +26,7 @@ const AdminProduct = () => {
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isFinishUpdated, setIsFinishUpdated] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
+  const [selectedRoom, setSelectedRoom] = useState('');
 
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
@@ -51,7 +52,7 @@ const AdminProduct = () => {
       height: ''
     }
   });
-  
+
   const [stateProductDetails, setStateProductDetails] = useState({
     name: '',
     image: '',
@@ -72,9 +73,10 @@ const AdminProduct = () => {
       height: ''
     }
   });
+  const [selectedRoomDetails, setSelectedRoomDetails] = useState(stateProductDetails?.room || '');
 
   const mutation = useMutationHooks((data) => {
-    const {name, image, images, type, price, countInStock, description, room, brand, origin, discount, colors, size} = data;
+    const { name, image, images, type, price, countInStock, description, room, brand, origin, discount, colors, size } = data;
     return ProductService.createProduct({ name, image, images, type, price, countInStock, description, room, brand, origin, discount, colors, size });
   });
 
@@ -88,7 +90,7 @@ const AdminProduct = () => {
 
   const { data, isLoading, isSuccess, isError } = mutation;
   const { data: dataUpdated, isLoading: isLoadingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate;
-  
+
   const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
   const getAllProducts = async () => {
     const res = await ProductService.getAllProductAdmin();
@@ -103,7 +105,7 @@ const AdminProduct = () => {
   const fetchGetDetailsProduct = async (rowSelected) => {
     setIsLoadingUpdate(true);
     setIsOpenDrawer(true);
-    
+
     const res = await ProductService.getDetailsProduct(rowSelected);
     if (res?.data) {
       setStateProductDetails({
@@ -125,8 +127,8 @@ const AdminProduct = () => {
           width: res?.data?.size?.width || '',
           height: res?.data?.size?.height || ''
         }
-      });      
-      
+      });
+
     }
     setIsLoadingUpdate(false);
   };
@@ -142,30 +144,30 @@ const AdminProduct = () => {
     setIsModalOpen(false);
     setStateProduct({
       name: '',
-    image: '',
-    images: [],
-    type: '',
-    price: '',
-    countInStock: '',
-    description: '',
-    room: '',      // Thêm phòng
-    brand: '',     // Thêm thương hiệu
-    origin: '',    // Thêm xuất xứ
-    discount: '',  // Thêm giảm giá
-    selled: '',    // Thêm số lượng đã bán
-    colors: [],    // Thêm màu sắc
-    size: {
-      length: '',
-      width: '',
-      height: ''
-    }
+      image: '',
+      images: [],
+      type: '',
+      price: '',
+      countInStock: '',
+      description: '',
+      room: '',      // Thêm phòng
+      brand: '',     // Thêm thương hiệu
+      origin: '',    // Thêm xuất xứ
+      discount: '',  // Thêm giảm giá
+      selled: '',    // Thêm số lượng đã bán
+      colors: [],    // Thêm màu sắc
+      size: {
+        length: '',
+        width: '',
+        height: ''
+      }
     });
-    form.resetFields(); 
+    form.resetFields();
   };
 
   const handleOnchange = (e) => {
     const { name, value } = e.target;
-  
+
     if (name === 'length' || name === 'width' || name === 'height') {
       setStateProduct((prevState) => ({
         ...prevState,
@@ -181,12 +183,12 @@ const AdminProduct = () => {
       }));
     }
   };
-  
-  
+
+
 
   const handleOnchangeDetails = (e) => {
     const { name, value } = e.target;
-  
+
     // Xử lý cho các trường liên quan đến size nếu cần (ví dụ: length, width, height)
     if (name === 'length' || name === 'width' || name === 'height') {
       setStateProductDetails((prevState) => ({
@@ -203,7 +205,7 @@ const AdminProduct = () => {
       }));
     }
   };
-  
+
 
   const handleOnchangeAvatar = async ({ fileList }) => {
     const file = fileList[0];
@@ -237,7 +239,7 @@ const AdminProduct = () => {
       images: newImages
     }));
   };
-  
+
 
   const handleOnchangeAvatarDetails = async ({ fileList }) => {
     const file = fileList[0];
@@ -457,7 +459,7 @@ const AdminProduct = () => {
       form.setFieldsValue(stateProduct); // Đồng bộ state vào form mỗi khi mở lại
     }
   }, [isModalOpen]);
-  
+
   useEffect(() => {
     form.setFieldsValue(stateProductDetails);
   }, [form, stateProductDetails]);
@@ -491,6 +493,13 @@ const AdminProduct = () => {
       message.error('Xóa sản phẩm thất bại!');
     }
   }, [isSuccessDeleted, isErrorDeleted]);
+  const productTypesByRoom = {
+    'Phòng khách': ['Sofa', 'Bàn trà', 'Kệ tivi', 'Ghế đơn', 'Tủ trang trí'],
+    'Phòng ngủ': ['Giường', 'Tủ quần áo', 'Tab đầu giường', 'Bàn trang điểm', 'Chăn ga gối'],
+    'Phòng ăn': ['Bàn ăn', 'Ghế ăn', 'Tủ bếp', 'Tủ rượu', 'Phụ kiện bàn ăn'],
+    'Phòng làm việc': ['Bàn làm việc', 'Ghế làm việc', 'Kệ sách', 'Tủ hồ sơ', 'Đèn bàn'],
+    'Trang trí nhà cửa': ['Tranh treo tường', 'Đèn trang trí', 'Thảm', 'Cây giả', 'Đồng hồ trang trí']
+  };
 
   const productTypes = [
     "Sofa", "Bàn trà", "Kệ tivi", "Ghế đơn", "Tủ trang trí", "Giường", "Tủ quần áo",
@@ -536,300 +545,356 @@ const AdminProduct = () => {
       {/* Modal thêm sản phẩm */}
       <Modal forceRender title="Tạo sản phẩm mới" open={isModalOpen} onCancel={handleCancel} footer={null}>
         <Loading isLoading={isLoading}>
-        <Form
-  labelCol={{ span: 8 }}
-  wrapperCol={{ span: 16 }}
-  form={form}
-  onFinish={onFinish}
-  autoComplete="off"
->
-  {['name', 'type', 'price', 'countInStock', 'description', 'room', 'brand', 'origin', 'discount'].map((field) => (
-    <Form.Item
-      key={field}
-      label={field.charAt(0).toUpperCase() + field.slice(1)}
-      name={field}
-      rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}
-    >
-      {field === 'type' ? (
-        <Select
-          value={stateProduct[field]}
-          onChange={(value) => handleOnchange({ target: { name: field, value } })}
-        >
-          {productTypes.map((type) => (
-            <Select.Option key={type} value={type}>
-              {type}
-            </Select.Option>
-          ))}
-        </Select>
-      ) : (
-        <InputComponent
-          value={stateProduct[field]}
-          onChange={handleOnchange}
-          name={field}
-        />
-      )}
-    </Form.Item>
-  ))}
+          <Form
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
+            form={form}
+            onFinish={onFinish}
+            autoComplete="off"
+          >
+            {['name', 'price', 'countInStock', 'description', 'brand', 'origin', 'discount'].map((field) => (
+              <Form.Item
+                key={field}
+                label={field.charAt(0).toUpperCase() + field.slice(1)}
+                name={field}
+                rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}
+              >
+                <InputComponent
+                  value={stateProduct[field]}
+                  onChange={handleOnchange}
+                  name={field}
+                />
+              </Form.Item>
+            ))}
 
-  {/* Cập nhật màu sắc */}
-  <Form.Item
-    label="Màu sắc"
-    name="colors"
-    rules={[{ required: true, message: 'Vui lòng chọn màu sắc' }]}
-  >
-    <Select
-      mode="multiple"
-      value={stateProduct.colors}
-      onChange={(value) => handleOnchange({ target: { name: 'colors', value } })}
-    >
-      {['Đỏ', 'Xanh', 'Vàng', 'Trắng', 'Đen'].map((color) => (
-        <Select.Option key={color} value={color}>
-          {color}
-        </Select.Option>
-      ))}
-    </Select>
-  </Form.Item>
+            <Form.Item
+              label="Phòng"
+              name="room"
+              rules={[{ required: true, message: 'Vui lòng chọn phòng' }]}
+            >
+              <Select
+                value={stateProduct.room}
+                onChange={(value) => {
+                  handleOnchange({ target: { name: 'room', value } });
+                  setSelectedRoom(value);
+                  // Reset type nếu đổi phòng
+                  form.setFieldsValue({ type: undefined });
+                }}
+              >
+                {Object.keys(productTypesByRoom).map((room) => (
+                  <Select.Option key={room} value={room}>
+                    {room}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
 
-  {/* Cập nhật kích thước */}
-  <Form.Item label="Kích thước">
-  <Input.Group compact>
-    <InputComponent
-      style={{ width: '33.3%' }}
-      placeholder="Dài"
-      name="length"
-      value={stateProduct?.size?.length || ''}
-      onChange={handleOnchange}
-    />
-    <InputComponent
-      style={{ width: '33.3%' }}
-      placeholder="Rộng"
-      name="width"
-      value={stateProduct?.size?.width || ''}
-      onChange={handleOnchange}
-    />
-    <InputComponent
-      style={{ width: '33.3%' }}
-      placeholder="Cao"
-      name="height"
-      value={stateProduct?.size?.height || ''}
-      onChange={handleOnchange}
-    />
-  </Input.Group>
-</Form.Item>
+            <Form.Item
+              label="Loại"
+              name="type"
+              rules={[{ required: true, message: 'Vui lòng chọn loại sản phẩm' }]}
+            >
+              <Select
+                value={stateProduct.type}
+                onChange={(value) => handleOnchange({ target: { name: 'type', value } })}
+                disabled={!selectedRoom}
+                placeholder={!selectedRoom ? 'Vui lòng chọn phòng trước' : 'Chọn loại sản phẩm'}
+              >
+                {(productTypesByRoom[selectedRoom] || []).map((type) => (
+                  <Select.Option key={type} value={type}>
+                    {type}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
 
 
-  {/* Cập nhật ảnh */}
-  <Form.Item
-    label="Ảnh"
-    name="image"
-    rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
-  >
-    <WrapperUploadFile
-      onChange={handleOnchangeAvatar}
-      maxCount={1}
-      beforeUpload={() => false}
-      customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
-    >
-      <Button>Select File</Button>
-      {stateProduct?.image && (
-        <img
-          src={stateProduct?.image}
-          style={{
-            height: '60px',
-            width: '60px',
-            borderRadius: '50%',
-            objectFit: 'cover',
-            marginLeft: '10px'
-          }}
-          alt=""
-        />
-      )}
-    </WrapperUploadFile>
-  </Form.Item>
+            {/* Cập nhật màu sắc */}
+            <Form.Item
+              label="Màu sắc"
+              name="colors"
+              rules={[{ required: true, message: 'Vui lòng chọn màu sắc' }]}
+            >
+              <Select
+                mode="multiple"
+                value={stateProduct.colors}
+                onChange={(value) => handleOnchange({ target: { name: 'colors', value } })}
+              >
+                {['Đỏ', 'Xanh', 'Vàng', 'Trắng', 'Đen'].map((color) => (
+                  <Select.Option key={color} value={color}>
+                    {color}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
 
-  {/* Thêm ảnh phụ */}
-  <Form.Item label="Ảnh phụ">
-    <WrapperUploadFile
-      onChange={handleOnchangeImages}
-      maxCount={5}
-      beforeUpload={() => false}
-      customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
-    >
-      <Button>Select Files</Button>
-    </WrapperUploadFile>
-  </Form.Item>
+            {/* Cập nhật kích thước */}
+            <Form.Item label="Kích thước">
+              <Input.Group compact>
+                <InputComponent
+                  style={{ width: '33.3%' }}
+                  placeholder="Dài"
+                  name="length"
+                  value={stateProduct?.size?.length || ''}
+                  onChange={handleOnchange}
+                />
+                <InputComponent
+                  style={{ width: '33.3%' }}
+                  placeholder="Rộng"
+                  name="width"
+                  value={stateProduct?.size?.width || ''}
+                  onChange={handleOnchange}
+                />
+                <InputComponent
+                  style={{ width: '33.3%' }}
+                  placeholder="Cao"
+                  name="height"
+                  value={stateProduct?.size?.height || ''}
+                  onChange={handleOnchange}
+                />
+              </Input.Group>
+            </Form.Item>
 
-  <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
-    <Button type="primary" htmlType="submit">Submit</Button>
-  </Form.Item>
-</Form>
+
+            {/* Cập nhật ảnh */}
+            <Form.Item
+              label="Ảnh"
+              name="image"
+              rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
+            >
+              <WrapperUploadFile
+                onChange={handleOnchangeAvatar}
+                maxCount={1}
+                beforeUpload={() => false}
+                customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
+              >
+                <Button>Select File</Button>
+                {stateProduct?.image && (
+                  <img
+                    src={stateProduct?.image}
+                    style={{
+                      height: '60px',
+                      width: '60px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      marginLeft: '10px'
+                    }}
+                    alt=""
+                  />
+                )}
+              </WrapperUploadFile>
+            </Form.Item>
+
+            {/* Thêm ảnh phụ */}
+            <Form.Item label="Ảnh phụ">
+              <WrapperUploadFile
+                onChange={handleOnchangeImages}
+                maxCount={5}
+                beforeUpload={() => false}
+                customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
+              >
+                <Button>Select Files</Button>
+              </WrapperUploadFile>
+            </Form.Item>
+
+            <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
+              <Button type="primary" htmlType="submit">Submit</Button>
+            </Form.Item>
+          </Form>
 
         </Loading>
       </Modal>
 
       {/* Drawer chi tiết sản phẩm */}
       <DrawerComponent title="Chi tiết sản phẩm" isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} width="90%">
-  <Loading isLoading={isLoadingUpdate || isFinishUpdated}>
-    <Form
-      labelCol={{ span: 4 }}
-      wrapperCol={{ span: 20 }}
-      form={form}
-      onFinish={onUpdateProduct}
-      autoComplete="off"
-    >
-      {/* Các trường cơ bản */}
-      {['name', 'type', 'price', 'countInStock', 'description'].map((field) => (
-        <Form.Item
-          key={field}
-          label={field.charAt(0).toUpperCase() + field.slice(1)}
-          name={field}
-          rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}
-        >
-          {field === 'type' ? (
-            <Select
-              value={stateProductDetails[field]}
-              onChange={(value) => handleOnchangeDetails({ target: { name: field, value } })}
+        <Loading isLoading={isLoadingUpdate || isFinishUpdated}>
+          <Form
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+            form={form}
+            onFinish={onUpdateProduct}
+            autoComplete="off"
+          >
+            {/* Các trường cơ bản */}
+            {['name', 'price', 'countInStock', 'description'].map((field) => (
+              <Form.Item
+                key={field}
+                label={field.charAt(0).toUpperCase() + field.slice(1)}
+                name={field}
+                rules={[{ required: true, message: `Vui lòng nhập ${field}` }]}
+              >
+                <InputComponent
+                  value={stateProductDetails[field]}
+                  onChange={handleOnchangeDetails}
+                  name={field}
+                />
+              </Form.Item>
+            ))}
+
+            <Form.Item
+              label="Phòng"
+              name="room"
+              rules={[{ required: true, message: 'Vui lòng chọn phòng' }]}
             >
-              {productTypes.map((type) => (
-                <Select.Option key={type} value={type}>
-                  {type}
-                </Select.Option>
-              ))}
-            </Select>
-          ) : (
-            <InputComponent
-              value={stateProductDetails[field]}
-              onChange={handleOnchangeDetails}
-              name={field}
-            />
-          )}
-        </Form.Item>
-      ))}
+              <Select
+                value={stateProductDetails.room}
+                onChange={(value) => {
+                  handleOnchangeDetails({ target: { name: 'room', value } });
+                  setSelectedRoomDetails(value);
+                  form.setFieldsValue({ type: undefined }); // reset loại sản phẩm khi đổi phòng
+                }}
+              >
+                {Object.keys(productTypesByRoom).map((room) => (
+                  <Select.Option key={room} value={room}>
+                    {room}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
 
-      {/* Các trường bổ sung */}
-      {['room', 'brand', 'origin', 'discount', 'selled'].map((field) => (
-        <Form.Item
-          key={field}
-          label={field.charAt(0).toUpperCase() + field.slice(1)}
-          name={field}
-        >
-          <InputComponent
-            value={stateProductDetails[field]}
-            onChange={handleOnchangeDetails}
-            name={field}
-          />
-        </Form.Item>
-      ))}
+            <Form.Item
+              label="Loại"
+              name="type"
+              rules={[{ required: true, message: 'Vui lòng chọn loại sản phẩm' }]}
+            >
+              <Select
+                value={stateProductDetails.type}
+                onChange={(value) => handleOnchangeDetails({ target: { name: 'type', value } })}
+                disabled={!selectedRoomDetails}
+                placeholder={!selectedRoomDetails ? 'Vui lòng chọn phòng trước' : 'Chọn loại sản phẩm'}
+              >
+                {(productTypesByRoom[selectedRoomDetails] || []).map((type) => (
+                  <Select.Option key={type} value={type}>
+                    {type}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
 
-      {/* Trường màu sắc */}
-      <Form.Item
-    label="Màu sắc"
-    name="colors"
-    rules={[{ required: true, message: 'Vui lòng chọn màu sắc' }]}
-  >
-    <Select
-      mode="multiple"
-      value={stateProductDetails.colors}
-      onChange={(value) => handleOnchangeDetails({ target: { name: 'colors', value } })}
-    >
-      {['Đỏ', 'Xanh', 'Vàng', 'Trắng', 'Đen'].map((color) => (
-        <Select.Option key={color} value={color}>
-          {color}
-        </Select.Option>
-      ))}
-    </Select>
-  </Form.Item>
+            {/* Các trường bổ sung */}
+            {['room', 'brand', 'origin', 'discount', 'selled'].map((field) => (
+              <Form.Item
+                key={field}
+                label={field.charAt(0).toUpperCase() + field.slice(1)}
+                name={field}
+              >
+                <InputComponent
+                  value={stateProductDetails[field]}
+                  onChange={handleOnchangeDetails}
+                  name={field}
+                />
+              </Form.Item>
+            ))}
 
-      {/* Trường kích thước */}
-      <Form.Item label="Kích thước">
-  <Input.Group compact>
-    <InputComponent
-      style={{ width: '33.3%' }}
-      placeholder="Dài"
-      name="length"
-      value={stateProductDetails?.size?.length || ''}
-      onChange={handleOnchangeDetails}
-    />
-    <InputComponent
-      style={{ width: '33.3%' }}
-      placeholder="Rộng"
-      name="width"
-      value={stateProductDetails?.size?.width || ''}
-      onChange={handleOnchangeDetails}
-    />
-    <InputComponent
-      style={{ width: '33.3%' }}
-      placeholder="Cao"
-      name="height"
-      value={stateProductDetails?.size?.height || ''}
-      onChange={handleOnchangeDetails}
-    />
-  </Input.Group>
-</Form.Item>
+            {/* Trường màu sắc */}
+            <Form.Item
+              label="Màu sắc"
+              name="colors"
+              rules={[{ required: true, message: 'Vui lòng chọn màu sắc' }]}
+            >
+              <Select
+                mode="multiple"
+                value={stateProductDetails.colors}
+                onChange={(value) => handleOnchangeDetails({ target: { name: 'colors', value } })}
+              >
+                {['Đỏ', 'Xanh', 'Vàng', 'Trắng', 'Đen'].map((color) => (
+                  <Select.Option key={color} value={color}>
+                    {color}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            {/* Trường kích thước */}
+            <Form.Item label="Kích thước">
+              <Input.Group compact>
+                <InputComponent
+                  style={{ width: '33.3%' }}
+                  placeholder="Dài"
+                  name="length"
+                  value={stateProductDetails?.size?.length || ''}
+                  onChange={handleOnchangeDetails}
+                />
+                <InputComponent
+                  style={{ width: '33.3%' }}
+                  placeholder="Rộng"
+                  name="width"
+                  value={stateProductDetails?.size?.width || ''}
+                  onChange={handleOnchangeDetails}
+                />
+                <InputComponent
+                  style={{ width: '33.3%' }}
+                  placeholder="Cao"
+                  name="height"
+                  value={stateProductDetails?.size?.height || ''}
+                  onChange={handleOnchangeDetails}
+                />
+              </Input.Group>
+            </Form.Item>
 
 
-      {/* Ảnh chính */}
-      <Form.Item
-        label="Ảnh chính"
-        name="image"
-        rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
-      >
-        <WrapperUploadFile
-          onChange={handleOnchangeAvatarDetails}
-          maxCount={1}
-          beforeUpload={() => false}
-          customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
-        >
-          <Button>Chọn ảnh</Button>
-          {stateProductDetails?.image && (
-            <img
-              src={stateProductDetails?.image}
-              style={{
-                height: '60px',
-                width: '60px',
-                borderRadius: '8px',
-                objectFit: 'cover',
-                marginLeft: '10px'
-              }}
-              alt=""
-            />
-          )}
-        </WrapperUploadFile>
-      </Form.Item>
+            {/* Ảnh chính */}
+            <Form.Item
+              label="Ảnh chính"
+              name="image"
+              rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
+            >
+              <WrapperUploadFile
+                onChange={handleOnchangeAvatarDetails}
+                maxCount={1}
+                beforeUpload={() => false}
+                customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
+              >
+                <Button>Chọn ảnh</Button>
+                {stateProductDetails?.image && (
+                  <img
+                    src={stateProductDetails?.image}
+                    style={{
+                      height: '60px',
+                      width: '60px',
+                      borderRadius: '8px',
+                      objectFit: 'cover',
+                      marginLeft: '10px'
+                    }}
+                    alt=""
+                  />
+                )}
+              </WrapperUploadFile>
+            </Form.Item>
 
-      {/* Ảnh phụ */}
-      <Form.Item label="Ảnh phụ" name="images">
-        <WrapperUploadFile
-          multiple
-          onChange={handleOnchangeImagesDetails}
-          beforeUpload={() => false}
-          customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
-        >
-          <Button>Chọn ảnh</Button>
-        </WrapperUploadFile>
-        <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-          {stateProductDetails.images?.map((img, index) => (
-            <img
-              key={index}
-              src={img}
-              alt=""
-              style={{
-                width: '60px',
-                height: '60px',
-                objectFit: 'cover',
-                borderRadius: '8px'
-              }}
-            />
-          ))}
-        </div>
-      </Form.Item>
+            {/* Ảnh phụ */}
+            <Form.Item label="Ảnh phụ" name="images">
+              <WrapperUploadFile
+                multiple
+                onChange={handleOnchangeImagesDetails}
+                beforeUpload={() => false}
+                customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
+              >
+                <Button>Chọn ảnh</Button>
+              </WrapperUploadFile>
+              <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                {stateProductDetails.images?.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt=""
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      objectFit: 'cover',
+                      borderRadius: '8px'
+                    }}
+                  />
+                ))}
+              </div>
+            </Form.Item>
 
-      <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
-        <Button type="primary" htmlType="submit">Áp dụng</Button>
-      </Form.Item>
-    </Form>
-  </Loading>
-</DrawerComponent>
+            <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
+              <Button type="primary" htmlType="submit">Áp dụng</Button>
+            </Form.Item>
+          </Form>
+        </Loading>
+      </DrawerComponent>
 
 
       {/* Modal xoá sản phẩm */}
