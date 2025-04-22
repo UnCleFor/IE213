@@ -72,6 +72,9 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const handleNavigateLogin = () => {
     navigate('/sign_in')
   }
+  const handleNavigateCart = () => {
+    navigate('/order')
+  }
 
   const handleLogOut = async () => {
     try {
@@ -128,7 +131,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       <WrapperContentPopup onClick={handleOrderHistory}>Lịch sử mua hàng</WrapperContentPopup>
       {user?.isAdmin && (
         <WrapperContentPopup onClick={handleAdmin}>Quản lý hệ thống</WrapperContentPopup>
-      )}      
+      )}
       <WrapperContentPopup onClick={handleLogOut}>Đăng xuất</WrapperContentPopup>
     </div>
   )
@@ -146,7 +149,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
           <Row align="middle" style={{ width: "100%" }} gutter={[16, 16]}>
             {/* Logo */}
             <Col xs={6} sm={4}>
-              <img src={beautihome} alt="BeautiHome Logo"  style={{ ...styles.logo, cursor: 'pointer' }} onClick={handleHome}/>
+              <img src={beautihome} alt="BeautiHome Logo" style={{ ...styles.logo, cursor: 'pointer' }} onClick={handleHome} />
             </Col>
 
             {/* Thanh tìm kiếm luôn hiện ở mobile (ẩn ở md trở lên) */}
@@ -175,18 +178,18 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
               )} */}
               <Loading isLoading={loading}>
                 <WrapperHeaderAccount>
-                {userAvatar ? (
-                  <img src={userAvatar} 
-                      style = {{ height: '40px', width: '40px', borderRadius: '50%', objectFit: 'cover'}}
-                      alt="avatar"/>
-                ): (
-                  <UserOutlined style={{ fontSize: "20px", color: "brown" }} />
-                )}
+                  {userAvatar ? (
+                    <img src={userAvatar}
+                      style={{ height: '40px', width: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                      alt="avatar" />
+                  ) : (
+                    <UserOutlined style={{ fontSize: "20px", color: "brown" }} />
+                  )}
                   {/* Trên PC: Hover để hiển thị Popover */}
                   {!screens.xs ? (
                     user?.name ? (
                       <Popover placement="bottom" content={content} trigger="hover">
-                        <div style={{ cursor: 'pointer'}}>{user.name}</div>
+                        <div style={{ cursor: 'pointer' }}>{user.name}</div>
                       </Popover>
                     ) : (
                       <div onClick={handleNavigateLogin} style={{ cursor: 'pointer' }}>
@@ -212,11 +215,10 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                     )
                   )}
                 </WrapperHeaderAccount>
-              
-              {/* video 52 21:20 */}
+
               </Loading>
               {!isHiddenCart && (
-                <WrapperHeaderAccount>
+                <WrapperHeaderAccount onClick={handleNavigateCart} style={{ cursor: 'pointer' }}>
                   <ShoppingCartOutlined style={{ fontSize: "20px", color: "brown" }} />
                   {!screens.xs && <WrapperTextHeaderSmall>Cart</WrapperTextHeaderSmall>}
                 </WrapperHeaderAccount>
