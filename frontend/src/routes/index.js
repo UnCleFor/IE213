@@ -3,6 +3,7 @@ import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import OrderPage from "../pages/OrderPage/OrderPage";
 import ProductDetailsPage from "../pages/ProductDetailsPage/ProductDetailsPage";
 import ProductsPage from "../pages/ProductsPage/ProductsPage"
+import TypeProductPage from "../pages/TypeProductPage/TypeProductPage"
 import AboutUsPage from "../pages/AboutUsPage/AboutUsPage"
 import ChinhSachDoiTraPage from "../pages/ChinhSachDoiTraPage/ChinhSachDoiTraPage"
 import ChinhSachBaoMatPage from "../pages/ChinhSachBaoMatPage/ChinhSachBaoMatPage"
@@ -32,6 +33,11 @@ export const routes = [
         page: ProductsPage,
         isShowHeader: true
     },
+    {
+        path: 'product/:type',
+        page: TypeProductPage,
+        isShowHeader: true
+    },    
     {
         path: '/product_details/:id',
         page: ProductDetailsPage,
