@@ -1,142 +1,253 @@
+import React, { useState } from 'react';
 import { increaseAmount, decreaseAmount, removeOrderProduct, removeAllOrderProduct } from '../../redux/slices/orderSlide';
-import React, { useState } from 'react'
-import { WrapperCountOrder, WrapperInfo, WrapperItemOrder, WrapperLeft, WrapperListOrder, WrapperPriceDiscount, WrapperRight, WrapperStyleHeader } from './style'
-import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons'
-import { WrapperInputNumber } from '../../components/ProductDetailsComponent/style';
+import {
+  PageContainer,
+  ContentContainer,
+  CartTitle,
+  CartLayout,
+  CartLeft,
+  CartRight,
+  CartHeader,
+  CheckboxContainer,
+  Checkbox,
+  HeaderText,
+  HeaderActions,
+  CartItem,
+  ProductInfo,
+  ProductImage,
+  ProductDetails,
+  ProductName,
+  ProductActions,
+  PriceColumn,
+  QuantityColumn,
+  TotalColumn,
+  ActionColumn,
+  PriceText,
+  OriginalPrice,
+  QuantityControl,
+  QuantityButton,
+  DisabledQuantityButton,
+  QuantityInput,
+  QuantityInputWrapper,
+  DeleteButton,
+  SummaryTitle,
+  SummaryItem,
+  SummaryLabel,
+  SummaryValue,
+  TotalPrice,
+  CheckoutButton,
+  EmptyCart
+} from './style';
+import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { Checkbox } from 'antd';
 
 const OrderPage = () => {
-  const order = useSelector((state) => state.order)
-  const [listChecked, setListChecked] = useState([])
-  const dispatch = useDispatch()
+  const order = useSelector((state) => state.order);
+  const [listChecked, setListChecked] = useState([]);
+  const [inputValues, setInputValues] = useState({});
+  const dispatch = useDispatch();
 
   const onChange = (e) => {
     if (listChecked.includes(e.target.value)) {
-      const newListChecked = listChecked.filter((item) => item !== e.target.value)
-      setListChecked(newListChecked)
+      const newListChecked = listChecked.filter((item) => item !== e.target.value);
+      setListChecked(newListChecked);
     } else {
-      setListChecked([...listChecked, e.target.value])
+      setListChecked([...listChecked, e.target.value]);
     }
   };
 
   const handleChangeCount = (type, idProduct) => {
     if (type === 'increase') {
-      dispatch(increaseAmount({ idProduct }))
+      dispatch(increaseAmount({ idProduct }));
     } else {
-      dispatch(decreaseAmount({ idProduct }));
       const product = order.orderItems.find(item => item.product === idProduct);
-      if (product && product.amount === 1) {
-        dispatch(removeOrderProduct({ idProduct }));
+      if (product && product.amount > 1) {
+        dispatch(decreaseAmount({ idProduct }));
       }
     }
-  }
+  };
+
+  const handleInputChange = (value, idProduct) => {
+    setInputValues(prev => ({ ...prev, [idProduct]: value }));
+
+    if (value >= 1) {
+      const currentItem = order.orderItems.find(item => item.product === idProduct);
+      if (currentItem) {
+        const difference = value - currentItem.amount;
+
+        if (difference > 0) {
+          for (let i = 0; i < difference; i++) {
+            dispatch(increaseAmount({ idProduct }));
+          }
+        } else if (difference < 0) {
+          for (let i = 0; i < Math.abs(difference); i++) {
+            if (currentItem.amount > 1) {
+              dispatch(decreaseAmount({ idProduct }));
+            }
+          }
+        }
+      }
+    }
+  };
 
   const handleDeleteOrder = (idProduct) => {
-    dispatch(removeOrderProduct({ idProduct }))
-  }
+    dispatch(removeOrderProduct({ idProduct }));
+  };
 
   const handleOnchangeCheckAll = (e) => {
     if (e.target.checked) {
-      const newListChecked = order?.orderItems?.map((item) => item?.product)
-      setListChecked(newListChecked)
+      const newListChecked = order?.orderItems?.map((item) => item?.product);
+      setListChecked(newListChecked);
     } else {
-      setListChecked([])
+      setListChecked([]);
     }
-  }
+  };
 
   const handleRemoveAllOrder = () => {
     if (listChecked?.length > 0) {
-      dispatch(removeAllOrderProduct({ listChecked }))
+      dispatch(removeAllOrderProduct({ listChecked }));
     }
-  }
+  };
 
   const totalAmount = order?.orderItems?.reduce((total, item) => {
     if (listChecked.includes(item?.product)) {
-      return total + (item?.price * item?.amount)
+      return total + (item?.price * item?.amount);
     }
-    return total
-  }, 0)
+    return total;
+  }, 0);
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)
-  }
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  };
 
   return (
-    <div style={{ background: '#f5f5fa', width: '100%', height: '100vh' }}>
-      <div style={{ height: '100%', width: '1270px', margin: '0 auto' }}>
-        <h3>Giỏ hàng</h3>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <WrapperLeft>
-            <WrapperStyleHeader>
-              <span style={{ display: 'inline-block', width: '390px' }}>
-                <Checkbox onChange={handleOnchangeCheckAll} checked={listChecked?.length === order?.orderItems?.length}></Checkbox>
-                <span>Tất cả ({order?.orderItems?.length} sản phẩm)</span>
-              </span>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span>Đơn giá</span>
-                <span>Số lượng</span>
-                <span>Thành tiền</span>
-                <DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleRemoveAllOrder} />
-              </div>
-            </WrapperStyleHeader>
-            <WrapperListOrder>
-              {order?.orderItems?.map((orderItem) => {
-                return (
-                  <WrapperItemOrder key={orderItem?.product}>
-                    <div style={{ width: '390px', display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <Checkbox onChange={onChange} value={orderItem?.product} checked={listChecked.includes(orderItem?.product)} />
-                      <img src={orderItem?.image} style={{ width: '77px', height: '79px', objectFit: 'cover' }} />
-                      <div style={{
-                        width: 260,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                      }}>{orderItem?.name}</div>
-                    </div>
-                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span>
-                        <span style={{ fontSize: '13px', color: '#242424' }}>{formatCurrency(orderItem?.price)}</span>
-                      </span>
-                      <WrapperCountOrder>
-                        <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('decrease', orderItem?.product)}>
-                          <MinusOutlined style={{ color: '#000', fontSize: '10px' }} />
-                        </button>
-                        <WrapperInputNumber defaultValue={orderItem?.amount} value={orderItem?.amount} size="small" />
-                        <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase', orderItem?.product)}>
-                          <PlusOutlined style={{ color: '#000', fontSize: '10px' }} />
-                        </button>
-                      </WrapperCountOrder>
-                      <span style={{ color: 'rgb(255, 66, 78)', fontSize: '13px', fontWeight: 500 }}>
-                        {formatCurrency(orderItem?.price * orderItem?.amount)}
-                      </span>
-                      <DeleteOutlined style={{ cursor: 'pointer' }} onClick={() => handleDeleteOrder(orderItem?.product)} />
-                    </div>
-                  </WrapperItemOrder>
-                )
-              })}
-            </WrapperListOrder>
-          </WrapperLeft>
-          <WrapperRight>
-            <div style={{ width: '100%' }}>
-              <WrapperInfo>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span>Tạm tính</span>
-                  <span style={{ color: '#000', fontSize: '14px', fontWeight: 'bold' }}>
-                    {formatCurrency(totalAmount)}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span>Phí vận chuyển</span>
-                  <span style={{ color: '#000', fontSize: '14px', fontWeight: 'bold' }}>0 ₫</span>
-                </div>
-              </WrapperInfo>
-            </div>
-          </WrapperRight>
-        </div>
-      </div>
-    </div>
-  )
-}
+    <PageContainer>
+      <ContentContainer>
+        <CartTitle>Giỏ hàng của bạn</CartTitle>
 
-export default OrderPage
+        {order?.orderItems?.length > 0 ? (
+          <CartLayout>
+            <CartLeft>
+              <CartHeader>
+                <CheckboxContainer>
+                  <Checkbox
+                    onChange={handleOnchangeCheckAll}
+                    checked={listChecked?.length === order?.orderItems?.length}
+                  />
+                  <HeaderText>Sản phẩm ({order?.orderItems?.length})</HeaderText>
+                </CheckboxContainer>
+                <HeaderActions>
+                  <PriceColumn>
+                    <HeaderText>Đơn giá</HeaderText>
+                  </PriceColumn>
+                  <QuantityColumn>
+                    <HeaderText>Số lượng</HeaderText>
+                  </QuantityColumn>
+                  <TotalColumn>
+                    <HeaderText>Thành tiền</HeaderText>
+                  </TotalColumn>
+                  <ActionColumn>
+                    <DeleteButton onClick={handleRemoveAllOrder}>
+                      <DeleteOutlined />
+                    </DeleteButton>
+                  </ActionColumn>
+                </HeaderActions>
+              </CartHeader>
+
+              {order?.orderItems?.map((orderItem) => (
+                <CartItem key={orderItem?.product}>
+                  <ProductInfo>
+                    <Checkbox
+                      onChange={onChange}
+                      value={orderItem?.product}
+                      checked={listChecked.includes(orderItem?.product)}
+                    />
+                    <ProductImage src={orderItem?.image} alt={orderItem?.name} />
+                    <ProductDetails>
+                      <ProductName>{orderItem?.name}</ProductName>
+                    </ProductDetails>
+                  </ProductInfo>
+                  <ProductActions>
+                    <PriceColumn>
+                      <PriceText>{formatCurrency(orderItem?.price)}</PriceText>
+                      {orderItem?.originalPrice && (
+                        <OriginalPrice>{formatCurrency(orderItem?.originalPrice)}</OriginalPrice>
+                      )}
+                    </PriceColumn>
+                    <QuantityColumn>
+                      <QuantityControl>
+                        {orderItem.amount <= 1 ? (
+                          <DisabledQuantityButton>
+                            <MinusOutlined style={{ fontSize: '12px' }} />
+                          </DisabledQuantityButton>
+                        ) : (
+                          <QuantityButton
+                            onClick={() => handleChangeCount('decrease', orderItem?.product)}
+                          >
+                            <MinusOutlined style={{ fontSize: '12px' }} />
+                          </QuantityButton>
+                        )}
+
+                        <QuantityInputWrapper>
+                          <QuantityInput
+                            min={1}
+                            value={orderItem.amount}
+                            onChange={(value) => handleInputChange(value, orderItem.product)}
+                          />
+                        </QuantityInputWrapper>
+
+                        <QuantityButton
+                          onClick={() => handleChangeCount('increase', orderItem?.product)}
+                        >
+                          <PlusOutlined style={{ fontSize: '12px' }} />
+                        </QuantityButton>
+                      </QuantityControl>
+                    </QuantityColumn>
+                    <TotalColumn>
+                      <PriceText>
+                        {formatCurrency(orderItem?.price * orderItem?.amount)}
+                      </PriceText>
+                    </TotalColumn>
+                    <ActionColumn>
+                      <DeleteButton onClick={() => handleDeleteOrder(orderItem?.product)}>
+                        <DeleteOutlined />
+                      </DeleteButton>
+                    </ActionColumn>
+                  </ProductActions>
+                </CartItem>
+              ))}
+            </CartLeft>
+
+            <CartRight>
+              <SummaryTitle>Tóm tắt đơn hàng</SummaryTitle>
+              <SummaryItem>
+                <SummaryLabel>Tạm tính</SummaryLabel>
+                <SummaryValue>{formatCurrency(totalAmount)}</SummaryValue>
+              </SummaryItem>
+              <SummaryItem>
+                <SummaryLabel>Phí vận chuyển</SummaryLabel>
+                <SummaryValue>0 ₫</SummaryValue>
+              </SummaryItem>
+              <SummaryItem>
+                <SummaryLabel>Giảm giá</SummaryLabel>
+                <SummaryValue>-0 ₫</SummaryValue>
+              </SummaryItem>
+              <TotalPrice>
+                <span>Tổng cộng</span>
+                <span>{formatCurrency(totalAmount)}</span>
+              </TotalPrice>
+              <CheckoutButton>TIẾN HÀNH THANH TOÁN</CheckoutButton>
+            </CartRight>
+          </CartLayout>
+        ) : (
+          <EmptyCart>
+            <h3>Giỏ hàng của bạn đang trống</h3>
+            <p>Hãy thêm sản phẩm vào giỏ hàng để bắt đầu mua sắm</p>
+          </EmptyCart>
+        )}
+      </ContentContainer>
+    </PageContainer>
+  );
+};
+
+export default OrderPage;

@@ -29,6 +29,7 @@ const { useBreakpoint } = Grid;
 const { useToken } = theme;
 
 const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
+
   const { token } = useToken();
   const screens = useBreakpoint();
   //const [showSearch, setShowSearch] = useState(false);
@@ -36,7 +37,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const [userName, setUserName] = useState('')
   const [userAvatar, setUserAvatar] = useState('')
   const order = useSelector((state) => state.order)
-
+  const totalQuantity = order?.orderItems?.reduce((sum, item) => sum + item.amount, 0);
   const styles = {
     container: {
       display: "flex",
@@ -219,7 +220,26 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
               </Loading>
               {!isHiddenCart && (
                 <WrapperHeaderAccount onClick={handleNavigateCart} style={{ cursor: 'pointer' }}>
-                  <ShoppingCartOutlined style={{ fontSize: "20px", color: "brown" }} />
+                  <div style={{ position: 'relative' }}>
+                    <ShoppingCartOutlined style={{ fontSize: "20px", color: "brown" }} />
+                    {totalQuantity > 0 && (
+                      <span style={{
+                        position: 'absolute',
+                        top: -9,
+                        right: -10,
+                        background: 'red',
+                        color: 'white',
+                        borderRadius: '50%',
+                        padding: '2px 6px',
+                        fontSize: '9px',
+                        fontWeight: 'bold',
+                        lineHeight: '1',
+                      }}>
+                        {totalQuantity}
+                      </span>
+                    )}
+                  </div>
+
                   {!screens.xs && <WrapperTextHeaderSmall>Cart</WrapperTextHeaderSmall>}
                 </WrapperHeaderAccount>
               )}
