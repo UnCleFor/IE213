@@ -1,59 +1,112 @@
-import React, { useState } from 'react'
-import { Menu } from 'antd';
-import { getItem } from '../../utils';
-import { UserOutlined, AppstoreOutlined } from '@ant-design/icons'
+import React, { useState } from 'react';
+import { Layout, Menu, Button } from 'antd';
+import {
+  UserOutlined,
+  AppstoreOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+} from '@ant-design/icons';
 import HeaderComponent from '../../components/HeaderComponent/HeaderComponent';
 import AdminUser from '../../components/AdminUser/AdminUser';
 import AdminProduct from '../../components/AdminProduct/AdminProduct';
+import { getItem } from '../../utils';
+
+const { Sider, Content } = Layout;
 
 const AdminPage = () => {
   const items = [
     getItem('Người dùng', 'user', <UserOutlined />),
-    getItem('Sản phẩm', 'product', <AppstoreOutlined />)
+    getItem('Sản phẩm', 'product', <AppstoreOutlined />),
   ];
 
-  // const [openKeys, setOpenKeys] = useState(['user']);
-  const [keySelected, setKeySelected] = useState('user')
+  const [collapsed, setCollapsed] = useState(false);
+  const [keySelected, setKeySelected] = useState('user');
 
   const renderPage = (key) => {
     switch (key) {
       case 'user':
-        return (<AdminUser />)
+        return <AdminUser />;
       case 'product':
-        return (<AdminProduct />)
+        return <AdminProduct />;
       default:
-        return <></>
+        return null;
     }
-  }
+  };
 
   const handleOnClick = ({ key }) => {
-    setKeySelected(key)
-  }
-  console.log('keySelected', keySelected)
+    setKeySelected(key);
+  };
+
   return (
     <>
       <HeaderComponent isHiddenSearch isHiddenCart />
 
-      <div style={{ display: 'flex' }}>
-        <Menu
-          mode="inline"
-          // openKeys={openKeys}
-          // onOpenChange={onOpenChange}
+      <Layout style={{ minHeight: '100vh' }}>
+        <Sider
+          collapsed={collapsed}
+          trigger={null} // Ẩn trigger mặc định
+          collapsible
+          breakpoint="lg"
+          collapsedWidth="0"
           style={{
-            width: 256,
-            boxShadow: '1px 1px 2px #ccc',
-            height: '100vh',
+            background: '#fff',
+            boxShadow: '0px 0 5px rgba(0,0,0,0.1)',
+            zIndex: 1000,
+            position: 'relative',
           }}
-          items={items}
-          onClick={handleOnClick}
-        />
-        <div style={{ flex: 1, padding: '15px' }}>
-          {renderPage(keySelected)}
+        >
+          {/* Nút toggle custom nằm ở trên */}
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined style={{color:'white'}} /> : <MenuFoldOutlined style={{color:'white'}} />}
+            onClick={() => setCollapsed(!collapsed)}
+            style={{
+              position: 'absolute',
+              top: 1,
+              left: 1,
+              zIndex: 1001,
+              fontSize: 18,
+              backgroundColor:'brown',
+            }}
+          />
+          <div
+            style={{
+              height: 64,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 'bold',
+              fontSize: 20,
+              marginTop: 40, // Đẩy logo xuống để nhường chỗ cho nút toggle
+            }}
+          >
+            {collapsed ? 'A' : 'Admin'}
+          </div>
+          <Menu
+            mode="inline"
+            selectedKeys={[keySelected]}
+            onClick={handleOnClick}
+            items={items}
+            style={{ borderRight: 0 }}
+          />
+        </Sider>
 
-        </div>
-      </div>
+        <Layout>
+          <Content
+            style={{
+              
+              padding: '24px',
+              background: '#fff',
+              
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            }}
+          >
+            {renderPage(keySelected)}
+          </Content>
+        </Layout>
+      </Layout>
     </>
-  )
-}
+  );
+};
 
-export default AdminPage
+export default AdminPage;

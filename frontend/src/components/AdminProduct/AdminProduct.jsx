@@ -16,7 +16,9 @@ import { getBase64 } from '../../utils';
 import ModalComponent from '../ModalComponent/ModalComponent';
 import numeral from 'numeral';
 const AdminProduct = () => {
-  const [form] = Form.useForm();
+  const [formAdd] = Form.useForm();
+  const [formUpdate] = Form.useForm();
+
   const queryClient = useQueryClient();
   const user = useSelector((state) => state?.user);
 
@@ -173,25 +175,37 @@ const AdminProduct = () => {
         height: ''
       }
     });
-    form.resetFields();
+    formAdd.resetFields();
+    formUpdate.resetFields();
+    mutation.reset();
   };
 
   const handleOnchange = (e) => {
     const { name, value } = e.target;
 
     if (name === 'length' || name === 'width' || name === 'height') {
-      setStateProduct((prevState) => ({
-        ...prevState,
-        size: {
-          ...(prevState.size || {}),
-          [name]: value
-        }
+      const newSize = {
+        ...(stateProduct.size || {}),
+        [name]: value
+      };
+
+      // Cập nhật cả state và form
+      setStateProduct(prev => ({
+        ...prev,
+        size: newSize
       }));
+
+      formAdd.setFieldsValue({
+        size: newSize
+      });
     } else {
-      setStateProduct((prevState) => ({
-        ...prevState,
+      setStateProduct(prev => ({
+        ...prev,
         [name]: value
       }));
+      formAdd.setFieldsValue({
+        [name]: value
+      });
     }
   };
 
@@ -219,15 +233,24 @@ const AdminProduct = () => {
 
 
   const handleOnchangeAvatar = async ({ fileList }) => {
-    const file = fileList[0];
+    const file = fileList?.[0];
+    if (!file) return;
+
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
+
+    // Cập nhật cả state và form value
     setStateProduct({
       ...stateProduct,
-      image: file.preview
+      image: file.preview,
+    });
+
+    formAdd.setFieldsValue({
+      image: file.preview // Cập nhật giá trị cho trường 'image' trong form
     });
   };
+
 
   const handleOnchangeImages = async ({ fileList }) => {
     const newImages = await Promise.all(fileList.map(file => getBase64(file.originFileObj)));
@@ -392,20 +415,20 @@ const AdminProduct = () => {
     room: undefined,
     type: undefined,
   });
-  
+
   const handleTableChange = (pagination, currentFilters) => {
     setFilters({
       room: currentFilters.room || undefined,
       type: currentFilters.type || undefined,
     });
   };
-  
+
   const getAvailableTypes = () => {
     // Nếu không chọn phòng nào, trả về tất cả type
     if (!filters.room || filters.room.length === 0) {
       return productTypes;
     }
-    
+
     // Lấy tất cả type của các room được chọn
     const types = new Set();
     filters.room.forEach(room => {
@@ -413,7 +436,7 @@ const AdminProduct = () => {
     });
     return Array.from(types);
   };
-  
+
   const columns = [
     {
       title: 'Name',
@@ -455,8 +478,8 @@ const AdminProduct = () => {
       onFilter: (value, record) => {
         // Nếu có filter type, kiểm tra cả type
         if (filters.type && filters.type.length > 0) {
-          return record.room === value && 
-                 filters.type.includes(record.type);
+          return record.room === value &&
+            filters.type.includes(record.type);
         }
         return record.room === value;
       },
@@ -473,12 +496,12 @@ const AdminProduct = () => {
       onFilter: (value, record) => {
         // Luôn ưu tiên kiểm tra type trước
         if (record.type !== value) return false;
-        
+
         // Nếu có chọn phòng thì kiểm tra phòng
         if (filters.room && filters.room.length > 0) {
           return filters.room.includes(record.room);
         }
-        
+
         // Nếu không chọn phòng thì chỉ cần khớp type
         return true;
       },
@@ -500,18 +523,19 @@ const AdminProduct = () => {
 
   useEffect(() => {
     if (isModalOpen) {
-      form.setFieldsValue(stateProduct); // Đồng bộ state vào form mỗi khi mở lại
+      formAdd.setFieldsValue(stateProduct); // Đồng bộ state vào form mỗi khi mở lại
     }
   }, [isModalOpen]);
 
   useEffect(() => {
-    form.setFieldsValue(stateProductDetails);
-  }, [form, stateProductDetails]);
+    formUpdate.setFieldsValue(stateProductDetails);
+  }, [formUpdate, stateProductDetails]);
 
   useEffect(() => {
     if (isSuccess && data?.status === 'OK') {
       message.success('Thêm sản phẩm thành công!');
       handleCancel();
+      queryClient.invalidateQueries(['products']);
     } else if (data?.status === 'ERR') {
       message.error('Thêm sản phẩm thất bại!');
     }
@@ -552,18 +576,24 @@ const AdminProduct = () => {
   return (
     <div>
       <WrapperHeader>Quản lý sản phẩm</WrapperHeader>
-
       <div style={{ marginTop: '10px' }}>
         <Button
-          style={{
-            height: '150px',
-            width: '150px',
-            borderRadius: '6px',
-            borderStyle: 'dashed'
-          }}
+          type="dashed"
           onClick={() => setIsModalOpen(true)}
+          style={{
+            height: 150,
+            width: 150,
+            borderRadius: 10,
+            fontSize: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#999'
+          }}
         >
-          <PlusOutlined style={{ fontSize: '60px' }} />
+          <PlusOutlined style={{ fontSize: 40, marginBottom: 8 }} />
+          New Product
         </Button>
       </div>
 
@@ -578,11 +608,8 @@ const AdminProduct = () => {
             onClick: () => setRowSelected(record._id)
           })}
           // phân trang tượng trưng
-          pagination={{
-            pageSize: 10,
-            showTotal: (total, range) => `${range[0]}-${range[1]} trong ${total} sản phẩm`
-          }}
           onChange={handleTableChange}
+          exportFileName="products_list"
         />
       </div>
 
@@ -592,9 +619,17 @@ const AdminProduct = () => {
           <Form
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
-            form={form}
+            form={formAdd}
             onFinish={onFinish}
             autoComplete="off"
+            initialValues={{
+              size: {
+                length: stateProduct.size?.length || '',
+                width: stateProduct.size?.width || '',
+                height: stateProduct.size?.height || ''
+              },
+
+            }}
           >
             {['name', 'price', 'countInStock', 'description', 'brand', 'origin', 'discount'].map((field) => (
               <Form.Item
@@ -622,7 +657,7 @@ const AdminProduct = () => {
                   handleOnchange({ target: { name: 'room', value } });
                   setSelectedRoom(value);
                   // Reset type nếu đổi phòng
-                  form.setFieldsValue({ type: undefined });
+                  formAdd.setFieldsValue({ type: undefined });
                 }}
               >
                 {Object.keys(productTypesByRoom).map((room) => (
@@ -679,6 +714,7 @@ const AdminProduct = () => {
                   noStyle
                 >
                   <InputComponent
+                    name="length" // Thêm prop name
                     style={{ width: '33.3%' }}
                     placeholder="Length"
                     onChange={handleOnchange}
@@ -691,6 +727,7 @@ const AdminProduct = () => {
                   noStyle
                 >
                   <InputComponent
+                    name="width" // Thêm prop name
                     style={{ width: '33.3%' }}
                     placeholder="Width"
                     onChange={handleOnchange}
@@ -703,6 +740,7 @@ const AdminProduct = () => {
                   noStyle
                 >
                   <InputComponent
+                    name="height" // Thêm prop name
                     style={{ width: '33.3%' }}
                     placeholder="Height"
                     onChange={handleOnchange}
@@ -788,13 +826,13 @@ const AdminProduct = () => {
           setIsOpenDrawer(false);
           mutationUpdate.reset();  // Reset mutation khi đóng drawer
         }}
-        width="50%"
+       
       >
         <Loading isLoading={isLoadingUpdate || isFinishUpdated}>
           <Form
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
-            form={form}
+            form={formUpdate}
             onFinish={onUpdateProduct}
             autoComplete="off"
           >
@@ -824,7 +862,7 @@ const AdminProduct = () => {
                 onChange={(value) => {
                   handleOnchangeDetails({ target: { name: 'room', value } });
                   setSelectedRoomDetails(value);
-                  form.setFieldsValue({ type: undefined }); // reset loại sản phẩm khi đổi phòng
+                  formUpdate.setFieldsValue({ type: undefined }); // reset loại sản phẩm khi đổi phòng
                 }}
               >
                 {Object.keys(productTypesByRoom).map((room) => (
@@ -940,10 +978,12 @@ const AdminProduct = () => {
             <Form.Item
               label="Avatar"
               name="image"
+              valuePropName="fileList" // Thêm prop này
+              getValueFromEvent={(e) => e.fileList} // Chuyển đổi event thành giá trị
               rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
             >
               <WrapperUploadFile
-                onChange={handleOnchangeAvatarDetails}
+                onChange={handleOnchangeAvatar}
                 maxCount={1}
                 beforeUpload={() => false}
                 customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
@@ -957,9 +997,8 @@ const AdminProduct = () => {
                     style={{
                       height: '60px',
                       width: '60px',
-                      borderRadius: '8px',
                       objectFit: 'cover',
-                      marginLeft: '10px'
+                      borderRadius: '8px'
                     }}
                     alt=""
                   />
@@ -994,7 +1033,7 @@ const AdminProduct = () => {
               </div>
             </Form.Item>
             {dataUpdated?.status === 'ERR' && <span style={{ color: 'red' }}>{dataUpdated?.message}</span>}
-            <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
+            <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
               <Button type="primary" htmlType="submit">Áp dụng</Button>
             </Form.Item>
           </Form>

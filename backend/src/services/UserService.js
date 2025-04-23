@@ -4,46 +4,50 @@ const bcrypt = require('bcrypt')
 const { generalAccessToken,generalRefreshToken } = require('./JwtService')
 
 const createUser = (newUser) => {
-    return new Promise( async(resolve,reject) => {
-        // lấy các trường ra từ input
-        const {name, email, password, confirmPassword, phone } = newUser
-        try {
-            // biến kiểm tra coi mail có được xài chưa
-            const checkUser = await User.findOne({
-                email: email
-            })
-            // nếu khác null thì tức là đã có, == null tức là chưa có
-            if (checkUser !== null){
-                resolve({
-                    status: 'ERR',
-                    message: 'Email đã được sử dụng'
-                })
-            }
-            // hàm băm mật khẩu thành các kí tự đặt biệt với key = 10
-            const hash = bcrypt.hashSync(password,10)
-            // console.log('hash',hash)
-            // tạo user mới
-            const createdUser = await User.create({
-                name, 
-                email, 
-                password: hash, 
-                phone
-            })
-            // thông báo khi tạo user thành công
-            if (createdUser) {
-                resolve({
-                    status:"OK",
-                    message: "Tạo thành công",
-                    data: createdUser
-                })
-            }
-            
+    return new Promise(async (resolve, reject) => {
+      const { name, email, password, confirmPassword, phone, avatar } = newUser;
+  
+      try {
+        const checkUser = await User.findOne({ email: email });
+  
+        if (checkUser !== null) {
+          resolve({
+            status: 'ERR',
+            message: 'Email đã được sử dụng'
+          });
+          return;
         }
-        catch(e) {
-            reject(e)
+  
+        const hash = bcrypt.hashSync(password, 10);
+  
+        const userData = {
+          name,
+          email,
+          password: hash,
+          phone
+        };
+  
+        // Chỉ thêm avatar nếu có
+        if (avatar) {
+          userData.avatar = avatar;
         }
-    })
-}
+  
+        const createdUser = await User.create(userData);
+  
+        if (createdUser) {
+          resolve({
+            status: "OK",
+            message: "Tạo thành công",
+            data: createdUser
+          });
+        }
+  
+      } catch (e) {
+        reject(e);
+      }
+    });
+  };
+  
 const loginUser = (userLogin) => {
     return new Promise( async(resolve,reject) => {
         // lấy các trường ra từ input

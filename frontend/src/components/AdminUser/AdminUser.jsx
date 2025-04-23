@@ -16,7 +16,10 @@ import * as UserService from '../../services/UserService';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 
 const AdminUser = () => {
-  const [form] = Form.useForm();
+  // Tách thành 2 form riêng biệt
+  const [formAdd] = Form.useForm();
+  const [formUpdate] = Form.useForm();
+
   const queryClient = useQueryClient();
   const user = useSelector((state) => state?.user);
 
@@ -25,13 +28,13 @@ const AdminUser = () => {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isFinishUpdated, setIsFinishUpdated] = useState(false);
-  const [isFinishDeletedMany,setIsFinishDeletedMany] = useState(false);
+  const [isFinishDeletedMany, setIsFinishDeletedMany] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
 
   const [searchText, setSearchText] = useState('');
-    const [searchedColumn, setSearchedColumn] = useState('');
-    const searchInput = useRef(null);
-    
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
+
 
   const [stateUser, setStateUser] = useState({
     name: '',
@@ -66,9 +69,9 @@ const AdminUser = () => {
     return UserService.deleteUser(id, token);
   });
 
-  const mutationDeleteMany = useMutationHooks(({token,...ids }) => {
-      return UserService.deleteManyUser(ids, token);
-    });
+  const mutationDeleteMany = useMutationHooks(({ token, ...ids }) => {
+    return UserService.deleteManyUser(ids, token);
+  });
 
   const { data, isLoading, isSuccess, isError } = mutation;
   const { data: dataUpdated, isLoading: isLoadingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate;
@@ -108,7 +111,8 @@ const AdminUser = () => {
       phone: '',
       avatar: ''
     });
-    form.resetFields();
+    formAdd.resetFields();
+    formUpdate.resetFields();
     mutation.reset();
   };
 
@@ -128,11 +132,18 @@ const AdminUser = () => {
 
   const handleOnchangeAvatar = async ({ fileList }) => {
     const file = fileList[0];
+    if (!file) return;
+
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
+
+    // Cập nhật cả state và form
     setStateUser({
       ...stateUser,
+      avatar: file.preview
+    });
+    formAdd.setFieldsValue({
       avatar: file.preview
     });
   };
@@ -158,19 +169,21 @@ const AdminUser = () => {
   const handleDeleteManyUsers = (ids) => {
     setIsFinishDeletedMany(true)
     mutationDeleteMany.mutate({
-      ids:ids,
-      token: user.access_token})
+      ids: ids,
+      token: user.access_token
+    })
   }
 
   const onFinish = () => {
-    // Gửi payload đầy đủ bao gồm confirmPassword
+
     mutation.mutate({
-      ...stateUser, // Bao gồm confirmPassword vào đây
+      ...stateUser,
     });
   };
 
+
   const onUpdateUser = () => {
-    //console.log('onUpdateUser called'); // Đảm bảo sự kiện này được gọi
+    console.log('onUpdateUser called'); // Đảm bảo sự kiện này được gọi
     setIsFinishUpdated(true)
     mutationUpdate.mutate({
       id: rowSelected,
@@ -209,7 +222,7 @@ const AdminUser = () => {
     clearFilters();          // Xóa bộ lọc hiện tại
     setSearchText('');       // Reset từ khóa tìm kiếm
     confirm();               // Kích hoạt lại lọc (với từ khóa rỗng)
-  };  
+  };
 
   const getColumnSearchProps = dataIndex => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
@@ -233,7 +246,7 @@ const AdminUser = () => {
             Tìm
           </Button>
           <Button
-            onClick={() => clearFilters && handleReset(clearFilters,confirm)}
+            onClick={() => clearFilters && handleReset(clearFilters, confirm)}
             size="small"
             style={{ width: 90 }}
           >
@@ -291,26 +304,26 @@ const AdminUser = () => {
       render: (_, record) => renderAction(record),
     },
   ];
-  
+
 
   const dataTable = users?.data?.map((user) => ({ ...user, key: user._id }));
 
   useEffect(() => {
-      if (isModalOpen) {
-        form.setFieldsValue(stateUser); // Đồng bộ state vào form mỗi khi mở lại
-      }
-    }, [isModalOpen]);
-    
+    if (isModalOpen) {
+      formAdd.setFieldsValue(stateUser); // Đồng bộ state vào form mỗi khi mở lại
+    }
+  }, [isModalOpen]);
+
   useEffect(() => {
-    form.setFieldsValue(stateUserDetails);
-  }, [form, stateUserDetails]);
+    formUpdate.setFieldsValue(stateUserDetails);
+  }, [formUpdate, stateUserDetails]);
 
   useEffect(() => {
     if (isSuccess && data?.status === 'OK') {
       message.success('Thêm người dùng thành công!');
       handleCancel();
       queryClient.invalidateQueries(['users']);
-    } else if(data?.status === 'ERR') {
+    } else if (data?.status === 'ERR') {
       message.error('Thêm người dùng thất bại!');
     }
   }, [isSuccess, isError]);
@@ -321,7 +334,7 @@ const AdminUser = () => {
       queryClient.invalidateQueries(['users']);
       setIsFinishUpdated(false);
       setIsOpenDrawer(false);
-    } else if (dataUpdated?.status === 'ERR'){
+    } else if (dataUpdated?.status === 'ERR') {
       setIsFinishUpdated(false);
       message.error('Cập nhật thất bại!');
     }
@@ -338,29 +351,41 @@ const AdminUser = () => {
   }, [isSuccessDeleted, isErrorDeleted]);
 
   useEffect(() => {
-      if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
-        message.success('Xóa các người dùng thành công!');
-        queryClient.invalidateQueries(['user']);
-        setIsFinishDeletedMany(false);
-      } else if (isErrorDeletedMany) {
-        message.error('Xóa các người dùng thất bại!');
-      }
-    }, [isSuccessDeletedMany, isErrorDeletedMany]);
+    if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
+      message.success('Xóa các người dùng thành công!');
+      queryClient.invalidateQueries(['user']);
+      setIsFinishDeletedMany(false);
+    } else if (isErrorDeletedMany) {
+      message.error('Xóa các người dùng thất bại!');
+    }
+  }, [isSuccessDeletedMany, isErrorDeletedMany]);
 
   return (
     <div>
       <WrapperHeader>Quản lý người dùng</WrapperHeader>
       <div style={{ marginTop: '10px' }}>
         <Button
-          style={{ height: '150px', width: '150px', borderRadius: '6px', borderStyle: 'dashed' }}
+          type="dashed"
           onClick={() => setIsModalOpen(true)}
+          style={{
+            height: 150,
+            width: 150,
+            borderRadius: 10,
+            fontSize: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#999'
+          }}
         >
-          <PlusOutlined style={{ fontSize: '60px' }} />
+          <PlusOutlined style={{ fontSize: 40, marginBottom: 8 }} />
+          New User
         </Button>
       </div>
       <div style={{ marginTop: '20px' }}>
         <TableComponent
-        deleteAll={handleDeleteManyUsers}
+          deleteAll={handleDeleteManyUsers}
           forceRender
           columns={columns}
           isLoading={isLoadingUser || isFinishDeletedMany}
@@ -368,17 +393,12 @@ const AdminUser = () => {
           onRow={(record) => ({
             onClick: () => setRowSelected(record._id)
           })}
-          // phân trang tượng trưng
-          pagination={{
-            pageSize: 5,
-            showTotal: (total, range) => `${range[0]}-${range[1]} trong ${total} sản phẩm`
-          }}
+          exportFileName="users_list"
         />
       </div>
-
       <Modal forceRender title="Tạo người dùng mới" open={isModalOpen} onCancel={handleCancel} footer={null}>
         <Loading isLoading={isLoading}>
-          <Form labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} form={form} onFinish={onFinish}>
+          <Form labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} form={formAdd} onFinish={onFinish}>
             {['name', 'email', 'phone'].map((field) => (
               <Form.Item
                 key={field}
@@ -424,7 +444,17 @@ const AdminUser = () => {
               />
             </Form.Item>
 
-            <Form.Item label="Avatar" name="avatar">
+            <Form.Item
+              label="Avatar"
+              name="avatar"
+              valuePropName="fileList"
+              getValueFromEvent={(e) => {
+                if (Array.isArray(e)) {
+                  return e;
+                }
+                return e && e.fileList;
+              }}
+            >
               <WrapperUploadFile
                 onChange={handleOnchangeAvatar}
                 maxCount={1}
@@ -432,8 +462,9 @@ const AdminUser = () => {
                 customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
               >
                 <Button>Select Avatar</Button>
-                </WrapperUploadFile>
-                <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+              </WrapperUploadFile>
+
+              <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {stateUser?.avatar && (
                   <img
                     src={stateUser.avatar}
@@ -444,12 +475,12 @@ const AdminUser = () => {
                       objectFit: 'cover',
                       marginLeft: '10px',
                     }}
-                    alt=""
+                    alt="avatar"
                   />
                 )}
               </div>
             </Form.Item>
-            {data?.status === 'ERR' && <span style={{color:'red'}}>{data?.message}</span>}
+            {data?.status === 'ERR' && <span style={{ color: 'red' }}>{data?.message}</span>}
             <Form.Item wrapperCol={{ offset: 21, span: 3 }}>
               <Button type="primary" htmlType="submit">
                 Tạo
@@ -467,14 +498,14 @@ const AdminUser = () => {
           setIsOpenDrawer(false);
           mutationUpdate.reset();  // Reset mutation khi đóng drawer
         }}
+
         
-        width="30%"
       >
         <Loading isLoading={isLoadingUpdate || isFinishUpdated}>
           <Form
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 18 }}
-            form={form}
+            form={formUpdate}
             onFinish={onUpdateUser}  // Vẫn giữ onFinish nếu bạn muốn form submit qua button submit
           >
             {['name', 'email', 'phone'].map((field) => (
@@ -503,8 +534,8 @@ const AdminUser = () => {
                 customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
               >
                 <Button>Chọn ảnh</Button>
-                </WrapperUploadFile>
-                <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+              </WrapperUploadFile>
+              <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {stateUserDetails?.avatar && (
                   <img
                     src={stateUserDetails.avatar}
@@ -520,7 +551,7 @@ const AdminUser = () => {
                 )}
               </div>
             </Form.Item>
-            {dataUpdated?.status === 'ERR' && <span style={{color:'red'}}>{dataUpdated?.message}</span>}
+            {dataUpdated?.status === 'ERR' && <span style={{ color: 'red' }}>{dataUpdated?.message}</span>}
             {/* Nút Cập nhật thủ công */}
             <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
               <Button
