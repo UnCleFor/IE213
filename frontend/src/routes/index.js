@@ -16,6 +16,7 @@ import OrderHistoryPage from '../pages/OrderHistoryPage/OrderHistoryPage'
 import OrderDetailPage from "../pages/OrderDetailPage/OrderDetailPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
 import CheckOutPage from "../pages/CheckOutPage/CheckOutPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage/ForgotPasswordPage";
 // Mảng routes trong file routes/index.js chứa các đường dẫn
 export const routes = [
     {
@@ -108,5 +109,10 @@ export const routes = [
         path: '/checkout',
         page: CheckOutPage,
         isShowHeader: true
-    }
+    },
+    {
+        path: '/forgot-password',
+        page: ForgotPasswordPage,
+        isShowHeader: false
+    },
 ]

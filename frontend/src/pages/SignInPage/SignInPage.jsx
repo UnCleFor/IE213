@@ -70,6 +70,9 @@ const SignInPage = () => {
         mutation.mutate({ email, password })
         console.log('sign_in', email, password)
     }
+    const handleForgotPass = () => {
+        navigate('/forgot-password')
+    }
     return (
         <div style={{
             display: 'flex',
@@ -147,7 +150,7 @@ const SignInPage = () => {
                             textButton="ĐĂNG NHẬP"
                         ></ButtonComponent>
                     </Loading>
-                    <p><WrapperTextLight>Quên mật khẩu</WrapperTextLight></p>
+                    <p><WrapperTextLight onClick={handleForgotPass}>Quên mật khẩu</WrapperTextLight></p>
                     <p>Chưa có tài khoản? <WrapperTextLight onClick={handleNavigateSignUp}>Tạo tài khoản</WrapperTextLight></p>
                 </Col>
             </Row>
