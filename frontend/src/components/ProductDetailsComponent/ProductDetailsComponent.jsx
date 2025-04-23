@@ -27,8 +27,12 @@ const ProductDetailsComponent = ({ idProduct }) => {
             const res = await ProductService.getDetailsProduct(id);
             return res.data
         }
-
     };
+
+    useEffect(() => {
+        initFacebookSDK()
+    }, [])
+
     const { isLoading, data: productDetails } = useQuery({
         queryKey: ['product-details', idProduct],
         queryFn: fetchGetDetailsProduct,
@@ -252,6 +256,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                         </tbody>
                     </TableProductDetails>
                 </div>
+                <CommentComponent dataHref={"https://developers.facebook.com/docs/plugins/comments#configurator"} width="1115"/>
             </div>
         </isLoading>
     )
