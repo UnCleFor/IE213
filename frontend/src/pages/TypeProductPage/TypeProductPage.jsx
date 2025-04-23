@@ -5,30 +5,50 @@ import CardComponent from '../../components/CardComponent/CardComponent';
 import ContainerComponent from '../../components/ContainerComponent/ContainerComponent';
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 import { useLocation } from 'react-router-dom';
+import * as ProductService from '../../services/ProductService'
+import LoadingComponent from '../../components/LoadingComponent/Loading'
 
 const { Option  } = Select;
 const { Title } = Typography;
 
 const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
   const [products, setProducts] = useState([]);
-  const location = useLocation()
-  console.log('location', location)
-  const fetchProducts = async () => {
-    try {
-      let url = `${process.env.REACT_APP_API_URL}/product/get-all`;
-      if (type) {
-        url += `?filter=type&filter=${type}`;
-      }
-      const res = await axios.get(url);
-      setProducts(res.data.data);
-    } catch (error) {
-      console.error('Lỗi khi lấy danh sách sản phẩm:', error);
-    }
-  };
+  const {state} = useLocation()
+  const [loading, setLoading] = useState(false)
+  //console.log('state nè (label)', state?.label)
+  // const fetchProducts = async () => {
+  //   try {
+  //     let url = `${process.env.REACT_APP_API_URL}/product/get-all`;
+  //     if (type) {
+  //       url += `?filter=type&filter=${type}`;
+  //     }
+  //     const res = await axios.get(url);
+  //     setProducts(res.data.data);
+  //   } catch (error) {
+  //     console.error('Lỗi khi lấy danh sách sản phẩm:', error);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchProducts();
-  }, [type]);
+  // useEffect(() => {
+  //   fetchProducts();
+  // }, [type]);
+
+    const fetchProductType = async (type) => {
+      setLoading(true)
+      const res = await ProductService.getProductType(type)
+      if (res?.status == 'OK') {
+        setLoading(false)
+        setProducts(res?.data)
+      } else {
+        setLoading(false)
+      }
+    }
+
+    useEffect(() => {
+      if (state) {
+        fetchProductType(state)
+      }
+    },[state])
 
     const [category, setCategory] = useState(null);
     const [minPrice, setMinPrice] = useState(null);
@@ -120,6 +140,7 @@ const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
         </Row>
 
         {/* Lưới sản phẩm */}
+        <LoadingComponent isLoading={loading}>
         <Row gutter={[16, 24]}>
           {products.length > 0 ? (
             products.map((product) => (
@@ -138,6 +159,7 @@ const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
             </Col>
           )}
         </Row>
+        </LoadingComponent>
 
         {/* Phân trang */}
         <Pagination

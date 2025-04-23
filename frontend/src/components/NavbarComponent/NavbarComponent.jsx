@@ -64,92 +64,91 @@ export default function NavbarComponent() {
   };
 
   // Xử lý khi click vào parent item
-  const handleParentClick = (key) => {
-    navigate(`/product/${key}`);
+  const handleParentClick = (key, label) => {
+    navigate(`/product/${key}`, {state: {label}});
     setOpen(false);
   };
 
   const productTypesByRoom = [   //thể hiện trên navbar
     {
-      label: <span onClick={() => handleParentClick("PhongKhach")}>Phòng khách</span>,
+      label: <span onClick={() => handleParentClick("phong-khach", "Phòng Khách")}>Phòng khách</span>,
       key: "PhongKhach",
       children: [
         { label: "Sofa", key: "sofa" },
-        { label: "Bàn trà", key: "bantra" },
-        { label: "Kệ tivi", key: "ketivi" },
-        { label: "Ghế đơn", key: "ghedon" },
-        { label: "Tủ trang trí", key: "tutrangtri" },
+        { label: "Bàn trà", key: "ban-tra" },
+        { label: "Kệ tivi", key: "ke-tivi" },
+        { label: "Ghế đơn", key: "ghe-don" },
+        { label: "Tủ trang trí", key: "tu-trang-tri" },
       ],
     },
     {
-      label: <span onClick={() => handleParentClick("PhongAn")}>Phòng ăn</span>,
+      label: <span onClick={() => handleParentClick("phong-an", "Phòng ăn")}>Phòng ăn</span>,
       key: "PhongAn",
       children: [
-        { label: "Bàn ăn", key: "banan" },
-        { label: "Ghế ăn", key: "ghean" },
-        { label: "Tủ bếp", key: "tubep" },
-        { label: "Tủ rượu", key: "turuou" },
-        { label: "Phụ kiện bàn ăn", key: "phukienbanan" },
+        { label: "Bàn ăn", key: "ban-an" },
+        { label: "Ghế ăn", key: "ghe-an" },
+        { label: "Tủ bếp", key: "tu-bep" },
+        { label: "Tủ rượu", key: "tu-ruou" },
+        { label: "Phụ kiện bàn ăn", key: "phu-kien-ban-an" },
       ],
     },
     {
-      label: <span onClick={() => handleParentClick("PhongNgu")}>Phòng ngủ</span>,
+      label: <span onClick={() => handleParentClick("phong-ngu", "Phòng ngủ")}>Phòng ngủ</span>,
       key: "PhongNgu",
       children: [
         { label: "Giường", key: "giuong" },
-        { label: "Tủ quần áo", key: "tuquanao" },
-        { label: "Tab đầu giường", key: "tabdaugiuong" },
-        { label: "Bàn trang điểm", key: "bantrangdiem" },
-        { label: "Chăn ga gối", key: "changagoi" },
+        { label: "Tủ quần áo", key: "tu-quan-ao" },
+        { label: "Tab đầu giường", key: "tab-dau-giuong" },
+        { label: "Bàn trang điểm", key: "ban-trang-diem" },
+        { label: "Chăn ga gối", key: "chan-ga-goi" },
       ],
     },
     {
-      label: <span onClick={() => handleParentClick("PhongLamViec")}>Phòng làm việc</span>,
+      label: <span onClick={() => handleParentClick("phong-lam-viec", "Phòng làm việc")}>Phòng làm việc</span>,
       key: "PhongLamViec",
       children: [
-        { label: "Bàn làm việc", key: "banlamviec" },
-        { label: "Ghế làm việc", key: "ghelamviec" },
-        { label: "Kệ sách", key: "kesach" },
-        { label: "Tủ hồ sơ", key: "tuhoso" },
-        { label: "Đèn bàn", key: "denban" },
+        { label: "Bàn làm việc", key: "ban-lam-viec" },
+        { label: "Ghế làm việc", key: "ghe-lam-viec" },
+        { label: "Kệ sách", key: "ke-sach" },
+        { label: "Tủ hồ sơ", key: "tu-ho-so" },
+        { label: "Đèn bàn", key: "den-ban" },
       ],
     },
     {
-      label: <span onClick={() => handleParentClick("TrangTriNhaCua")}>Trang trí nhà cửa</span>,
+      label: <span onClick={() => handleParentClick("trang-tri-nha-cua", "Trang trí nhà cửa")}>Trang trí nhà cửa</span>,
       key: "TrangTriNhaCua",
       children: [
-        { label: "Tranh treo tường", key: "tranhtreotuong" },
-        { label: "Đèn trang trí", key: "dentrangtri" },
+        { label: "Tranh treo tường", key: "tranh-treo-tuong" },
+        { label: "Đèn trang trí", key: "den-trang-tri" },
         { label: "Thảm", key: "tham" },
-        { label: "Cây giả", key: "caygia" },
-        { label: "Đồng hồ trang trí", key: "donghotrangtri" },       
+        { label: "Cây giả", key: "cay-gia" },
+        { label: "Đồng hồ trang trí", key: "dong-ho-trang-tri" },       
       ],
     },
   ];
 
   const handleNavigatetype = (e) => {
     const { key } = e;
-  
+    const { keyPath } = e;
+    //console.log('key parent nè', keyPath[1])// key cua parent
     // Tìm label tương ứng từ menuItems
     const findLabel = (items, key) => {
       for (const item of items) {
         if (item.key === key) return item.label;
-        if (item.children) {
-          const child = item.children.find(c => c.key === key);
-          if (child) return child.label;
-        }
+        const child = item.children.find(c => c.key === key);
+        if (child) return child.label;
       }
       return null;
     };
   
 
     
-    const label = findLabel(menuItems, key);
+    const label = findLabel(productTypesByRoom, key);
   
-    console.log("Đi tới:", key, "Label:", label?.props?.children || label);
+    //console.log("Đi tới:", key, "Label:", label);
   
     const normalizedKey = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ /g, '_');
-    navigate(`/product/${normalizedKey}`);
+    navigate(`/product/${key}`, {state: {label}});
   };
   
   // const categories = [
@@ -180,14 +179,14 @@ export default function NavbarComponent() {
   //   },
   // ];
   
-  const menuItems = productTypesByRoom.map((category) => ({
-    label: <span>{category.label}</span>, // không cần onClick ở đây nữa
-    key: category.key,
-    children: category.children.map((child) => ({
-      label: <span>{child.label}</span>,
-      key: child.key,
-    })),
-  }));
+  // const menuItems = productTypesByRoom.map((category) => ({
+  //   label: category.label,//<span>{category.label}</span>, // không cần onClick ở đây nữa
+  //   key: category.key,
+  //   children: category.children.map((child) => ({
+  //     label: child.label,//<span>{child.label}</span>,
+  //     key: child.key,
+  //   })),
+  // }));
     
   const styles = {
     header: {
@@ -234,7 +233,7 @@ export default function NavbarComponent() {
               rootClassName="custom-navbar"
               style={styles.menu}
               mode="horizontal"
-              items={menuItems}
+              items={productTypesByRoom}
               onClick={handleNavigatetype}
               selectedKeys={[current]}
             />
@@ -253,7 +252,7 @@ export default function NavbarComponent() {
                 onClose={() => setOpen(false)}
                 open={open}
               >
-                <Menu mode="inline" items={menuItems} onClick={handleNavigatetype} selectedKeys={[current]} />
+                <Menu mode="inline" items={productTypesByRoom} onClick={handleNavigatetype} selectedKeys={[current]} />
               </Drawer>
             </>
           )}
