@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 import LikeButtonComponent from '../LikeButtonComponent/LikeButtonComponent'
 import CommentComponent from '../CommentComponent/CommentComponent'
 import { convertPrice, initFacebookSDK } from '../../utils'
+import Loading from '../LoadingComponent/Loading'
 
 const ProductDetailsComponent = ({ idProduct }) => {
     const [quantity, setQuantity] = useState(1);
@@ -238,7 +239,6 @@ const ProductDetailsComponent = ({ idProduct }) => {
                     </Col>
                 </Row>
 
-
                 <h2>Mô tả sản phẩm</h2>
                 <div className="border border-gray-300 rounded-md" style={{ paddingBottom: "20px" }}>
                     <TableProductDetails>
@@ -257,7 +257,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                         </tbody>
                     </TableProductDetails>
                 </div>
-                <CommentComponent dataHref={"https://developers.facebook.com/docs/plugins/comments#configurator"} width="1115"/>
+                <CommentComponent dataHref={"https://developers.facebook.com/docs/plugins/comments#configurator"} width="1115" />
             </div>
         </isLoading>
     )
