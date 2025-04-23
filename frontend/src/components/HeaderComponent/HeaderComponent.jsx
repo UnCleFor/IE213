@@ -225,15 +225,20 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                     {totalQuantity > 0 && (
                       <span style={{
                         position: 'absolute',
-                        top: -9,
-                        right: -10,
+                        top: '-9px',
+                        right: '-10px',
                         background: 'red',
                         color: 'white',
                         borderRadius: '50%',
-                        padding: '2px 6px',
-                        fontSize: '9px',
+                        width: '14px',
+                        height: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '9.5px',
                         fontWeight: 'bold',
                         lineHeight: '1',
+                        boxShadow: '0 0 0 1px white',
                       }}>
                         {totalQuantity}
                       </span>
@@ -277,7 +282,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
           </SearchInputWrapper>
         </WrapperSearchMobile>
       )} */}
-    </div>
+    </div >
   );
 };
 

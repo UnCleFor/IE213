@@ -30,9 +30,17 @@ export const CartLayout = styled.div`
 
 export const CartLeft = styled.div`
   flex: 1;
+  min-width: 0; 
+  max-width: 100%; 
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  align-self: flex-start; 
+  
+  &:only-child {
+    flex: 0 1 auto; 
+    width: fit-content; 
+  }
 `;
 
 export const CartRight = styled.div`
@@ -108,6 +116,7 @@ export const ProductImage = styled.img`
 
 export const ProductDetails = styled.div`
   flex: 1;
+  position: relative;
 `;
 
 export const ProductName = styled.div`
@@ -122,28 +131,20 @@ export const ProductName = styled.div`
 
 export const ProductActions = styled.div`
   display: flex;
+  align-items: center;
   justify-content: space-between;
   width: 60%;
-  align-items: center;
+  gap: 40px; 
 `;
 
 export const PriceColumn = styled.div`
-  width: 25%;
+  width: 25%; 
   text-align: center;
+  padding-right: 20px;
 `;
 
 export const QuantityColumn = styled.div`
-  width: 30%;
-  text-align: center;
-`;
-
-export const TotalColumn = styled.div`
-  width: 25%;
-  text-align: center;
-`;
-
-export const ActionColumn = styled.div`
-  width: 20%;
+  width: 35%; 
   text-align: center;
 `;
 
@@ -177,8 +178,8 @@ export const QuantityButton = styled.button`
   cursor: pointer;
   transition: all 0.2s;
   &:hover {
-    border-color: #1890ff;
-    color: #1890ff;
+    border-color: #a52a2a;
+    color: #a52a2a;
   }
 `;
 
@@ -190,13 +191,20 @@ export const QuantityInput = styled(InputNumber)`
 `;
 
 export const DeleteButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 5px;
   background: transparent;
   border: none;
-  color: #999;
+  color: #ff4d4f;
   cursor: pointer;
-  transition: color 0.2s;
+  font-size: 13px;
+  padding: 5px 0;
+  margin-top: 8px;
+  transition: all 0.2s;
+
   &:hover {
-    color: #ff4d4f;
+    text-decoration: underline;
   }
 `;
 
@@ -217,11 +225,6 @@ export const SummaryLabel = styled.span`
   color: #666;
 `;
 
-export const SummaryValue = styled.span`
-  font-weight: 500;
-  color: #333;
-`;
-
 export const TotalPrice = styled.div`
   display: flex;
   justify-content: space-between;
@@ -236,7 +239,7 @@ export const TotalPrice = styled.div`
 export const CheckoutButton = styled.button`
   width: 100%;
   padding: 12px;
-  background: #1890ff;
+  background: #a52a2a;
   color: white;
   border: none;
   border-radius: 4px;
@@ -245,7 +248,7 @@ export const CheckoutButton = styled.button`
   cursor: pointer;
   transition: background 0.2s;
   &:hover {
-    background: #40a9ff;
+    background: #a52a2a;
   }
 `;
 
@@ -275,3 +278,28 @@ export const DisabledQuantityButton = styled(QuantityButton)`
   }
 `;
 
+export const ProductMaterial = styled.div`
+  font-size: 13px;
+  color: #666;
+  margin-top: 4px;
+`;
+
+export const DeleteButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 10px;
+`;
+
+export const ProductBottomSection = styled.div`
+  display: flex;
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px dashed #eee;
+  margin-top: 10px;
+`;
+
+export const SummaryValue = styled.span`
+  font-weight: 500;
+  color: #333;
+`;
