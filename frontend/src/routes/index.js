@@ -17,6 +17,7 @@ import OrderDetailPage from "../pages/OrderDetailPage/OrderDetailPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
 import CheckOutPage from "../pages/CheckOutPage/CheckOutPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage/ForgotPasswordPage";
+import ShopTheLook from "../pages/ShopTheLookPage/ShopTheLookPage";
 // Mảng routes trong file routes/index.js chứa các đường dẫn
 export const routes = [
     {
@@ -114,5 +115,10 @@ export const routes = [
         path: '/forgot-password',
         page: ForgotPasswordPage,
         isShowHeader: false
+    },
+    {
+        path: '/shop-the-look',
+        page: ShopTheLook,
+        isShowHeader: true
     },
 ]
