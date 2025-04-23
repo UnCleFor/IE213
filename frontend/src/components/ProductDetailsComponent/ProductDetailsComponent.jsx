@@ -12,7 +12,7 @@ import * as ProductService from '../../services/ProductService'
 import { useQuery } from '@tanstack/react-query'
 import LikeButtonComponent from '../LikeButtonComponent/LikeButtonComponent'
 import CommentComponent from '../CommentComponent/CommentComponent'
-import { initFacebookSDK } from '../../utils'
+import { convertPrice, initFacebookSDK } from '../../utils'
 
 const ProductDetailsComponent = ({ idProduct }) => {
     const [quantity, setQuantity] = useState(1);
@@ -74,7 +74,8 @@ const ProductDetailsComponent = ({ idProduct }) => {
                     amount: quantity,
                     image: productDetails?.image,
                     price: productDetails?.price,
-                    product: productDetails?._id
+                    product: productDetails?._id,
+                    discount: productDetails?.discount
                 }
             }))
         }
@@ -135,7 +136,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                         <p><strong>Nhóm sản phẩm:</strong> {product.tags.join(", ")}</p>
 
                         <WrapperStylePriceProduct>
-                            {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(productDetails?.price)}
+                            {convertPrice(productDetails?.price)}
                         </WrapperStylePriceProduct>
 
                         <SizeProduct>

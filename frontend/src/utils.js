@@ -53,3 +53,12 @@ export const initFacebookSDK = () => {
     fjs.parentNode.insertBefore(js, fjs);
   })(document, 'script', 'facebook-jssdk');
 };
+
+export const convertPrice = (price) => {
+  try {
+    const result = price?.toLocaleString('vi-VN').replace(",", ".")
+    return `${result} VNĐ`
+  } catch (error) {
+    return null
+  }
+}

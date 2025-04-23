@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { increaseAmount, decreaseAmount, removeOrderProduct, removeAllOrderProduct } from '../../redux/slices/orderSlide';
 import {
   PageContainer,
@@ -40,12 +40,31 @@ import {
 } from './style';
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
+import { convertPrice } from '../../utils';
 
 const OrderPage = () => {
   const order = useSelector((state) => state.order);
   const [listChecked, setListChecked] = useState([]);
   const [inputValues, setInputValues] = useState({});
   const dispatch = useDispatch();
+
+  const priceMemo = useMemo(() => {
+    const result = order?.orderItems?.reduce((total, curr) => {
+      return total + ((curr.price * curr.amount))
+    }, 0)
+    return result
+  }, [order])
+  const priceDiscountMemo = useMemo(() => {
+    const result = order?.orderItems?.reduce((total, curr) => {
+      if(curr.discount) {
+              return total + ((curr.price * curr.amount * (curr.discount / 100)))
+      }
+      return total
+    }, 0)
+    return result
+  }, [order])
+  console.log(order)
+  console.log(priceDiscountMemo)
 
   const onChange = (e) => {
     if (listChecked.includes(e.target.value)) {
@@ -169,9 +188,9 @@ const OrderPage = () => {
                   </ProductInfo>
                   <ProductActions>
                     <PriceColumn>
-                      <PriceText>{formatCurrency(orderItem?.price)}</PriceText>
+                      <PriceText>{convertPrice(orderItem?.price)}</PriceText>
                       {orderItem?.originalPrice && (
-                        <OriginalPrice>{formatCurrency(orderItem?.originalPrice)}</OriginalPrice>
+                        <OriginalPrice>{convertPrice(orderItem?.originalPrice)}</OriginalPrice>
                       )}
                     </PriceColumn>
                     <QuantityColumn>
@@ -205,7 +224,7 @@ const OrderPage = () => {
                     </QuantityColumn>
                     <TotalColumn>
                       <PriceText>
-                        {formatCurrency(orderItem?.price * orderItem?.amount)}
+                        {convertPrice(orderItem?.price * orderItem?.amount)}
                       </PriceText>
                     </TotalColumn>
                     <ActionColumn>
@@ -222,19 +241,15 @@ const OrderPage = () => {
               <SummaryTitle>Tóm tắt đơn hàng</SummaryTitle>
               <SummaryItem>
                 <SummaryLabel>Tạm tính</SummaryLabel>
-                <SummaryValue>{formatCurrency(totalAmount)}</SummaryValue>
-              </SummaryItem>
-              <SummaryItem>
-                <SummaryLabel>Phí vận chuyển</SummaryLabel>
-                <SummaryValue>0 ₫</SummaryValue>
+                <SummaryValue>{convertPrice(priceMemo)}</SummaryValue>
               </SummaryItem>
               <SummaryItem>
                 <SummaryLabel>Giảm giá</SummaryLabel>
-                <SummaryValue>-0 ₫</SummaryValue>
+                <SummaryValue>{convertPrice(priceDiscountMemo)}</SummaryValue>
               </SummaryItem>
               <TotalPrice>
-                <span>Tổng cộng</span>
-                <span>{formatCurrency(totalAmount)}</span>
+                <span>Thành tiền</span>
+                <span>{convertPrice(priceMemo - priceDiscountMemo)}</span>
               </TotalPrice>
               <CheckoutButton>TIẾN HÀNH THANH TOÁN</CheckoutButton>
             </CartRight>

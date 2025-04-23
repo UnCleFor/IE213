@@ -4,6 +4,7 @@ import { ShoppingCartOutlined, EyeOutlined, HeartOutlined } from "@ant-design/ic
 import { StyledCard, CardWrapper, ImageWrapper, HoverActions, WrapperTitle, WrapperPrice } from "./style";
 import tu_giay from "./tu_giay.webp";
 import { useNavigate } from 'react-router-dom'
+import { convertPrice } from "../../utils";
 
 // const CardComponent = () => {
 //   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -117,7 +118,7 @@ const CardComponent = ({ name, price, image, description, id }) => {
         onClick= {() => handleDetailsProduct(id)}
       >
         <WrapperTitle>{name}</WrapperTitle>
-        <WrapperPrice>{price.toLocaleString('vi-VN')}đ</WrapperPrice>
+        <WrapperPrice>{convertPrice(price)}</WrapperPrice>
       </StyledCard>
 
       <Modal
@@ -134,7 +135,7 @@ const CardComponent = ({ name, price, image, description, id }) => {
         ]}
       >
         <img src={image} alt={name} style={{ width: '100%', marginBottom: 16 }} />
-        <p><strong>Giá:</strong> {price.toLocaleString('vi-VN')}đ</p>
+        <p><strong>Giá:</strong> {convertPrice(price)}</p>
         <p><strong>Mô tả:</strong> {description}</p>
       </Modal>
     </CardWrapper>
