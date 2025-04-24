@@ -30,7 +30,7 @@ const authMiddleWare = (req, res, next) => {
 const authUserMiddleWare = (req, res, next) => {
     
     const token = req.headers.token?.split(' ')[1]; 
-    //console.log("Token nhận được:", token);
+    console.log("Token nhận được:", token);
     const userId = req.params.id
     jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
         if (err) {
@@ -41,7 +41,7 @@ const authUserMiddleWare = (req, res, next) => {
             // });
             return next()
         }
-    
+        req.user = user; // ✅ GÁN user VÀO req.user để controller đọc được
         //const { payload } = user
         if (user.isAdmin || user.id === userId) {
             //console.log('true')
