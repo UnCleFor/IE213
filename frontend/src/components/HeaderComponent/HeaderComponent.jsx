@@ -22,12 +22,13 @@ import beautihome from "./beautihome.png";
 import ContainerComponent from "../ContainerComponent/ContainerComponent";
 import { useDispatch, useSelector } from "react-redux";
 import * as UserService from '../../services/UserService'
-import { resetUser } from '../../redux/slices/userSlide'
+import { resetUser } from '../../redux/slices/userSlide';
 import Loading from "../../components/LoadingComponent/Loading";
 import { searchProduct } from "../../redux/slices/productSlide";
+import { resetOrder } from '../../redux/slices/orderSlide'
+
 const { useBreakpoint } = Grid;
 const { useToken } = theme;
-
 const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
 
   const { token } = useToken();
@@ -83,6 +84,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       await UserService.logoutUser(); // Gọi API logout
       localStorage.removeItem('access_token'); // Xoá token khỏi localStorage
       dispatch(resetUser()); // Reset user trong Redux
+      dispatch(resetOrder())
       navigate('/')
       setLoading(false);
     } catch (error) {
