@@ -18,14 +18,13 @@ const orderSchema = new mongoose.Schema(
         shippingAddress: {
             fullName: { type: String, required: true}, 
             address: { type: String, required: true},
-            city: { type: String, required: true},
             phone: { type: String, required: true},
         },
         paymentMethod: { type: String, required: true}, 
 
         itemsPrice:  { type: Number, required: true}, 
+        totalDiscount:  { type: Number, required: true}, 
         shippingPrice:  { type: Number, required: true}, 
-        taxPrice:  { type: Number, required: true}, 
         totalPrice:  { type: Number, required: true}, 
         
         // tham chiếu đến bảng user
@@ -44,5 +43,5 @@ const orderSchema = new mongoose.Schema(
         timestamps: true
     }
 );
-const Order = mongoose.model("Order", productSchema);
+const Order = mongoose.model("Order", orderSchema);
 module.exports = Order;

@@ -4,6 +4,11 @@ import ContainerComponent from "../../components/ContainerComponent/ContainerCom
 import { OrderDetailWrapper } from "./style";
 import pic from "./pic.png"; // ảnh mặc định sản phẩm
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
+import { useMutationHooks } from "../../hooks/useMutationHook";
+import * as OrderService from "../../services/OrderService"
+import * as UserService from "../../services/UserService"
+import { useSelector } from "react-redux";
+import { convertPrice } from "../../utils";
 
 const { Title, Text } = Typography;
 
@@ -27,17 +32,6 @@ const CheckoutPage = () => {
   const [selectedShipping, setSelectedShipping] = useState("fast");
   const [selectedPayment, setSelectedPayment] = useState("cod");
 
-  const subtotal = useMemo(() => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  }, []);
-
-  const shippingFee = useMemo(() => {
-    const selected = shippingMethods.find((s) => s.id === selectedShipping);
-    return selected ? selected.fee : 0;
-  }, [selectedShipping]);
-
-  const total = subtotal + shippingFee;
-
   const onFinish = (values) => {
     const orderInfo = {
       ...values,
@@ -50,6 +44,64 @@ const CheckoutPage = () => {
     console.log("Order Info:", orderInfo);
     message.success("Đặt hàng thành công!");
   };
+
+  const order = useSelector((state) => state.order);
+  const user = useSelector((state) => state.user);
+
+  const subtotal = useMemo(() => {
+    return order?.orderItemsSelected?.reduce((total, item) => total + item.price * item.amount, 0);
+  }, [order]);
+
+  const totalDiscount = useMemo(() => {
+    return order?.orderItemsSelected?.reduce((total, item) => total + item.price * item.amount * item.discount/100, 0);
+  }, [order]);
+
+  console.log(totalDiscount)
+
+
+  const shippingFee = useMemo(() => {
+    const selected = shippingMethods.find((s) => s.id === selectedShipping);
+    return selected ? selected.fee : 0;
+  }, [selectedShipping]);
+
+  const total = subtotal + shippingFee - totalDiscount;
+
+  const [stateUserDetails, setStateUserDetails] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+  });
+
+  const mutationUpdate = useMutationHooks((data) => {
+    const { id, token, ...rests } = data
+    const res = UserService.updateUser(id, { ...rests }, token)
+    return res
+  })
+
+  const mutationAddOrder = useMutationHooks((data) => {
+    const { token, ...rests } = data
+    const res = OrderService.createOrder({ ...rests }, token)
+    return res
+  })
+
+  const handleAddOrder = () => {
+    mutationAddOrder.mutate(
+      {
+        token: user?.access_token, orderItems: order?.orderItemsSelected,
+        fullName: user?.name, address: user?.address, phone: user?.phone,
+        // paymentMethod: paymentMethods.name,
+        paymentMethod: paymentMethods.find((p) => p.id === selectedPayment).name,
+        itemsPrice: subtotal,
+        totalDiscount: totalDiscount,
+        shippingPrice: shippingFee,
+        totalPrice: total,
+        user: user?.id
+      }
+    )
+  }
+
+  console.log('Order', order, user)
 
   return (
     <ContainerComponent>
@@ -111,58 +163,67 @@ const CheckoutPage = () => {
 
           {/* Danh sách sản phẩm + Tổng tiền */}
           <Card title="Đơn hàng của bạn" style={{ marginBottom: 16 }}>
-            {cartItems.map((item, index) => (
-              <Row key={index} justify="space-between" align="middle" style={{ marginBottom: 12 }}>
+            {order?.orderItemsSelected?.map((orderItem) => (
+              <Row key={orderItem?.product} justify="space-between" align="middle" style={{ marginBottom: 12 }}>
                 <Col span={16} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <Avatar shape="square" size={48} src={item.image} />
+                  <Avatar shape="square" size={48} src={orderItem?.image} alt={orderItem?.name} />
                   <div>
-                    <div style={{ fontWeight: 500 }}>{item.name}</div>
+                    <div style={{ fontWeight: 500 }}>{orderItem?.name}</div>
                     <div style={{ fontSize: 13, color: "#666" }}>
-                      Số lượng: {item.quantity}
+                      Số lượng: {orderItem?.amount}
                     </div>
                   </div>
                 </Col>
                 <Col span={8} style={{ textAlign: "right" }}>
-                  {(item.price * item.quantity).toLocaleString()}₫
+                  <p>{convertPrice(orderItem?.price * orderItem?.amount)}</p>
+                  {orderItem?.discount && (
+                    <p>
+                      - {convertPrice(orderItem?.price * orderItem?.amount * orderItem?.discount / 100)}
+                    </p>
+                  )}
                 </Col>
               </Row>
             ))}
             <Divider />
             <Row justify="space-between">
               <Text>Tạm tính:</Text>
-              <Text>{subtotal.toLocaleString()}₫</Text>
+              <Text>{convertPrice(subtotal)}</Text>
+            </Row>
+            <Row justify="space-between">
+              <Text>Giảm giá:</Text>
+              <Text>{convertPrice(totalDiscount)}</Text>
             </Row>
             <Row justify="space-between">
               <Text>Phí giao hàng:</Text>
-              <Text>{shippingFee.toLocaleString()}₫</Text>
+              <Text>{convertPrice(shippingFee)}</Text>
             </Row>
             <Row justify="space-between" style={{ marginTop: 8 }}>
               <Title level={4}>Tổng cộng:</Title>
-              <Title level={4}>{total.toLocaleString()}₫</Title>
+              <Title level={4}>{convertPrice(total)}</Title>
             </Row>
           </Card>
 
           {/* Nút đặt hàng */}
           <Row justify="end">
-          <ButtonComponent
-                            //onClick={handleUpdate}
-                            size="large"
-                            styleButton={{
-                                backgroundColor: 'brown',
-                                padding: '12px 28px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                marginBottom:'10px'
-                            }}
-                            styleTextButton={{
-                                color: 'white',
-                                fontSize: '16px',
-                                fontWeight: 'bold',
-                            }}
-                            textButton="Mua hàng"
-                            
-                        />
+            <ButtonComponent
+              onClick={() => { handleAddOrder() }}
+              size="large"
+              styleButton={{
+                backgroundColor: 'brown',
+                padding: '12px 28px',
+                borderRadius: '8px',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                marginBottom: '10px'
+              }}
+              styleTextButton={{
+                color: 'white',
+                fontSize: '16px',
+                fontWeight: 'bold',
+              }}
+              textButton="THANH TOÁN"
+
+            />
           </Row>
         </Form>
       </OrderDetailWrapper>

@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { increaseAmount, decreaseAmount, removeOrderProduct, removeAllOrderProduct } from '../../redux/slices/orderSlide';
+import React, { useEffect, useMemo, useState } from 'react';
+import { increaseAmount, decreaseAmount, removeOrderProduct, removeAllOrderProduct, selectedOrder } from '../../redux/slices/orderSlide';
 import {
   PageContainer,
   ContentContainer,
@@ -39,12 +39,18 @@ import {
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { convertPrice } from '../../utils';
+import { useNavigate } from "react-router-dom";
 
 const OrderPage = () => {
   const order = useSelector((state) => state.order);
+  const navigate = useNavigate()
   const [listChecked, setListChecked] = useState([]);
   const [inputValues, setInputValues] = useState({});
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(selectedOrder({ listChecked }))
+  }, [listChecked])
 
   const priceMemo = useMemo(() => {
     return order?.orderItems?.reduce((total, curr) => total + (curr.price * curr.amount), 0);
@@ -120,6 +126,11 @@ const OrderPage = () => {
       dispatch(removeAllOrderProduct({ listChecked }));
     }
   };
+
+  const handleAddCard = () => {
+    console.log("alo")
+    navigate('/checkout')
+  }
 
   return (
     <PageContainer>
@@ -266,6 +277,7 @@ const OrderPage = () => {
                   position: 'relative',
                   opacity: listChecked.length === 0 ? 0.7 : 1,
                 }}
+                onClick={handleAddCard}
               >
                 TIẾN HÀNH THANH TOÁN
               </CheckoutButton>
