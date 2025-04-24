@@ -1,4 +1,6 @@
-import { axiosJWT } from "./UserService";
+import {
+    axiosJWT
+} from "./UserService";
 
 // export const createProduct = async (data) => {
 //     const res = await axios.post(`${process.env.REACT_APP_API_URL}/product/create`, data)

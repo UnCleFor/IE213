@@ -31,6 +31,7 @@ const paymentMethods = [
 const CheckoutPage = () => {
   const [selectedShipping, setSelectedShipping] = useState("fast");
   const [selectedPayment, setSelectedPayment] = useState("cod");
+  const [form] = Form.useForm(); // Tạo form instance
 
   const onFinish = (values) => {
     const orderInfo = {
@@ -51,19 +52,13 @@ const CheckoutPage = () => {
   const subtotal = useMemo(() => {
     return order?.orderItemsSelected?.reduce((total, item) => total + item.price * item.amount, 0);
   }, [order]);
-
   const totalDiscount = useMemo(() => {
     return order?.orderItemsSelected?.reduce((total, item) => total + item.price * item.amount * item.discount/100, 0);
   }, [order]);
-
-  console.log(totalDiscount)
-
-
   const shippingFee = useMemo(() => {
     const selected = shippingMethods.find((s) => s.id === selectedShipping);
     return selected ? selected.fee : 0;
   }, [selectedShipping]);
-
   const total = subtotal + shippingFee - totalDiscount;
 
   const [stateUserDetails, setStateUserDetails] = useState({
@@ -85,29 +80,43 @@ const CheckoutPage = () => {
     return res
   })
 
-  const handleAddOrder = () => {
-    mutationAddOrder.mutate(
-      {
-        token: user?.access_token, orderItems: order?.orderItemsSelected,
-        fullName: user?.name, address: user?.address, phone: user?.phone,
-        // paymentMethod: paymentMethods.name,
-        paymentMethod: paymentMethods.find((p) => p.id === selectedPayment).name,
-        itemsPrice: subtotal,
-        totalDiscount: totalDiscount,
-        shippingPrice: shippingFee,
-        totalPrice: total,
-        user: user?.id
-      }
-    )
-  }
+  const { isLoading, data } = mutationUpdate
+  const { isLoading: isLoadingAddOrder } = mutationAddOrder 
 
-  console.log('Order', order, user)
+  const handleAddOrder = () => {
+    form.validateFields().then((values) => {
+      if(user?.access_token && order?.orderItemsSelected) {
+        mutationAddOrder.mutate(
+          {
+            token: user?.access_token, 
+            orderItems: order?.orderItemsSelected,
+            fullName: values.name, 
+            address: values.address, 
+            phone: values.phone,
+            paymentMethod: paymentMethods.find((p) => p.id === selectedPayment).name,
+            itemsPrice: subtotal,
+            totalDiscount: totalDiscount,
+            shippingPrice: shippingFee,
+            totalPrice: total,
+            user: user?.id
+          },
+          {
+            onSuccess: () => {
+              message.success('Đặt hàng thành công');
+            }
+          }
+        );
+      }
+    }).catch((errorInfo) => {
+      console.log('Validation Failed:', errorInfo);
+    });
+  }
 
   return (
     <ContainerComponent>
       <OrderDetailWrapper>
         <Title level={3}>Thanh toán</Title>
-        <Form layout="vertical" onFinish={onFinish}>
+        <Form form={form} layout="vertical" onFinish={onFinish}>
           {/* Thông tin người nhận */}
           <Card title="Thông tin người nhận" style={{ marginBottom: 16 }}>
             <Row gutter={[16, 16]}>
@@ -222,7 +231,6 @@ const CheckoutPage = () => {
                 fontWeight: 'bold',
               }}
               textButton="THANH TOÁN"
-
             />
           </Row>
         </Form>
