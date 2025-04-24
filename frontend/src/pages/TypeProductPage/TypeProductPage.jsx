@@ -7,13 +7,19 @@ import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 import { useLocation } from 'react-router-dom';
 import * as ProductService from '../../services/ProductService'
 import LoadingComponent from '../../components/LoadingComponent/Loading'
+import { current } from '@reduxjs/toolkit';
+import { useSelector } from 'react-redux';
+import { useDebounce } from '../../hooks/useDebounce';
 
-const { Option  } = Select;
+
+const { Option } = Select;
 const { Title } = Typography;
 
 const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
+  const searchProduct = useSelector((state) => state?.product?.search)
+  const searchDebounce = useDebounce(searchProduct, 500)
   const [products, setProducts] = useState([]);
-  const {state} = useLocation()
+  const { state } = useLocation()
   const [loading, setLoading] = useState(false)
   //console.log('state nè (label)', state?.label)
   // const fetchProducts = async () => {
@@ -33,28 +39,51 @@ const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
   //   fetchProducts();
   // }, [type]);
 
-    const fetchProductType = async (type) => {
-      setLoading(true)
-      const res = await ProductService.getProductType(type)
-      if (res?.status == 'OK') {
-        setLoading(false)
-        setProducts(res?.data)
-      } else {
-        setLoading(false)
-      }
+  const [panigate, setPanigate] = useState({
+    page: 0,
+    limit: 10,
+    total: 1,
+  })
+
+  const fetchProductType = async (type, page, limit) => {
+    setLoading(true)
+    const res = await ProductService.getProductType(type, page, limit)
+    if (res?.status == 'OK') {
+      setLoading(false)
+      setProducts(res?.data)
+      setPanigate({ ...panigate, total: res?.totalPage })
+    } else {
+      setLoading(false)
     }
+  }
 
-    useEffect(() => {
-      if (state) {
-        fetchProductType(state)
-      }
-    },[state])
+  // useEffect(() => {
+  //   let newProduct = []
+  //   if (searchDebounce) {
+  //     newProduct = products?.filter((pro) => pro?.name === searchDebounce)
+  //     console.log('newProducts', newProduct)
+  //     setProducts(newProduct)
+  //   }
+  // }, [searchDebounce])
+  // console.log('searchProduct', searchProduct)
 
-    const [category, setCategory] = useState(null);
-    const [minPrice, setMinPrice] = useState(null);
-    const [maxPrice, setMaxPrice] = useState(null);
-    const [sortBy, setSortBy] = useState(null);
-    const handleFilter = () => {
+  useEffect(() => {
+    if (state) {
+      fetchProductType(state, panigate.page, panigate.limit)
+    }
+  }, [state, panigate.page, panigate.limit])
+
+  const onChange = (current, pageSize) => {
+    setPanigate({ ...panigate, page: current - 1, limit: [pageSize] })
+  }
+
+
+
+  const [category, setCategory] = useState(null);
+  const [minPrice, setMinPrice] = useState(null);
+  const [maxPrice, setMaxPrice] = useState(null);
+  const [sortBy, setSortBy] = useState(null);
+  const handleFilter = () => {
     console.log("Lọc theo:", { category, minPrice, maxPrice, sortBy });
     // TODO: gọi API hoặc filter dữ liệu tại đây
   };
@@ -64,8 +93,8 @@ const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
       <div style={{ padding: "16px 0" }}>
         <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>{name}</Title>
 
-      {/* Bộ lọc + sắp xếp */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }} justify="start">
+        {/* Bộ lọc + sắp xếp */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }} justify="start">
           <Col xs={24} sm={12} md={6}>
             <Select
               placeholder="Loại sản phẩm"
@@ -141,30 +170,37 @@ const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
 
         {/* Lưới sản phẩm */}
         <LoadingComponent isLoading={loading}>
-        <Row gutter={[16, 24]}>
-          {products.length > 0 ? (
-            products.map((product) => (
-              <Col key={product._id} xs={12} sm={12} md={8} lg={6} xl={6}>
-                <CardComponent
-                  name={product.name}
-                  price={product.price}
-                  image={product.image}
-                  description={product.description}
-                />
+          <Row gutter={[16, 24]}>
+            {products.length > 0 ? (
+              products?.filter((pro) => {
+                if (searchDebounce === '') {
+                  return pro
+                } else if (pro?.name?.toLowerCase()?.includes(searchDebounce?.toLowerCase())) {
+                  return pro
+                }
+              })?.map((product) => (
+                <Col key={product._id} xs={12} sm={12} md={8} lg={6} xl={6}>
+                  <CardComponent
+                    name={product.name}
+                    price={product.price}
+                    image={product.image}
+                    description={product.description}
+                  />
+                </Col>
+              ))
+            ) : (
+              <Col span={24} style={{ textAlign: 'center' }}>
+                <p>Không tìm thấy sản phẩm phù hợp.</p>
               </Col>
-            ))
-          ) : (
-            <Col span={24} style={{ textAlign: 'center' }}>
-              <p>Không tìm thấy sản phẩm phù hợp.</p>
-            </Col>
-          )}
-        </Row>
+            )}
+          </Row>
         </LoadingComponent>
 
         {/* Phân trang */}
         <Pagination
-          defaultCurrent={1}
-          total={products.length}
+          defaultCurrent={panigate.page + 11}
+          total={panigate?.total}
+          onChange={onChange}
           pageSize={8}
           style={{ display: 'flex', justifyContent: 'center', margin: '32px 0' }}
         />
