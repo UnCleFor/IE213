@@ -65,13 +65,13 @@ export default function NavbarComponent() {
 
   // Xử lý khi click vào parent item
   const handleParentClick = (key, label) => {
-    navigate(`/product/${key}`, {state: {label}});
+    navigate(`/product/${key}`, {state: {label, filterBy: 'room' }});
     setOpen(false);
   };
 
   const productTypesByRoom = [   //thể hiện trên navbar
     {
-      label: <span onClick={() => handleParentClick("phong-khach", "Phòng Khách")}>Phòng khách</span>,
+      label: <span onClick={() => handleParentClick("phong-khach", "Phòng khách")}>Phòng khách</span>,
       key: "PhongKhach",
       children: [
         { label: "Sofa", key: "sofa" },
@@ -148,7 +148,7 @@ export default function NavbarComponent() {
     //console.log("Đi tới:", key, "Label:", label);
   
     const normalizedKey = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ /g, '_');
-    navigate(`/product/${key}`, {state: {label}});
+    navigate(`/product/${key}`, {state: {label, filterBy: 'type'}});
   };
   
   // const categories = [

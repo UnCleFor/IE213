@@ -156,25 +156,21 @@ const deleteProduct = (id) => {
     })
 }
 
-const getAllProduct = (limit, page, sort, filter) => {
+const getAllProduct = (limit, page, sort, filter, value) => {
     // Tạo xử lý bất đồng bộ
     return new Promise(async (resolve, reject) => {
         try {
             const totalProduct = await Product.countDocuments()
             let allProduct = []
             // Filter
-            if (filter) {
-                const label = filter[0]
-                const value = filter[1]
+            if (filter && value) {
+                const label = filter;
+                const filterValue = value;
 
                 const allProductFilter = await Product.aggregate([
                     {
-                        $search: {
-                            index: "default",
-                            text: {
-                                query: value,
-                                path: label,
-                            }
+                        $match: {
+                            [label]: { $regex: filterValue, $options: 'i' }
                         }
                     },
                     { $skip: page * limit },
@@ -190,14 +186,10 @@ const getAllProduct = (limit, page, sort, filter) => {
 
                 const totalFiltered = await Product.aggregate([
                     {
-                        $search: {
-                            index: "default",
-                            text: {
-                                query: value,
-                                path: label,
-                            }
+                        $match: {
+                            [label]: { $regex: filterValue, $options: 'i' }
                         }
-                        },
+                    },
                     { $count: "total" }
                 ]);
                 const totalProduct = totalFiltered[0]?.total || 0;

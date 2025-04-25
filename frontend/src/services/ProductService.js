@@ -76,9 +76,9 @@ export const deleteProduct = async (id, access_token) => {
   return res.data;
 };
 
-export const getProductType = async (type, page, limit) => {
-  if (type) {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all?filter=type&filter=${type}&limit=${limit}&page=${page}`)
+export const getProductType = async (filterBy, label, page, limit) => {
+  if (filterBy) {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all?filter=${filterBy}&label=${label}&limit=${limit}&page=${page}`)
     return res.data
   }
 };

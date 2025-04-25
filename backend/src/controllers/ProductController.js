@@ -85,8 +85,8 @@ const deleteProduct = async (req, res) => {
 
 const getAllProduct = async (req, res) => {
     try {
-        const { limit, page, sort, filter } = req.query
-        const ketqua = await ProductService.getAllProduct(Number(limit) || null, Number(page) || 0, sort, filter)
+        const { limit, page, sort, filter, label } = req.query
+        const ketqua = await ProductService.getAllProduct(Number(limit) || null, Number(page) || 0, sort, filter, label)
         return res.status(200).json(ketqua)
     }
     catch(e) {

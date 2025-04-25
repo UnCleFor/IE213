@@ -15,11 +15,12 @@ import { useDebounce } from '../../hooks/useDebounce';
 const { Option } = Select;
 const { Title } = Typography;
 
-const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
+const TypeProduct = () => {
   const searchProduct = useSelector((state) => state?.product?.search)
   const searchDebounce = useDebounce(searchProduct, 500)
   const [products, setProducts] = useState([]);
   const { state } = useLocation()
+  const { label, filterBy } = state || {}
   const [loading, setLoading] = useState(false)
   //console.log('state nè (label)', state?.label)
   // const fetchProducts = async () => {
@@ -45,9 +46,9 @@ const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
     total: 1,
   })
 
-  const fetchProductType = async (type, page, limit) => {
+  const fetchProductType = async (filterBy, label, page, limit) => {
     setLoading(true)
-    const res = await ProductService.getProductType(type, page, limit)
+    const res = await ProductService.getProductType(filterBy, label, page, limit)
     if (res?.status == 'OK') {
       setLoading(false)
       setProducts(res?.data)
@@ -68,16 +69,16 @@ const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
   // console.log('searchProduct', searchProduct)
 
   useEffect(() => {
-    if (state) {
-      fetchProductType(state, panigate.page, panigate.limit)
+    if (label && filterBy) {
+      fetchProductType(filterBy, label, panigate.page, panigate.limit)
     }
-  }, [state, panigate.page, panigate.limit])
+  }, [filterBy, label, panigate.page, panigate.limit])
 
   const onChange = (current, pageSize) => {
     setPanigate({ ...panigate, page: current - 1, limit: [pageSize] })
   }
 
-
+  console.log('filter nè:', filterBy)
 
   const [category, setCategory] = useState(null);
   const [minPrice, setMinPrice] = useState(null);
@@ -91,7 +92,7 @@ const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
   return (
     <ContainerComponent>
       <div style={{ padding: "16px 0" }}>
-        <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>{name}</Title>
+        <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>{label}</Title>
 
         {/* Bộ lọc + sắp xếp */}
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }} justify="start">
@@ -170,7 +171,7 @@ const TypeProduct = ({ name = 'Sản phẩm', type = null }) => {
 
         {/* Lưới sản phẩm */}
         <LoadingComponent isLoading={loading}>
-          <Row gutter={[16, 24]}>
+          <Row gutter={[16, 24]} style={{ padding: 0 }}>
             {products.length > 0 ? (
               products?.filter((pro) => {
                 if (searchDebounce === '') {
