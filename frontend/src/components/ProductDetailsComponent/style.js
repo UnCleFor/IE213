@@ -56,23 +56,48 @@ export const TableProductDetails = styled.table`
   border-collapse: collapse;
   font-family: Arial, sans-serif;
   font-size: 16px;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+`;
+
+export const RowDetail = styled.tr`
+  @media (max-width: 768px) {
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+  }
 `;
 
 export const Td = styled.td`
   padding: 10px 15px;
   border: 1px solid #ddd;
   text-align: left;
+
+  @media (max-width: 768px) {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid #eee;
+  }
 `;
 
 export const TitleCell = styled(Td)`
-  width: 20%;
   font-weight: bold;
+  background-color: #f1f1f1;
+
+  @media (max-width: 768px) {
+    background-color: transparent;
+    font-weight: 600;
+  }
 `;
 
 export const DetailsCell = styled(Td)`
-  width: 80%;
-`;
-
-export const RowDetail = styled.tr`
-  background-color: ${(props) => (props.even ? "#f5f5f5" : "#ffffff")};
+  @media (max-width: 768px) {
+    padding-left: 20px;
+  }
 `;

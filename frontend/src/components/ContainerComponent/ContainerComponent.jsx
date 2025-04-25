@@ -26,7 +26,7 @@ export default function ContainerComponent({ children }) {
     width: "100%",
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center",
+    //alignItems: "center",
     margin: "0 auto",
     maxWidth: token.screenXL,
     padding: `0 ${horizontalPadding}px`,
