@@ -58,8 +58,15 @@ const SignInPage = () => {
 
     const isLoading = mutation.isPending
 
-
     console.log('mutation', mutation)
+
+    useEffect(() => {
+        if (isSuccess && data?.status === 'OK') {
+          message.success('Đăng nhập thành công!');
+        } else if (data?.status === 'ERR') {
+          message.error(data?.message);
+        }
+      }, [isSuccess, isError]);
 
     const handleNavigateSignUp = () => {
         navigate('/sign_up')

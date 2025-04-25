@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { Col, Row, Button, Grid, theme, Popover } from "antd";
+import { Col, Row, Button, Grid, theme, Popover, message } from "antd";
 import {
   // WrapperHeader,
   WrapperHeaderAccount,
@@ -86,9 +86,11 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       dispatch(resetUser()); // Reset user trong Redux
       dispatch(resetOrder())
       navigate('/')
+      message.success('Đăng xuất thành công')
       setLoading(false);
     } catch (error) {
       console.error('Logout error:', error);
+      message.success('Đăng xuất thất bại')
       setLoading(false);
     }
   };

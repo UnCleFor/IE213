@@ -9,7 +9,6 @@ import * as message from '../../components/Message/Message';
 import Loading from '../../components/LoadingComponent/Loading'
 import { updateUser } from '../../redux/slices/userSlide'
 import { UploadOutlined } from '@ant-design/icons'
-
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent.jsx'
 
 const ProfilePage = () => {
@@ -19,16 +18,17 @@ const ProfilePage = () => {
     const [phone, setPhone] = useState('')
     const [address, setAddress] = useState('')
     const [avatar, setAvatar] = useState('')
+    const [isUpdating, setIsUpdating] = useState(false)
 
     const mutation = useMutationHooks(
         (data) => {
             const { id, access_token, ...rests } = data
-            UserService.updateUser(id, rests, access_token)
+            return UserService.updateUser(id, rests, access_token)
         }
     )
 
-    const isLoading = mutation.isPending
     const { data, isSuccess, isError } = mutation
+    const isLoading = mutation.isPending
 
     const dispatch = useDispatch()
 
@@ -41,38 +41,46 @@ const ProfilePage = () => {
     }, [user])
 
     useEffect(() => {
-        if (isSuccess) {
-            message.success()
-            handleGetDetailUser(user?.id, user.access_token)
-        } else if (isError) {
-            message.error()
+        if (isSuccess && isUpdating) {
+            if (data?.status === 'OK') {
+                message.success(data?.message || 'Cập nhật thông tin thành công!')
+                handleGetDetailUser(user?.id, user.access_token)
+            } else if (data?.status === 'ERR') {
+                message.error(data?.message || 'Cập nhật thất bại')
+            }
+            setIsUpdating(false)
+        } else if (isError && isUpdating) {
+            message.error('Lỗi hệ thống khi cập nhật')
+            setIsUpdating(false)
         }
-    }, [isSuccess, isError])
+    }, [isSuccess, isError, data])
 
     const handleGetDetailUser = async (id, token) => {
-        const res = await UserService.getDetailUser(id, token)
-        dispatch(updateUser({ ...res?.data, access_token: token }))
-        //console.log('res',res)
+        try {
+            const res = await UserService.getDetailUser(id, token)
+            dispatch(updateUser({ ...res?.data, access_token: token }))
+        } catch (error) {
+            message.error('Lỗi khi tải thông tin người dùng')
+        }
     }
 
     const handleOnchangeName = (value) => {
         setName(value)
     }
+
     const handleOnchangeEmail = (value) => {
         setEmail(value)
     }
+
     const handleOnchangePhone = (value) => {
         setPhone(value)
     }
+
     const handleOnchangeAddress = (value) => {
         setAddress(value)
     }
-    const handleOnchangeAvatar = async ({ fileList }) => {
-        // const file = fileList[0]
-        // if (!file.url && !file.preview) {
-        //     file.preview = await getBase64(file.originFileObj);
-        // }
 
+    const handleOnchangeAvatar = async ({ fileList }) => {
         const file = fileList[0]
         if(!file) return 
         const data = new FormData()
@@ -83,45 +91,86 @@ const ProfilePage = () => {
             method: "POST",
             body: data
         })
-
         const uploadedImageURL = await res.json()
-        console.log(uploadedImageURL.url)
         setAvatar(uploadedImageURL.url)
     }
 
     const handleUpdate = () => {
-        mutation.mutate({ id: user?.id, email, name, phone, address, avatar, access_token: user?.access_token })
+        // Validate required fields
+        if (!name.trim()) {
+            message.error('Vui lòng nhập họ và tên')
+            return
+        }
+        if (!email.trim()) {
+            message.error('Vui lòng nhập email')
+            return
+        }
+        if (!phone.trim()) {
+            message.error('Vui lòng nhập số điện thoại')
+            return
+        }
+
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(email)) {
+            message.error('Email không hợp lệ')
+            return
+        }
+
+        // Basic phone validation
+        const phoneRegex = /^(0|\+84)(3[2-9]|5[2689]|7[06-9]|8[1-689]|9[0-9])[0-9]{7}$/
+        if (!phoneRegex.test(phone)) {
+            message.error('Số điện thoại không hợp lệ')
+            return
+        }
+
+        setIsUpdating(true)
+        mutation.mutate({ 
+            id: user?.id, 
+            email, 
+            name, 
+            phone, 
+            address, 
+            avatar, 
+            access_token: user?.access_token 
+        })
     }
 
     return (
-        <div
-            style={{
-                maxWidth: '700px',
-                margin: '40px auto',
-                padding: '40px',
-                backgroundColor: '#fff',
-                borderRadius: '16px',
-                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
-            }}
-        >
+        <div style={{ maxWidth: '700px', margin: '40px auto', padding: '40px', backgroundColor: '#fff', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)' }}>
             <h2 style={{ textAlign: 'center', fontSize: '28px', marginBottom: '30px' }}>
                 Thông tin người dùng
             </h2>
             <Loading isLoading={isLoading}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     <WrapperInput>
-                        <WrapperLabel htmlFor='name'>Họ và tên</WrapperLabel>
-                        <InputForm id="name" value={name} onChange={handleOnchangeName} />
+                        <WrapperLabel htmlFor='name'>Họ và tên <span style={{color: 'red'}}>*</span></WrapperLabel>
+                        <InputForm 
+                            id="name" 
+                            value={name} 
+                            onChange={handleOnchangeName} 
+                           
+                        />
                     </WrapperInput>
 
                     <WrapperInput>
-                        <WrapperLabel htmlFor='email'>Email</WrapperLabel>
-                        <InputForm id="email" value={email} onChange={handleOnchangeEmail} />
+                        <WrapperLabel htmlFor='email'>Email <span style={{color: 'red'}}>*</span></WrapperLabel>
+                        <InputForm 
+                            id="email" 
+                            value={email} 
+                            onChange={handleOnchangeEmail} 
+                            
+                            type="email"
+                        />
                     </WrapperInput>
 
                     <WrapperInput>
-                        <WrapperLabel htmlFor='phone'>Số điện thoại</WrapperLabel>
-                        <InputForm id="phone" value={phone} onChange={handleOnchangePhone} />
+                        <WrapperLabel htmlFor='phone'>Điện thoại <span style={{color: 'red'}}>*</span></WrapperLabel>
+                        <InputForm 
+                            id="phone" 
+                            value={phone} 
+                            onChange={handleOnchangePhone}
+                        />
                     </WrapperInput>
 
                     <WrapperInput>
@@ -157,7 +206,7 @@ const ProfilePage = () => {
                             )}
                         </div>
                     </WrapperInput>
-
+                           
                     <div style={{ textAlign: 'center', marginTop: '24px' }}>
                         <ButtonComponent
                             onClick={handleUpdate}

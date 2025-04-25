@@ -3,49 +3,67 @@ const JwtService = require('../services/JwtService')
 // validator cho email (npm install email-validator)
 var validator = require("email-validator");
 
-const createUser = async (req,res) => {
+const createUser = async (req, res) => {
     try {
-        // lấy ra các thông tin cần thiết từ body của req đc gửi từ ui xuống để tạo user mới 
-        const {name, email, password, confirmPassword, phone } = req.body
+        const { name, email, password, confirmPassword, phone } = req.body;
         
-        // check email có hợp lệ ko
+        // Email validation
         const isCheckEmail = validator.validate(email);
         
-        // nếu thiếu 1 trường thì báo ERR
-        if ( !name || !email || !password || !confirmPassword ) {
+        // Phone number validation regex (Vietnamese format)
+        const phoneRegex = /^(0|\+84)(3[2-9]|5[2689]|7[06-9]|8[1-689]|9[0-9])[0-9]{7}$/;
+        
+        // Password requirements:
+        // - At least 8 characters
+        // - At least 1 uppercase letter
+        // - At least 1 lowercase letter
+        // - At least 1 number
+        // - At least 1 special character
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        // Validation checks
+        if (!name || !email || !password || !confirmPassword || !phone) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'Cần điền đầy đủ thông tin'
-            })
+            });
         } else if (!isCheckEmail) {
             return res.status(200).json({
                 status: 'ERR',
-                message: 'Email bị lỗi'
-            })
+                message: 'Email không hợp lệ'
+            });
         } else if (password !== confirmPassword) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'Mật khẩu nhập lại không trùng khớp'
-            })
+            });
+        } else if (!phoneRegex.test(phone)) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Số điện thoại không hợp lệ (phải là số điện thoại Việt Nam)'
+            });
+        } else if (!passwordRegex.test(password)) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt'
+            });
         }
         
-        // thực hiện gọi dịch vụ tạo user mới
-        const ketqua = await UserService.createUser(req.body)
-        return res.status(200).json(ketqua)
-    }
-    catch(e){
+        // If all validations pass, create the user
+        const response = await UserService.createUser(req.body);
+        return res.status(200).json(response);
+    } catch (e) {
         return res.status(404).json({
-            message: e
-        })
+            status: 'ERR',
+            message: e.message || 'Lỗi hệ thống'
+        });
     }
-}
+};
 
 const loginUser = async (req,res) => {
     try {
         // lấy ra các thông tin cần thiết từ body của req đc gửi từ ui xuống để tạo user mới 
         const { email, password } = req.body
-        
-        
         // check email có hợp lệ ko
         const isCheckEmail = validator.validate(email);
         //console.log(email, password)
@@ -61,7 +79,6 @@ const loginUser = async (req,res) => {
                 message: 'Email bị lỗi'
             })
         } 
-        
         // thực hiện gọi dịch vụ tạo user mới
         const ketqua = await UserService.loginUser(req.body)
         //tách phần refresh token ra khỏi kết quả và tạo ra newResponse để lưu lại kết quả sau khi tách
@@ -81,26 +98,59 @@ const loginUser = async (req,res) => {
     }
 }
 
-const updateUser = async (req,res) => {
+const updateUser = async (req, res) => {
     try {
-        const userId = req.params.id
-        const data = req.body
+        const userId = req.params.id;
+        const { name, email, password, phone } = req.body;
+
+        // Validation patterns
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email validation
+        const phoneRegex = /^(0|\+84)(3[2-9]|5[2689]|7[06-9]|8[1-689]|9[0-9])[0-9]{7}$/; // Vietnamese phone
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        // Required field check
         if (!userId) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'Thiếu userId'
-            })
+            });
         }
-        // thực hiện gọi dịch vụ tạo user mới
-        const ketqua = await UserService.updateUser(userId, data)
-        return res.status(200).json(ketqua)
-    }
-    catch(e){
+
+        // Validate email if provided
+        if (email && !emailRegex.test(email)) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Email không hợp lệ'
+            });
+        }
+
+        // Validate phone if provided
+        if (phone && !phoneRegex.test(phone)) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Số điện thoại không hợp lệ (phải là số điện thoại Việt Nam)'
+            });
+        }
+
+        // Validate password if provided
+        if (password && !passwordRegex.test(password)) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt'
+            });
+        }
+
+        // If all validations pass, update the user
+        const response = await UserService.updateUser(userId, req.body);
+        return res.status(200).json(response);
+
+    } catch (e) {
         return res.status(404).json({
-            message: e
-        })
+            status: 'ERR',
+            message: e.message || 'Lỗi hệ thống khi cập nhật thông tin'
+        });
     }
-}
+};
 
 const deleteUser = async (req,res) => {
     try {
@@ -171,7 +221,6 @@ const refreshToken = async (req,res) => {
         
         const ketqua = await JwtService.refreshTokenJwtService(token)
         return res.status(200).json(ketqua)
-        return
     }
     catch(e){
         return res.status(404).json({

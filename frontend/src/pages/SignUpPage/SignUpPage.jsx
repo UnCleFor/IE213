@@ -22,7 +22,7 @@ const SignUpPage = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
-    
+
 
     // Hàm dùng chung để cập nhật state
     const handleOnchange = (setter) => (value) => setter(value)
@@ -34,21 +34,18 @@ const SignUpPage = () => {
     const { data, isSuccess, isError } = mutation;
 
     // lỗi ko in ra được thông báo, nhưng chuyển trang đc
-    useEffect(()=>{  
-        
-        if(isSuccess &&  data?.status !== 'ERR'){
-            
+    useEffect(() => {
+        if (isSuccess && data?.status !== 'ERR') {
             message.success({
                 content: "Đăng ký thành công!",
-              });
+            });
             handleNavigateSignIn()
         } else if (isError) {
             message.error({
                 content: "Đăng ký thất bại!",
-              });
+            });
         }
-    },[isSuccess,isError])
-
+    }, [isSuccess, isError])
 
     const isLoading = mutation.isPending
 
@@ -56,8 +53,8 @@ const SignUpPage = () => {
         navigate('/sign_in')
     }
     const handleSignUp = () => {
-        mutation.mutate({name, phone, email, password, confirmPassword})
-        
+        mutation.mutate({ name, phone, email, password, confirmPassword })
+
     }
 
     return (
@@ -173,8 +170,8 @@ const SignUpPage = () => {
                     </div>
 
                     {/* Hiển thị lỗi nếu có */}
-                    {data?.status === 'ERR' && <span style={{color:'red'}}>{data?.message}</span>}
-                    
+                    {data?.status === 'ERR' && <span style={{ color: 'red' }}>{data?.message}</span>}
+
                     <Loading isLoading={isLoading}>
                         <ButtonComponent
                             disabled={

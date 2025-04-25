@@ -6,10 +6,8 @@ const { generalAccessToken,generalRefreshToken } = require('./JwtService')
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
       const { name, email, password, confirmPassword, phone, avatar } = newUser;
-  
       try {
         const checkUser = await User.findOne({ email: email });
-  
         if (checkUser !== null) {
           resolve({
             status: 'ERR',
@@ -17,23 +15,18 @@ const createUser = (newUser) => {
           });
           return;
         }
-  
         const hash = bcrypt.hashSync(password, 10);
-  
         const userData = {
           name,
           email,
           password: hash,
           phone
         };
-  
         // Chỉ thêm avatar nếu có
         if (avatar) {
           userData.avatar = avatar;
         }
-  
         const createdUser = await User.create(userData);
-  
         if (createdUser) {
           resolve({
             status: "OK",
