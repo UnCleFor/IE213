@@ -14,6 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import ContainerComponent from "../ContainerComponent/ContainerComponent";
 import beautihome from "./beautihome.png";
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -28,10 +29,13 @@ const Footer = () => {
           <Col xs={24} sm={12} md={6}>
             <FooterSection>
               <FooterTitle>BeauteHome</FooterTitle>
-              
-              <FooterLink onClick={() => navigate("/aboutus")}>
+              <FooterLink onClick={() => {
+                navigate("/aboutus");
+                window.scrollTo(0, 0);
+              }}>
                 Về chúng tôi
               </FooterLink>
+
             </FooterSection>
           </Col>
 
@@ -39,11 +43,11 @@ const Footer = () => {
           <Col xs={24} sm={12} md={6}>
             <FooterSection>
               <FooterTitle>Khám phá</FooterTitle>
-              <FooterLink href="#">Phòng khách</FooterLink>
-              <FooterLink href="#">Phòng ăn</FooterLink>
-              <FooterLink href="#">Phòng ngủ</FooterLink>
-              <FooterLink href="#">Phòng làm việc</FooterLink>
-              <FooterLink href="#">Trang trí nhà cửa</FooterLink>
+              <FooterLink to="/product/phong-khach" as={Link}>Phòng khách</FooterLink>
+              <FooterLink to="/product/phong-an" as={Link}>Phòng ăn</FooterLink>
+              <FooterLink to="/product/phong-ngu" as={Link}>Phòng ngủ</FooterLink>
+              <FooterLink to="/product/phong-lam-viec" as={Link}>Phòng làm việc</FooterLink>
+              <FooterLink to="/product/trang-tri-nha-cua" as={Link}>Trang trí nhà cửa</FooterLink>
             </FooterSection>
           </Col>
 
@@ -51,13 +55,24 @@ const Footer = () => {
           <Col xs={24} sm={12} md={6}>
             <FooterSection>
               <FooterTitle>Chính sách</FooterTitle>
-              <FooterLink onClick={() => navigate("/chinhsachdoitra")}>
+              <FooterLink onClick={() => {
+                navigate("/chinhsachdoitra");
+                window.scrollTo(0, 0);
+              }}>
                 Chính sách đổi trả
               </FooterLink>
-              <FooterLink onClick={() => navigate("/chinhsachbaomat")}>
+
+              <FooterLink onClick={() => {
+                navigate("/chinhsachbaomat");
+                window.scrollTo(0, 0);
+              }}>
                 Chính sách bảo mật
               </FooterLink>
-              <FooterLink onClick={() => navigate("/dieukhoandichvu")}>
+
+              <FooterLink onClick={() => {
+                navigate("/dieukhoandichvu");
+                window.scrollTo(0, 0);
+              }}>
                 Điều khoản dịch vụ
               </FooterLink>
             </FooterSection>

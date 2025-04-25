@@ -1,8 +1,10 @@
 const Order = require('../models/OrderProductModel')
+const product = require('../models/ProductModel')
+const EmailService = require('../services/EmailService')
 
 const createOrder = (newOrder) => {
     return new Promise(async (resolve, reject) => {
-      const { orderItems, paymentMethod, shippingMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, phone, user, totalDiscount } = newOrder;
+      const { orderItems, paymentMethod, shippingMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, phone, user, totalDiscount, email } = newOrder;
       try {
         const createdOrder = await Order.create({
           orderItems,

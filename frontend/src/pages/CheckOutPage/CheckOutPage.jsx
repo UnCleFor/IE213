@@ -111,7 +111,8 @@ const CheckoutPage = () => {
             totalDiscount: totalDiscount,
             shippingPrice: shippingFee,
             totalPrice: total,
-            user: user?.id
+            user: user?.id,
+            email: user?.email
           }
         );
       }
