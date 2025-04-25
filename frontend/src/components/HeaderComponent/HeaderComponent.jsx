@@ -231,7 +231,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                         position: 'absolute',
                         top: '-9px',
                         right: '-10px',
-                        background: 'red',
+                        background: 'brown',
                         color: 'white',
                         borderRadius: '50%',
                         width: '14px',
@@ -240,7 +240,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontSize: '9.5px',
-                        fontWeight: 'bold',
+                        fontWeight: 'normal',
                         lineHeight: '1',
                         boxShadow: '0 0 0 1px white',
                       }}>

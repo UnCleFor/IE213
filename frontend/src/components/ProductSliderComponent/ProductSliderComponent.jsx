@@ -72,6 +72,9 @@ const ProductSliderComponent = ({limit}) => {
         image={item.image}
         description={item.description}
         id={item._id}
+        discount={item.discount}
+        size={item.size}
+        colors={item.colors}
       />
     </SlideItemWrapper>
   ));
@@ -81,7 +84,7 @@ const ProductSliderComponent = ({limit}) => {
     dots: false,
     infinite: false,
     slidesToShow: 4,
-    slidesToScroll: 4,
+    slidesToScroll: 1,
     arrows: false,
     responsive: [
         { breakpoint: 1024, settings: { slidesToShow: 3 } },
