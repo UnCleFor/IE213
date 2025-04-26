@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Card, Row, Col, Typography, Radio, Input, Button, Form, message, Divider, Avatar } from "antd";
+import { Card, Row, Col, Typography, Radio, Input, Button, Form, Divider, Avatar } from "antd";
 import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 import { OrderDetailWrapper } from "./style";
 import pic from "./pic.png"; // ảnh mặc định sản phẩm
@@ -11,43 +11,27 @@ import { useSelector } from "react-redux";
 import { convertPrice } from "../../utils";
 import Loading from '../../components/LoadingComponent/Loading'
 import { useNavigate } from "react-router-dom";
+import * as message from '../../components/Message/Message';
+import { orderConstant } from "../../constant";
 
 const { Title, Text } = Typography;
 
 // Dữ liệu giỏ hàng có avatar
-const cartItems = [
-  { name: "Sofa cao cấp", quantity: 1, price: 1200000, image: pic },
-  { name: "Bàn gỗ tự nhiên", quantity: 2, price: 500000, image: pic },
-];
+const shippingMethods = Object.keys(orderConstant.delivery).map((key) => ({
+  id: key,
+  name: orderConstant.delivery[key].label,
+  fee: orderConstant.delivery[key].fee,
+}));
 
-const shippingMethods = [
-  { id: "fast", name: "Giao hàng nhanh", fee: 30000 },
-  { id: "standard", name: "Giao hàng tiêu chuẩn", fee: 20000 },
-];
-
-const paymentMethods = [
-  { id: "cod", name: "Thanh toán khi nhận hàng" },
-  { id: "bank", name: "Chuyển khoản ngân hàng" },
-];
+const paymentMethods = Object.keys(orderConstant.payment).map((key) => ({
+  id: key,
+  name: orderConstant.payment[key],
+}));
 
 const CheckoutPage = () => {
-  const [selectedShipping, setSelectedShipping] = useState("fast");
-  const [selectedPayment, setSelectedPayment] = useState("cod");
   const [form] = Form.useForm(); // Tạo form instance
-
-  const onFinish = (values) => {
-    const orderInfo = {
-      ...values,
-      shippingMethod: shippingMethods.find((s) => s.id === selectedShipping),
-      paymentMethod: paymentMethods.find((p) => p.id === selectedPayment).name,
-      cartItems,
-      subtotal,
-      total,
-    };
-    console.log("Order Info:", orderInfo);
-    message.success("Đặt hàng thành công!");
-  };
-
+  const [ delivery, setDelivery ] = useState('fast')
+  const [ payment, setPayment ] = useState('cod')
   const navigate = useNavigate()
   const order = useSelector((state) => state.order);
   const user = useSelector((state) => state.user);
@@ -59,9 +43,9 @@ const CheckoutPage = () => {
     return order?.orderItemsSelected?.reduce((total, item) => total + item.price * item.amount * item.discount / 100, 0);
   }, [order]);
   const shippingFee = useMemo(() => {
-    const selected = shippingMethods.find((s) => s.id === selectedShipping);
+    const selected = shippingMethods.find((s) => s.id === delivery);
     return selected ? selected.fee : 0;
-  }, [selectedShipping]);
+  }, [delivery]);
   const total = subtotal + shippingFee - totalDiscount;
 
   const [stateUserDetails, setStateUserDetails] = useState({
@@ -89,7 +73,14 @@ const CheckoutPage = () => {
     useEffect(() => {
       if (isSuccess && dataAdd?.status === 'OK') {
         message.success('Đặt hàng thành công')
-        navigate('/order_detail')
+        navigate('/order_history',
+        {
+          state: {
+            delivery,
+            payment,
+            orders: order?.orderItemsSelected
+          }
+        })
       } else if (isError) {
         message.error('Đặt hàng thất bại');
       }
@@ -105,8 +96,8 @@ const CheckoutPage = () => {
             fullName: values.name,
             address: values.address,
             phone: values.phone,
-            paymentMethod: paymentMethods.find((p) => p.id === selectedPayment).name,
-            shippingMethod: shippingMethods.find((s) => s.id === selectedShipping).name,
+            paymentMethod: paymentMethods.find((p) => p.id === payment).name,
+            shippingMethod: shippingMethods.find((s) => s.id === delivery).name,
             itemsPrice: subtotal,
             totalDiscount: totalDiscount,
             shippingPrice: shippingFee,
@@ -126,7 +117,7 @@ const CheckoutPage = () => {
       <Loading isLoading = {isLoadingAddOrder}>
         <OrderDetailWrapper>
           <Title level={3}>Thanh toán</Title>
-          <Form form={form} layout="vertical" onFinish={onFinish}>
+          <Form form={form} layout="vertical">
             {/* Thông tin người nhận */}
             <Card title="Thông tin người nhận" style={{ marginBottom: 16 }}>
               <Row gutter={[16, 16]}>
@@ -149,14 +140,14 @@ const CheckoutPage = () => {
             {/* Phương thức giao hàng */}
             <Card title="Phương thức giao hàng" style={{ marginBottom: 16 }}>
               <Radio.Group
-                onChange={(e) => setSelectedShipping(e.target.value)}
-                value={selectedShipping}
+                onChange={(e) => setDelivery(e.target.value)}
+                value={delivery}
               >
                 <Row gutter={[16, 16]}>
                   {shippingMethods.map((method) => (
                     <Col span={24} key={method.id}>
                       <Radio value={method.id}>
-                        {method.name} ({method.fee.toLocaleString()}₫)
+                        {method.name} ({convertPrice(method.fee)})
                       </Radio>
                     </Col>
                   ))}
@@ -167,8 +158,8 @@ const CheckoutPage = () => {
             {/* Phương thức thanh toán */}
             <Card title="Phương thức thanh toán" style={{ marginBottom: 16 }}>
               <Radio.Group
-                onChange={(e) => setSelectedPayment(e.target.value)}
-                value={selectedPayment}
+                onChange={(e) => setPayment(e.target.value)}
+                value={payment}
               >
                 <Row gutter={[16, 16]}>
                   {paymentMethods.map((method) => (

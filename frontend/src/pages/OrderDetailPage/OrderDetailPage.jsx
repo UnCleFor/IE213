@@ -3,6 +3,7 @@ import { Card, Button, Row, Col, Typography, Tag, Avatar } from "antd";
 import ContainerComponent from "../../components/ContainerComponent/ContainerComponent.jsx";
 import { OrderDetailWrapper } from "./style.js";
 import pic from "./pic.png"
+import { useLocation } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
