@@ -10,6 +10,7 @@ const SearchButton = (props) => {
     backgroundColorInput = "white",
     backgroundColorButton = "brown",
     colorButton = "white",
+    value,
     onChange,
     onClick
   } = props;
@@ -19,6 +20,7 @@ const SearchButton = (props) => {
       <InputComponent
         size={size}
         placeholder={placeholder}
+        value={value}
         onChange={onChange}
         style={{
             backgroundColor: backgroundColorInput,

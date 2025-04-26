@@ -280,10 +280,10 @@ const searchProducts = async (keyword) => {
               autocomplete: {
                 query: keyword,
                 path: "name",
-                tokenOrder: "sequential",
+                //tokenOrder: "sequential",
                 fuzzy: {
                   maxEdits: 1,
-                  prefixLength: 1,
+                  prefixLength: 2,
                 }
               }
             }
