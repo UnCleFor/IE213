@@ -5,11 +5,13 @@ import {
   AppstoreOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  ShoppingCartOutlined,
 } from '@ant-design/icons';
 import HeaderComponent from '../../components/HeaderComponent/HeaderComponent';
 import AdminUser from '../../components/AdminUser/AdminUser';
 import AdminProduct from '../../components/AdminProduct/AdminProduct';
 import { getItem } from '../../utils';
+import AdminOrder from '../../components/AdminOrder/AdminOrder';
 
 const { Sider, Content } = Layout;
 
@@ -17,6 +19,7 @@ const AdminPage = () => {
   const items = [
     getItem('Người dùng', 'user', <UserOutlined />),
     getItem('Sản phẩm', 'product', <AppstoreOutlined />),
+    getItem('Đơn hàng','order',<ShoppingCartOutlined />)
   ];
 
   const [collapsed, setCollapsed] = useState(false);
@@ -28,6 +31,8 @@ const AdminPage = () => {
         return <AdminUser />;
       case 'product':
         return <AdminProduct />;
+      case 'order':
+        return <AdminOrder />;
       default:
         return null;
     }

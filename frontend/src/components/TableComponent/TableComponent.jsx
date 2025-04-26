@@ -10,7 +10,7 @@ const TableComponent = (props) => {
     data = [],
     isLoading = false,
     columns = [],
-    deleteAll,
+    deleteAll, // This prop can be undefined to disable delete functionality
     exportFileName = 'data_export',
     exportSheetName = 'Sheet1',
     paginationConfig = {
@@ -18,7 +18,9 @@ const TableComponent = (props) => {
       showSizeChanger: true,
       pageSizeOptions: ['10', '20', '50', '100'],
       showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-    }
+    },
+    showDeleteAll = true, // New prop to control delete button visibility
+    showExport = true // New prop to control export button visibility
   } = props;
 
   const [rowSeletedKeys, setRowSeletedKeys] = useState([]);
@@ -30,7 +32,7 @@ const TableComponent = (props) => {
     onChange: (selectedRowKeys, selectedRows) => {
       setRowSeletedKeys(selectedRowKeys);
     },
-    preserveSelectedRowKeys: true, // Giữ lại selection khi phân trang
+    preserveSelectedRowKeys: true,
   };
 
   const handleDeleteAll = () => {
@@ -46,7 +48,6 @@ const TableComponent = (props) => {
           Object.entries(obj).forEach(([key, value]) => {
             const newKey = prefix ? `${prefix}.${key}` : key;
 
-            // Bỏ qua các trường không cần export
             if (['image', 'images', 'key', 'avatar', '__v', 'address', 'password'].some(word => newKey.toLowerCase().includes(word))) return;
 
             if (Array.isArray(value)) {
@@ -82,26 +83,27 @@ const TableComponent = (props) => {
   return (
     <Loading isLoading={isLoading}>
       <div style={{ width: '100%', overflowX: 'auto' }}>
-        <div style={{ marginBottom: 16, display: 'flex', gap:'10px'}}>
-        <Button type="primary" onClick={exportToExcel}>
-            Export Excel
-          </Button>
-          {rowSeletedKeys.length > 0 && (
-            <Button danger onClick={handleDeleteAll}>
-              Xoá mục đã chọn
-            </Button>
-          )}
-
-         
-        </div>
-
+        {(showExport || (showDeleteAll && deleteAll)) && (
+          <div style={{ marginBottom: 16, display: 'flex', gap: '10px' }}>
+            {showExport && (
+              <Button type="primary" onClick={exportToExcel}>
+                Export Excel
+              </Button>
+            )}
+            {showDeleteAll && deleteAll && rowSeletedKeys.length > 0 && (
+              <Button danger onClick={handleDeleteAll}>
+                Xoá mục đã chọn
+              </Button>
+            )}
+          </div>
+        )}
         <Table
           {...props}
           ref={tableRef}
-          rowSelection={{
+          rowSelection={deleteAll ? { // Only enable row selection if deleteAll is provided
             type: selectionType,
             ...rowSelection,
-          }}
+          } : undefined}
           columns={columns}
           dataSource={data}
           scroll={{ x: 'max-content' }}
@@ -112,7 +114,6 @@ const TableComponent = (props) => {
           }}
           onChange={handleTableChange}
         />
-
       </div>
     </Loading>
   );
