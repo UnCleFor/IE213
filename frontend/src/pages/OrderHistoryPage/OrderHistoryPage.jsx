@@ -5,10 +5,14 @@ import ContainerComponent from "../../components/ContainerComponent/ContainerCom
 import {orderCardStyle,ProductImage} from "./style.js"; // Giả sử bạn đã thêm style trong file này.
 import pic from "./pic.png"
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent.jsx";
+import { useLocation } from "react-router-dom";
 const { TabPane } = Tabs;
 
 const OrderHistoryPage = () => {
     const [orders, setOrders] = useState([]);
+    const location = useLocation()
+    const { state } = location
+    console.log('location', location)
 
     useEffect(() => {
         const fetchOrders = async () => {

@@ -28,10 +28,11 @@ const ForgotPasswordPage = () => {
         if (newPassword !== confirmPassword) {
             message.error('Mật khẩu mới và xác nhận mật khẩu không khớp');
             return;
+        } else {
+            message.success('Đặt lại mật khẩu thành công');
+            navigate('/sign_in');
         }
         // TODO: Gọi API đặt lại mật khẩu
-        message.success('Đặt lại mật khẩu thành công');
-        navigate('/sign_in');
     };
 
     const handleBackToSignIn = () => {

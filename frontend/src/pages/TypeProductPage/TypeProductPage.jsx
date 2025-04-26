@@ -186,6 +186,7 @@ const TypeProduct = () => {
                     price={product.price}
                     image={product.image}
                     description={product.description}
+                    id={product._id}
                     discount={product.discount}
                     size={product.size}
                     colors={product.colors}
