@@ -43,31 +43,79 @@ const TableComponent = (props) => {
     try {
       const exportData = data.map(item => {
         const flatItem = {};
-
+  
+        // Hàm đệ quy để làm phẳng object, bỏ qua các trường không cần thiết
         const flatten = (obj, prefix = '') => {
           Object.entries(obj).forEach(([key, value]) => {
             const newKey = prefix ? `${prefix}.${key}` : key;
-
-            if (['image', 'images', 'key', 'avatar', '__v', 'address', 'password'].some(word => newKey.toLowerCase().includes(word))) return;
-
-            if (Array.isArray(value)) {
+  
+            // Bỏ qua các trường không cần export
+            if (['image', 'images', 'key', 'avatar', '__v', 'password'].some(
+              word => newKey.toLowerCase().includes(word)
+            )) return;
+  
+            // Xử lý đặc biệt cho orderItems
+            if (key === 'orderItems' && Array.isArray(value)) {
+              flatItem[newKey] = value.map(orderItem => 
+                `${orderItem.name || orderItem.product?.name} (x${orderItem.amount})`
+              ).join('; ');
+            }
+            // Xử lý đặc biệt cho shippingAddress
+            else if (key === 'shippingAddress' && typeof value === 'object') {
+              flatItem[`${newKey}.fullName`] = value.fullName;
+              flatItem[`${newKey}.address`] = value.address;
+              flatItem[`${newKey}.phone`] = value.phone;
+              flatItem[`${newKey}.email`] = value.email;
+            }
+            // Xử lý mảng thông thường
+            else if (Array.isArray(value)) {
               flatItem[newKey] = value.join(', ');
-            } else if (typeof value === 'object' && value !== null) {
+            }
+            // Xử lý object lồng nhau
+            else if (typeof value === 'object' && value !== null) {
               flatten(value, newKey);
-            } else {
+            }
+            // Xử lý giá trị đơn giản
+            else {
               flatItem[newKey] = value;
             }
           });
         };
+  
         flatten(item);
+  
+        // Định dạng các trường giá cả
+        if (flatItem.totalPrice) {
+          flatItem.totalPrice = `${flatItem.totalPrice.toLocaleString()} ₫`;
+        }
+        if (flatItem.totalDiscount) {
+          flatItem.totalDiscount = `${flatItem.totalDiscount.toLocaleString()} ₫`;
+        }
+        if (flatItem.itemsPrice) {
+          flatItem.itemsPrice = `${flatItem.itemsPrice.toLocaleString()} ₫`;
+        }
+  
         return flatItem;
       });
+  
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(exportData);
+      
+      // Tự động điều chỉnh độ rộng cột
+      ws['!cols'] = Object.keys(exportData[0] || {}).map(() => ({ wch: 20 }));
+      
       XLSX.utils.book_append_sheet(wb, ws, exportSheetName);
-      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      saveAs(blob, `${exportFileName}.xlsx`);
+      
+      const excelBuffer = XLSX.write(wb, { 
+        bookType: 'xlsx', 
+        type: 'array' 
+      });
+      
+      const blob = new Blob([excelBuffer], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+      
+      saveAs(blob, `${exportFileName}_${new Date().toISOString().slice(0,10)}.xlsx`);
       message.success('Xuất file Excel thành công!');
     } catch (error) {
       console.error('Lỗi khi xuất Excel:', error);

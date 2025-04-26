@@ -226,6 +226,33 @@ const deleteManyUser = (ids) => {
     })
 }
 
+const getUserEmail = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const user = await User.findOne(
+                { _id: id },
+                { email: 1 }  
+            );
+            if (!user) {
+                resolve({
+                    status: 'ERR',
+                    message: 'Tài khoản không tồn tại'
+                });
+                return;
+            }
+            resolve({
+                status: 'OK',
+                message: 'Lấy email thành công',
+                data: {
+                    email: user.email
+                }
+            });  
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+
 module.exports = {
     createUser,
     loginUser,
@@ -233,5 +260,6 @@ module.exports = {
     deleteUser,
     getAllUser,
     getDetailsUser,
-    deleteManyUser
+    deleteManyUser,
+    getUserEmail
 }

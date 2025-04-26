@@ -14,7 +14,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import * as OrderService from '../../services/OrderService';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
-
+import * as UserService from '../../services/UserService';
 const AdminOrder = () => {
   // Tách thành 2 form riêng biệt
   const [formAdd] = Form.useForm();
@@ -104,6 +104,8 @@ const AdminOrder = () => {
   });
 
   const fetchGetDetailsOrder = async (rowSelected) => {
+    setIsLoadingUpdate(true);
+    setIsOpenDrawer(true);
     const res = await OrderService.getDetailOrder(rowSelected);
     if (res?.data) {
       setStateOrderDetails({
@@ -125,7 +127,7 @@ const AdminOrder = () => {
         createdAt: res?.data?.createdAt,
         state: res?.data?.state,
       });
-      setIsOpenDrawer(true);
+
     }
     setIsLoadingUpdate(false);
   };
@@ -220,7 +222,37 @@ const AdminOrder = () => {
   //     ...stateUser,
   //   });
   // };
+  const handleGetUserEmail = async (id, access_token) => {
+    try {
+      const res = await UserService.getUserEmail(id, access_token);
 
+      if (res?.status === "OK") {
+        return res.data.email; // Trả về chuỗi email
+      }
+      return "Không xác định"; // Trường hợp lỗi
+    } catch (error) {
+      console.error("Lỗi khi lấy email:", error);
+      return "Lỗi tải email";
+    }
+  };
+  // Tạo cache ở component cha
+  const emailCache = useRef(new Map());
+
+  // Component EmailCell với cache
+  const EmailCell = ({ userId, token }) => {
+    const [email, setEmail] = useState(emailCache.current.get(userId) || "Loading...");
+
+    useEffect(() => {
+      if (!emailCache.current.has(userId)) {
+        handleGetUserEmail(userId, token).then(email => {
+          emailCache.current.set(userId, email);
+          setEmail(email);
+        });
+      }
+    }, [userId, token]);
+
+    return <span>{email}</span>;
+  };
 
   const onUpdateOrder = () => {
     setIsFinishUpdated(true)
@@ -308,18 +340,61 @@ const AdminOrder = () => {
       },
     },
   });
+  const getColumnEmailSearchProps = (dataIndex) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          placeholder={`Tìm theo email`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => confirm()}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button
+            type="primary"
+            onClick={() => confirm()}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Tìm kiếm
+          </Button>
+          <Button
+            onClick={() => {
+              clearFilters?.();
+              confirm(); // Xóa filter và đóng dropdown
+            }}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </div>
+      </div>
+    ),
+    onFilter: (value, record) => {
+      const email = emailCache.current.get(record.user) || '';
+      return email.toLowerCase().includes(value.toLowerCase());
+    },
+  });
 
   const columns = [
     {
-      title: 'Order ID',
-      dataIndex: '_id',
-      render: (id) => id.substring(0, 8) + '...', // Show shortened ID
-      ...getColumnSearchProps('_id'),
+      title: 'Ordered Account',
+      dataIndex: 'user',
+      render: (id) => <EmailCell userId={id} token={user?.access_token} />,
+      ...getColumnEmailSearchProps('user'), // Sử dụng hàm search mới
+      sorter: (a, b) => {
+        const emailA = emailCache.current.get(a.user) || '';
+        const emailB = emailCache.current.get(b.user) || '';
+        return emailA.localeCompare(emailB);
+      },
     },
     {
       title: 'Items',
       dataIndex: 'orderItems',
-      render: (items) => `${items.length} items`, // Show count of items
+      render: (items) => `${items.length} items`,
+      sorter: (a, b) => a.orderItems.length - b.orderItems.length,
     },
     {
       title: 'Total Price',
@@ -327,11 +402,11 @@ const AdminOrder = () => {
       render: (price) => `${price.toLocaleString()} VND`, // Format price
       sorter: (a, b) => a.totalPrice - b.totalPrice,
     },
-    {
-      title: 'Discount',
-      dataIndex: 'totalDiscount',
-      render: (discount) => `${discount.toLocaleString()} VND`, // Format discount
-    },
+    // {
+    //   title: 'Discount',
+    //   dataIndex: 'totalDiscount',
+    //   render: (discount) => `${discount.toLocaleString()} VND`, // Format discount
+    // },
     {
       title: 'Payment Method',
       dataIndex: 'paymentMethod',
@@ -340,6 +415,16 @@ const AdminOrder = () => {
         { text: 'Chuyển khoản ngân hàng', value: 'Chuyển khoản ngân hàng' },
       ],
       onFilter: (value, record) => record.paymentMethod === value,
+    },
+    {
+      title: 'Paid',
+      dataIndex: 'isPaid',
+      filters: [
+        { text: 'Đã thanh toán', value: true },
+        { text: 'Chưa thanh toán', value: false },
+      ],
+      onFilter: (value, record) => record.isPaid === value,
+      render: (isPaid) => isPaid ? 'Đã thanh toán' : 'Chưa thanh toán',
     },
     {
       title: 'Status',
@@ -368,7 +453,7 @@ const AdminOrder = () => {
       dataIndex: 'createdAt',
       render: (date) => new Date(date).toLocaleDateString(), // Format date
       sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
-      defaultSortOrder: 'descend',
+      // defaultSortOrder: 'descend',
     },
     {
       title: 'Actions',
@@ -484,7 +569,11 @@ const AdminOrder = () => {
               <Input value={stateOrderDetails.paymentMethod} readOnly />
             </Form.Item>
 
-            <Form.Item label="Trạng thái thanh toán*" name="isPaid">
+            <Form.Item
+              label={<span style={{ fontWeight: 'bold', color: '#1890ff' }}>Trạng thái thanh toán</span>}
+              name="isPaid"
+              rules={[{ required: true, message: 'Vui lòng chọn trạng thái thanh toán' }]}
+            >
               <Select
                 value={stateOrderDetails.isPaid}
                 onChange={(value) => handleOnchangeDetails({ target: { name: 'isPaid', value } })}
@@ -495,7 +584,11 @@ const AdminOrder = () => {
               />
             </Form.Item>
 
-            <Form.Item label="Trạng thái giao hàng*" name="isDelivered">
+            <Form.Item
+              label={<span style={{ fontWeight: 'bold', color: '#1890ff' }}>Trạng thái giao hàng</span>}
+              name="isDelivered"
+              rules={[{ required: true, message: 'Vui lòng chọn trạng thái giao hàng' }]}
+            >
               <Select
                 value={stateOrderDetails.isDelivered}
                 onChange={(value) => handleOnchangeDetails({ target: { name: 'isDelivered', value } })}
@@ -506,7 +599,11 @@ const AdminOrder = () => {
               />
             </Form.Item>
 
-            <Form.Item label="Trạng thái đơn hàng*" name="state">
+            <Form.Item 
+              label={<span style={{ fontWeight: 'bold', color: '#1890ff' }}>Trạng thái đơn hàng</span>}
+              name="state"
+              rules={[{ required: true, message: 'Vui lòng chọn trạng thái đơn hàng' }]}
+            >
               <Select
                 value={stateOrderDetails.state}
                 onChange={(value) => handleOnchangeDetails({ target: { name: 'state', value } })}

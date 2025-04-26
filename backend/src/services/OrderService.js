@@ -71,7 +71,7 @@ const getOrderDetails = (orderId) => {
 const getAllOrders = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const allOrder = await Order.find()
+      const allOrder = await Order.find().sort({ createdAt: -1 }).exec();
       resolve({
         status: 'OK',
         message: 'Thành công',

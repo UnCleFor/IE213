@@ -267,6 +267,26 @@ const logoutUser = async (req, res) => {
     }
 }
 
+const getUserEmail = async (req,res) => {
+    try {
+        const userId = req.params.id
+        if (!userId) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Thiếu id user'
+            })
+        } 
+        // thực hiện gọi dịch vụ tạo user mới
+        const ketqua = await UserService.getUserEmail(userId)
+        return res.status(200).json(ketqua)
+    }
+    catch(e){
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 
 module.exports = {
     createUser,
@@ -277,5 +297,6 @@ module.exports = {
     getDetailsUser,
     refreshToken,
     logoutUser,
-    deleteManyUser
+    deleteManyUser,
+    getUserEmail
 }
