@@ -127,6 +127,15 @@ const deleteManyProduct = async (req, res) => {
     }
 }
 
+const searchProducts = async (req, res) => {
+    try {
+      const { keyword } = req.query;
+      const products = await ProductService.searchProducts(keyword);
+      return res.status(200).json( products);
+    } catch (e) {
+      return res.status(500).json({ message: 'Error searching products' });
+    }
+  };
 
 module.exports = {
     createProduct,
@@ -135,5 +144,6 @@ module.exports = {
     deleteProduct,
     getAllProduct,
     getAllType,
-    deleteManyProduct
+    deleteManyProduct,
+    searchProducts
 }

@@ -4,6 +4,7 @@ import OrderPage from "../pages/OrderPage/OrderPage";
 import ProductDetailsPage from "../pages/ProductDetailsPage/ProductDetailsPage";
 import ProductsPage from "../pages/ProductsPage/ProductsPage"
 import TypeProductPage from "../pages/TypeProductPage/TypeProductPage"
+import SearchResultPage from "../pages/SearchResultPage/SearchResultPage"
 import AboutUsPage from "../pages/AboutUsPage/AboutUsPage"
 import ChinhSachDoiTraPage from "../pages/ChinhSachDoiTraPage/ChinhSachDoiTraPage"
 import ChinhSachBaoMatPage from "../pages/ChinhSachBaoMatPage/ChinhSachBaoMatPage"
@@ -45,6 +46,11 @@ export const routes = [
         page: ProductDetailsPage,
         isShowHeader: true
     },
+    {
+        path: '/search',
+        page: SearchResultPage,
+        isShowHeader: true
+    },    
     {
         path: '*',
         page: NotFoundPage,

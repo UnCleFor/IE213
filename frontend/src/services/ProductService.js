@@ -95,3 +95,10 @@ export const deleteManyProduct = async (data, access_token) => {
   );
   return res.data;
 };
+
+export const fetchProductsByName = async (keyword) => {
+  const res = await axios.get(
+    `${process.env.REACT_APP_API_URL}/product/search?keyword=${keyword}`
+  );
+  return res.data;
+};

@@ -270,7 +270,42 @@ const deleteManyProduct = (ids) => {
     })
 }
 
-
+const searchProducts = async (keyword) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const products = await Product.aggregate([
+          {
+            $search: {
+              index: "default",
+              autocomplete: {
+                query: keyword,
+                path: "name",
+                tokenOrder: "sequential",
+                fuzzy: {
+                  maxEdits: 1,
+                  prefixLength: 1,
+                }
+              }
+            }
+          },
+          {
+            $limit: 20
+          }
+        ]);
+  
+        resolve({
+          status: "OK",
+          message: "Tìm kiếm thành công",
+          data: products,
+        });
+      } catch (e) {
+        console.error("Lỗi khi tìm kiếm:", e); // 👈 LOG ra lỗi
+        reject(e);
+      }
+    });
+  };  
+  
+  
 module.exports = {
     createProduct,
     updateProduct,
@@ -278,5 +313,6 @@ module.exports = {
     deleteProduct,
     getAllProduct,
     getAllType,
-    deleteManyProduct
+    deleteManyProduct,
+    searchProducts
 }

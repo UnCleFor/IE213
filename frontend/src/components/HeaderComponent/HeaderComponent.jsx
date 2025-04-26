@@ -141,10 +141,15 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     </div>
   )
 
-  const onSearch = (e) => { /*handleSearch*/
-    setSearch(e.target.value)
-    dispatch(searchProduct(e.target.value))
-  }
+  const handleInputChange = (e) => {
+    setSearch(e.target.value);
+  };
+  
+  const handleSearchClick = () => {
+    if (search.trim() !== "") {
+      navigate("/search", { state: { keyword: search } });
+    }
+  };
 
   return (
     <div style={{ position: "relative" }}>
@@ -167,7 +172,8 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                   size="large"
                   placeholder="What you want to buy?"
                   textButton="Search"
-                  onChange={onSearch}
+                  onChange={handleInputChange}
+                  onClick={handleSearchClick}
                 />
               </Col>
             )}
@@ -266,6 +272,8 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                 placeholder="What you want to buy?"
                 textButton="Search"
                 style={{ width: "100%" }} // Đảm bảo SearchButton chiếm 100% chiều rộng
+                onChange={handleInputChange}
+                onClick={handleSearchClick}
               />
             </Col>
           )}

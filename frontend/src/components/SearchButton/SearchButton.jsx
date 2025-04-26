@@ -1,6 +1,7 @@
 import { SearchOutlined } from "@ant-design/icons";
 import InputComponent from "../InputComponent/InputComponent";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
+import { useNavigate } from "react-router-dom";
 const SearchButton = (props) => {
   const {
     size,
@@ -9,6 +10,8 @@ const SearchButton = (props) => {
     backgroundColorInput = "white",
     backgroundColorButton = "brown",
     colorButton = "white",
+    onChange,
+    onClick
   } = props;
 
   return (
@@ -16,6 +19,7 @@ const SearchButton = (props) => {
       <InputComponent
         size={size}
         placeholder={placeholder}
+        onChange={onChange}
         style={{
             backgroundColor: backgroundColorInput,
             border: "1px solid gainsboro", // ✅ Màu viền xám
@@ -23,7 +27,7 @@ const SearchButton = (props) => {
             outline: "none", // ✅ Tắt hiệu ứng focus mặc định
             boxShadow: "none", // ✅ Xóa viền sáng khi click vào
           }}
-        {...props}
+        //{...props}
       />
       <ButtonComponent
         size={size}
@@ -35,6 +39,7 @@ const SearchButton = (props) => {
         styleTextButton={{ color: colorButton }}
         textButton={textButton}
         icon={<SearchOutlined style={{ color: colorButton }} />} // ✅ Đúng cách đổi màu icon
+        onClick={onClick}
       >
       </ButtonComponent>
     </div>
