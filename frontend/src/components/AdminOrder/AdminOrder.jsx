@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { WrapperHeader } from './style'
-import { Form, Button, Modal, Switch, Input, Space, Divider, Table } from 'antd';
+import { Form, Button, Modal, Switch, Input, Space, Divider, Table, Select } from 'antd';
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
 import DrawerComponent from '../DrawerComponent/DrawerComponent'
@@ -53,6 +53,7 @@ const AdminOrder = () => {
     isPaid: false,
     isDelivered: false,
     createdAt: '',
+    state: '',
   });
   const [stateOrderDetails, setStateOrderDetails] = useState({
     _id: '',
@@ -71,6 +72,7 @@ const AdminOrder = () => {
     isPaid: false,
     isDelivered: false,
     createdAt: '',
+    state: '',
   });
 
   // const mutation = useMutationHooks((data) => {
@@ -121,13 +123,14 @@ const AdminOrder = () => {
         isPaid: res?.data?.isPaid,
         isDelivered: res?.data?.isDelivered,
         createdAt: res?.data?.createdAt,
+        state: res?.data?.state,
       });
       setIsOpenDrawer(true);
     }
     setIsLoadingUpdate(false);
   };
   console.log('orderItems', stateOrderDetails?.orderItems)
-  
+
   const handleCancel = () => {
     setIsModalOpen(false);
     setStateOrder({
@@ -147,6 +150,7 @@ const AdminOrder = () => {
       isPaid: false,
       isDelivered: false,
       createdAt: '',
+      state: '',
     });
     //formAdd.resetFields();
     formUpdate.resetFields();
@@ -313,11 +317,6 @@ const AdminOrder = () => {
       ...getColumnSearchProps('_id'),
     },
     {
-      title: 'User ID',
-      dataIndex: 'user',
-      render: (userId) => userId.substring(0, 8) + '...', // Show shortened user ID
-    },
-    {
       title: 'Items',
       dataIndex: 'orderItems',
       render: (items) => `${items.length} items`, // Show count of items
@@ -337,8 +336,8 @@ const AdminOrder = () => {
       title: 'Payment Method',
       dataIndex: 'paymentMethod',
       filters: [
-        { text: 'Cash on Delivery', value: 'Thanh toán khi nhận hàng' },
-        // Add other payment methods if available
+        { text: 'Thanh toán khi nhận hàng', value: 'Thanh toán khi nhận hàng' },
+        { text: 'Chuyển khoản ngân hàng', value: 'Chuyển khoản ngân hàng' },
       ],
       onFilter: (value, record) => record.paymentMethod === value,
     },
@@ -346,17 +345,30 @@ const AdminOrder = () => {
       title: 'Status',
       dataIndex: 'isDelivered',
       filters: [
-        { text: 'Delivered', value: true },
-        { text: 'Pending', value: false },
+        { text: 'Đã giao', value: true },
+        { text: 'Đang xử lý', value: false },
       ],
       onFilter: (value, record) => record.isDelivered === value,
-      render: (isDelivered) => isDelivered ? 'Delivered' : 'Pending',
+      render: (isDelivered) => isDelivered ? 'Đã giao' : 'Đang xử lý',
+    },
+    {
+      title: 'State',
+      dataIndex: 'state',
+      filters: [
+        { text: 'Đã đặt', value: 'Đã đặt' },
+        { text: 'Đã xác nhận', value: 'Đã xác nhận' },
+        { text: 'Đang giao hàng', value: 'Đang giao hàng' },
+        { text: 'Đã giao', value: 'Đã giao' },
+        { text: 'Đã hủy', value: 'Đã hủy' },
+      ],
+      onFilter: (value, record) => record.state === value,
     },
     {
       title: 'Order Date',
       dataIndex: 'createdAt',
       render: (date) => new Date(date).toLocaleDateString(), // Format date
       sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+      defaultSortOrder: 'descend',
     },
     {
       title: 'Actions',
@@ -428,7 +440,7 @@ const AdminOrder = () => {
           //deleteAll={handleDeleteManyUsers}
           forceRender
           columns={columns}
-          isLoading={isLoadingOrder|| isFinishDeletedMany}
+          isLoading={isLoadingOrder || isFinishDeletedMany}
           data={dataTable}
           onRow={(record) => ({
             onClick: () => setRowSelected(record._id)
@@ -472,14 +484,45 @@ const AdminOrder = () => {
               <Input value={stateOrderDetails.paymentMethod} readOnly />
             </Form.Item>
 
-            <Form.Item label="Trạng thái thanh toán">
-              <Input value={stateOrderDetails.isPaid ? "Đã thanh toán" : "Chưa thanh toán"} readOnly />
+            <Form.Item label="Trạng thái thanh toán*" name="isPaid">
+              <Select
+                value={stateOrderDetails.isPaid}
+                onChange={(value) => handleOnchangeDetails({ target: { name: 'isPaid', value } })}
+                options={[
+                  { value: false, label: 'Chưa thanh toán' },
+                  { value: true, label: 'Đã thanh toán' }
+                ]}
+              />
             </Form.Item>
 
-            <Form.Item label="Trạng thái giao hàng">
-              <Input value={stateOrderDetails.isDelivered ? "Đã giao" : "Đang xử lý"} readOnly />
+            <Form.Item label="Trạng thái giao hàng*" name="isDelivered">
+              <Select
+                value={stateOrderDetails.isDelivered}
+                onChange={(value) => handleOnchangeDetails({ target: { name: 'isDelivered', value } })}
+                options={[
+                  { value: false, label: 'Đang xử lý' },
+                  { value: true, label: 'Đã giao' }
+                ]}
+              />
             </Form.Item>
 
+            <Form.Item label="Trạng thái đơn hàng*" name="state">
+              <Select
+                value={stateOrderDetails.state}
+                onChange={(value) => handleOnchangeDetails({ target: { name: 'state', value } })}
+                options={[
+                  { value: 'Đã đặt', label: 'Đã đặt' },
+                  { value: 'Đã xác nhận', label: 'Đã xác nhận' },
+                  { value: 'Đang giao hàng', label: 'Đang giao hàng' },
+                  { value: 'Đã giao', label: 'Đã giao' },
+                  { value: 'Đã hủy', label: 'Đã hủy' }
+                ]}
+              />
+            </Form.Item>
+            {dataUpdated?.status === 'ERR' && <span style={{ color: 'red' }}>{dataUpdated?.message}</span>}
+            <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
+              <Button type="primary" htmlType="submit">Áp dụng</Button>
+            </Form.Item>
             {/* Shipping Address */}
             <Divider orientation="left">Thông tin giao hàng</Divider>
 

@@ -7,33 +7,34 @@ const createOrder = (newOrder) => {
     return new Promise(async (resolve, reject) => {
       const { orderItems, paymentMethod, shippingMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, phone, user, totalDiscount, email } = newOrder;
       try {
-        console.log('orderItems', {orderItems})
-        const product = await Product.findOneAndUpdate({
-          _id: product,
-        })
-        // const createdOrder = await Order.create({
-        //   orderItems,
-        //   shippingAddress: {
-        //     fullName,
-        //     address,
-        //     phone,
-        //   },
-        //   itemsPrice,
-        //   paymentMethod,
-        //   shippingPrice,
-        //   totalPrice,
-        //   user,
-        //   totalDiscount,
-        //   shippingMethod
-        // });
+        // console.log('orderItems', {orderItems})
+        // const product = await Product.findOneAndUpdate({
+        //   _id: product,
+        // })
+        const createdOrder = await Order.create({
+          orderItems,
+          shippingAddress: {
+            fullName,
+            address,
+            phone,
+          },
+          itemsPrice,
+          paymentMethod,
+          shippingPrice,
+          totalPrice,
+          user,
+          totalDiscount,
+          shippingMethod,
+          state: 'Đã đặt',
+        });
 
-        // if (createdOrder) {
-        //   resolve({
-        //     status: "OK",
-        //     message: "Tạo thành công",
-        //     data: createdOrder
-        //   });
-        // }
+        if (createdOrder) {
+          resolve({
+            status: "OK",
+            message: "Tạo thành công",
+            data: createdOrder
+          });
+        }
         resolve({})
       } catch (e) {
         console.log('e', e)
