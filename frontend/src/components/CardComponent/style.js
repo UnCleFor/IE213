@@ -20,6 +20,8 @@ export const CardWrapper = styled.div`
 export const ImageWrapper = styled.div`
   position: relative;
   overflow: hidden;
+  width: 264px;
+  height:264px;
 `;
 
 export const HoverActions = styled.div`
@@ -80,4 +82,18 @@ export const WrapperPrice = styled.p`
     font-family: 'Quicksand', sans-serif; // ✅ Áp dụng font Quicksand
     color: brown; // ✅ Màu giá
     margin: 0px;
+    justify-content: space-between;
+`;
+export const SizeProduct = styled.div`
+  margin-bottom: 20px
+`
+
+export const SizeBox = styled.span`
+  margin: 10px;
+  padding: 5px;
+  border: 1px solid black
+`
+export const WrapperQuantity = styled.div`
+  display: flex;
+  justify-content: flex-end;  /* Aligns children to the right */
 `;

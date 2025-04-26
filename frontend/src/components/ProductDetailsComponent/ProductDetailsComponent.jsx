@@ -14,6 +14,9 @@ import LikeButtonComponent from '../LikeButtonComponent/LikeButtonComponent'
 import CommentComponent from '../CommentComponent/CommentComponent'
 import { convertPrice, initFacebookSDK } from '../../utils'
 import Loading from '../LoadingComponent/Loading'
+import SliderComponent from '../SliderComponent/SliderComponent'
+import ProductImageGallery from '../ProductImageGallery/ProductImageGallery'
+import ContainerComponent from '../ContainerComponent/ContainerComponent'
 
 const ProductDetailsComponent = ({ idProduct }) => {
     const [quantity, setQuantity] = useState(1);
@@ -21,13 +24,16 @@ const ProductDetailsComponent = ({ idProduct }) => {
     const navigate = useNavigate()
     const location = useLocation()
     const dispatch = useDispatch()
-
+    const [selectedColor, setSelectedColor] = useState(null);
+    const [isLoadingDetail,setIsLoadingDetail] = useState(false);
     const fetchGetDetailsProduct = async (context) => {
+        setIsLoadingDetail(true)
         const id = context?.queryKey && context?.queryKey[1]
         if (id) {
             const res = await ProductService.getDetailsProduct(id);
             return res.data
         }
+        setIsLoadingDetail(false)
     };
 
     useEffect(() => {
@@ -39,7 +45,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
         queryFn: fetchGetDetailsProduct,
         enabled: !!idProduct
     });
-    console.log('productDetails', productDetails)
+    
 
     const handleIncrease = () => {
         setQuantity(prev => prev + 1);
@@ -73,6 +79,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                 orderItem: {
                     name: productDetails?.name,
                     amount: quantity,
+                    //color:selectedColor,
                     image: productDetails?.image,
                     price: productDetails?.price,
                     product: productDetails?._id,
@@ -81,75 +88,102 @@ const ProductDetailsComponent = ({ idProduct }) => {
             }))
         }
     }
-    console.log('productDetails', productDetails, user)
 
-    const product =
-    {
-        name: "Teddy - Sofa 2 seaters",
-        code: "teddysofabang-5",
-        status: "Còn hàng",
-        brand: "I'm Home",
-        category: "Sofa modular",
-        price: 12500000,
-        sizes: [
-            "2200x950mm",
-            "2400x950mm"
-        ],
-        colors: [
-
-        ],
-        tags: [
-            "Color Pop",
-            "Sofa modular",
-            "Phòng khách",
-            "Sản phẩm nổi bật",
-            "Sản phẩm khuyến mãi",
-        ],
-        details: [
-            { label: "Chất liệu", value: "Khung gỗ dầu, Nệm mousse D40 + lò xo túi, Vải bọc tùy chọn" },
-            { label: "Vận chuyển", value: "Miễn phí nội thành HCM & TĐ" },
-            { label: "Thanh toán", value: "Thanh toán & Trả góp 0% qua thẻ tín dụng" },
-            { label: "Liên hệ", value: "Hotline: 0931 799 744 (Liên hệ để được tư vấn và đặt hàng theo yêu cầu)" },
-        ],
-    }
-
+    useEffect(() => {
+        // Mặc định chọn màu đầu tiên trong mảng màu nếu có
+        if (productDetails?.colors && productDetails?.colors.length > 0) {
+            setSelectedColor(productDetails.colors[0]);
+        }
+    }, [productDetails]);
     return (
-        <isLoading isLoading={isLoading}>
+        <isLoading isLoading={isLoading ||isLoadingDetail}>
             <div>
                 <Row style={{ padding: '16px 0px', background: 'white' }} gutter={[16, 16]}>
-                    <Col xs={24} sm={12} md={10} lg={10}>
-                        <Image src={productDetails?.image} alt="image product" preview={false} style={{ width: '100%', padding: "10px 0px" }} />
-                        <Row gutter={[8, 8]} justify="center">
-                            {[...Array(5)].map((_, index) => (
-                                <Col key={index} xs={4} sm={4} md={4} lg={4}>
-                                    <WrapperStyleImageSmall src={imageProductSmall} alt="image small" preview={false} />
-                                </Col>
-                            ))}
-                        </Row>
-                    </Col>
-
+                   
+                        {/* Căn giữa slide trong cột */}
+                        <ProductImageGallery productDetails={productDetails} />
+                    
                     <Col xs={24} sm={12} md={14} lg={14} style={{ padding: '0px 20px' }}>
                         <WrapperStyleNameProduct>{productDetails?.name}</WrapperStyleNameProduct>
-                        <p><strong>Mã sản phẩm:</strong> {product.code}</p>
-                        <p><strong>Tình trạng:</strong> {product.status}</p>
-                        <p><strong>Thương hiệu:</strong> {product.brand}</p>
-                        <p><strong>Phân khúc:</strong> {product.category}</p>
-                        <p><strong>Nhóm sản phẩm:</strong> {product.tags.join(", ")}</p>
+                        {/* <p><strong>Mã sản phẩm:</strong> {product.code}</p> */}
+                        <p><strong>Số lượng còn lại:</strong> {productDetails?.countInStock}</p>
+                        <p><strong>Thương hiệu:</strong> {productDetails?.brand}</p>
+                        <p><strong>Phân khúc:</strong> {productDetails?.type}</p>
+                        <p><strong>Nhóm sản phẩm:</strong> {`${productDetails?.type}, ${productDetails?.room}`}</p>
 
                         <WrapperStylePriceProduct>
-                            {convertPrice(productDetails?.price)}
+                            {/* Giá gốc - có gạch ngang nếu có discount */}
+                            {productDetails?.discount > 0 ? (
+                                <span style={{ textDecoration: 'line-through', color: '#666', fontSize: '20px' }}>
+                                    {convertPrice(productDetails?.price)}
+                                </span>
+                            ) : (
+                                convertPrice(productDetails?.price)
+                            )}
+
+                            {/* Hiển thị giá sau discount nếu có */}
+                            {productDetails?.discount > 0 && (
+                                <div style={{ color: '#ff424e', fontWeight: 'bold', marginTop: '4px', color: 'brown' }}>
+                                    {convertPrice(productDetails?.price * (1 - productDetails?.discount / 100))}
+                                    <span style={{ fontSize: '14px', marginLeft: '4px' }}>
+                                        (-{productDetails?.discount}%)
+                                    </span>
+                                </div>
+                            )}
                         </WrapperStylePriceProduct>
 
                         <SizeProduct>
                             <p><strong>Kích thước</strong></p>
-                            {product.sizes.map((size, index) => (
-                                <SizeBox key={index}>{size}</SizeBox>
-                            ))}
+                            {productDetails?.size && (
+                                <SizeBox>
+                                    {`${productDetails.size.length}mm x ${productDetails.size.width}mm x ${productDetails.size.height}mm`}
+                                </SizeBox>
+                            )}
                         </SizeProduct>
 
-                        <LikeButtonComponent dataHref={"https://developers.facebook.com/docs/plugins/"} />
+                        {selectedColor && (
+                            <p style={{ display: 'flex', alignItems: 'center', gap: '20px', margin: 0, marginBottom: '18px', marginTop: '10px' }}>
+                                <strong>Màu sắc: </strong>
+                                <span style={{ fontWeight: 'normal' }}>{selectedColor}</span>
+                            </p>
+                        )}
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                            {productDetails?.colors?.map((color, index) => {
+                                const colorMap = {
+                                    'Đỏ': '#ff0000',
+                                    'Xanh': '#0000ff',
+                                    'Vàng': '#ffff00',
+                                    'Trắng': '#ffffff',
+                                    'Đen': '#000000',
+                                    // Thêm các màu khác nếu cần
+                                };
+                                const colorCode = colorMap[color] || '#cccccc';
+                                return (
+                                    <div
+                                        key={index}
+                                        onClick={() => setSelectedColor(color)}
+                                        style={{
+                                            marginLeft: '10px',
+                                            width: '60px',
+                                            height: '60px',
+                                            backgroundColor: colorCode,
+                                            border: color === 'Trắng' ? '1px solid #ddd' : 'none',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: color === 'Đen' ? '#fff' : '#000',
+                                            // Thêm border khi được chọn
+                                            outline: selectedColor === color ? '2px solid #000' : 'none',
+                                            outlineOffset: '4px', // Khoảng cách giữa border và box
+                                            transition: 'all 0.2s ease' // Hiệu ứng mượt khi chuyển đổi
+                                        }}
+                                    >
 
-                        <p><strong>Màu sắc</strong></p>
+                                    </div>
+                                );
+                            })}
+                        </div>
 
                         <WrapperQuantity>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '20px 0' }}>
@@ -191,10 +225,6 @@ const ProductDetailsComponent = ({ idProduct }) => {
                             </div>
                         </WrapperQuantity>
 
-                        {/* <Row>
-                        <Col span={12}></Col>
-                        <Col span={12}></Col>
-                    </Row> */}
 
                         <WrapperBtnBuy>
                             <ButtonComponent
@@ -238,22 +268,29 @@ const ProductDetailsComponent = ({ idProduct }) => {
                         </WrapperBtnBuy>
                     </Col>
                 </Row>
-
+                <LikeButtonComponent dataHref={"https://developers.facebook.com/docs/plugins/"} />
                 <h2>Mô tả sản phẩm</h2>
                 <div className="border border-gray-300 rounded-md" style={{ paddingBottom: "20px" }}>
                     <TableProductDetails>
-
                         <tbody>
-                            {product.details.map((item, index) => (
-                                <RowDetail key={index} even={index % 2 === 0}>
-                                    <TitleCell>{item.label}</TitleCell>
-                                    <DetailsCell>
-                                        {item.value.split(", ").map((line, i) => (
-                                            <div key={i}>{line}</div>
-                                        ))}
-                                    </DetailsCell>
-                                </RowDetail>
-                            ))}
+                            <RowDetail style={{ backgroundColor: '#f9f9f9' }}>
+                                <TitleCell>Mô tả</TitleCell>
+                                <DetailsCell>
+                                    {productDetails?.description}
+                                </DetailsCell>
+                            </RowDetail>
+                            <RowDetail>
+                                <TitleCell>Thanh toán</TitleCell>
+                                <DetailsCell>
+                                    Thanh toán & Trả góp 0% qua thẻ tín dụng
+                                </DetailsCell>
+                            </RowDetail>
+                            <RowDetail style={{ backgroundColor: '#f9f9f9' }}>
+                                <TitleCell>Liên hệ</TitleCell>
+                                <DetailsCell>
+                                    Hotline: 0931 799 744 (Liên hệ để được tư vấn và đặt hàng theo yêu cầu)
+                                </DetailsCell>
+                            </RowDetail>
                         </tbody>
                     </TableProductDetails>
                 </div>

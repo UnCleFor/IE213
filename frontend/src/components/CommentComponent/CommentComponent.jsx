@@ -1,18 +1,20 @@
-import React, { useEffect } from 'react'
+import React, { useEffect } from 'react';
 
-const CommentComponent = (props) => {
-    const { dataHref, width } = props
+const CommentComponent = ({ dataHref }) => {
+  useEffect(() => {
+    if (window.FB) {
+      window.FB.XFBML.parse();
+    }
+  }, []);
 
-    useEffect(() => {
-        if (window.FB) {
-            window.FB.XFBML.parse()
-        }
-    }, [])
+  return (
+    <div
+      className="fb-comments"
+      data-href={dataHref}
+      data-width="100%"
+      data-numposts="5"
+    ></div>
+  );
+};
 
-    return (
-        <div class="fb-comments" data-href={dataHref} data-width={width} data-numposts="5" ></div>
-    )
-}
-
-
-export default CommentComponent
+export default CommentComponent;
