@@ -13,7 +13,7 @@ import {
     PointElement,
     LineElement
 } from 'chart.js';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Loading from '../LoadingComponent/Loading';
 
 ChartJS.register(
