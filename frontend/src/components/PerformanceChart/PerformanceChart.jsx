@@ -12,6 +12,7 @@ import {
     PointElement,
     LineElement
 } from 'chart.js';
+import Loading from '../LoadingComponent/Loading';
 
 ChartJS.register(
     CategoryScale,
@@ -24,7 +25,7 @@ ChartJS.register(
     PointElement,
     LineElement
 );
-const PerformanceChart = ({ orders }) => {
+const PerformanceChart = ({ orders, isLoading=false }) => {
     if (!orders?.data) return null;
     
     // Nhóm đơn hàng theo ngày
@@ -71,6 +72,7 @@ const PerformanceChart = ({ orders }) => {
     };
     
     return (
+      <Loading isLoading={isLoading}>
       <Card title="Hiệu suất theo ngày" bordered={false}>
         <Line
           data={data}
@@ -103,6 +105,7 @@ const PerformanceChart = ({ orders }) => {
           }}
         />
       </Card>
+      </Loading>
     );
   };
   export default PerformanceChart

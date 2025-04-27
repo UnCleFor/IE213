@@ -12,6 +12,7 @@ import {
     PointElement,
     LineElement
 } from 'chart.js';
+import Loading from '../LoadingComponent/Loading';
 
 ChartJS.register(
     CategoryScale,
@@ -25,7 +26,7 @@ ChartJS.register(
     LineElement
 );
 
-const ProductSalesChart = ({ orders }) => {
+const ProductSalesChart = ({ orders, isLoading=false }) => {
     if (!orders?.data) return null;
     
     // Thống kê sản phẩm bán chạy
@@ -66,6 +67,7 @@ const ProductSalesChart = ({ orders }) => {
     };
     
     return (
+      <Loading isLoading={isLoading}>
       <Card title="Top 10 sản phẩm bán chạy" bordered={false}>
         <Bar
           data={data}
@@ -102,6 +104,7 @@ const ProductSalesChart = ({ orders }) => {
           }}
         />
       </Card>
+      </Loading>
     );
   };
   export default ProductSalesChart
