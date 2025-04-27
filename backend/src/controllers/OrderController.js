@@ -65,9 +65,49 @@ const updatedOrder = async (req, res) => {
   }
 }
 
+const deleteOrder= async (req, res) => {
+    try {
+        const OrderId = req.params.id
+        if(!OrderId) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Order Id là bắt buộc'
+            })
+        }
+        const ketqua = await OrderService.deleteOrder(OrderId)
+        return res.status(200).json(ketqua)
+    }
+    catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
+const deleteManyOrder = async (req, res) => {
+    try {
+        const ids = req.body.ids
+        if(!ids) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Thiếu danh sách id'
+            })
+        }
+        const ketqua = await OrderService.deleteManyOrder(ids)
+        return res.status(200).json(ketqua)
+    }
+    catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 module.exports = {
     createOrder,
     getOrderDetails,
     getAllOrders,
-    updatedOrder
+    updatedOrder,
+    deleteOrder,
+    deleteManyOrder
 }

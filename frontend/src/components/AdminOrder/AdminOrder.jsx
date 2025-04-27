@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { WrapperHeader } from './style'
-import { Form, Button, Modal, Switch, Input, Space, Divider, Table, Select } from 'antd';
+import { Form, Button, Modal, Switch, Input, Space, Divider, Table, Select, Tabs } from 'antd';
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
 import DrawerComponent from '../DrawerComponent/DrawerComponent'
@@ -15,6 +15,10 @@ import { useMutationHooks } from '../../hooks/useMutationHook'
 import * as OrderService from '../../services/OrderService';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import * as UserService from '../../services/UserService';
+import OrderReports from '../OrderReports/OrderReports';
+import ProductSalesChart from '../ProductSalesChart/ProductSalesChart';
+import PerformanceChart from '../PerformanceChart/PerformanceChart';
+
 const AdminOrder = () => {
   // Tách thành 2 form riêng biệt
   const [formAdd] = Form.useForm();
@@ -75,31 +79,24 @@ const AdminOrder = () => {
     state: '',
   });
 
-  // const mutation = useMutationHooks((data) => {
-  //   const { name, email, phone, avatar, password, confirmPassword } = data;
-  //   return UserService.signupUser({ name, email, phone, avatar, password, confirmPassword });
-  // });
-
-
   const mutationUpdate = useMutationHooks(({ id, token, ...rests }) => {
     return OrderService.updatedOrder(id, rests, token);
   });
 
-  // const mutationDelete = useMutationHooks(({ id, token }) => {
-  //   return UserService.deleteUser(id, token);
-  // });
+  const mutationDelete = useMutationHooks(({ id, token }) => {
+    return OrderService.deleteOrder(id, token);
+  });
 
-  // const mutationDeleteMany = useMutationHooks(({ token, ...ids }) => {
-  //   return UserService.deleteManyUser(ids, token);
-  // });
+  const mutationDeleteMany = useMutationHooks(({ token, ...ids }) => {
+    return OrderService.deleteManyOrder(ids, token);
+  });
 
-  //const { data, isLoading, isSuccess, isError } = mutation;
   const { data: dataUpdated, isLoading: isLoadingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate;
-  // const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
-  // const { data: dataDeletedMany, isLoading: isLoadingDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeleteMany;
+  const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
+  const { data: dataDeletedMany, isLoading: isLoadingDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeleteMany;
 
   const { isLoading: isLoadingOrder, data: orders } = useQuery({
-    queryKey: ['orders', user.access_token], // queryKey thêm token để theo dõi thay đổi
+    queryKey: ['orders', user.access_token],
     queryFn: () => OrderService.getAllOrders(user.access_token),
   });
 
@@ -154,17 +151,8 @@ const AdminOrder = () => {
       createdAt: '',
       state: '',
     });
-    //formAdd.resetFields();
     formUpdate.resetFields();
-    //mutation.reset();
   };
-
-  // const handleOnchange = (e) => {
-  //   setStateUser({
-  //     ...stateUser,
-  //     [e.target.name]: e.target.value
-  //   });
-  // };
 
   const handleOnchangeDetails = (e) => {
     setStateOrderDetails({
@@ -173,59 +161,24 @@ const AdminOrder = () => {
     });
   };
 
-  // const handleOnchangeAvatar = async ({ fileList }) => {
-  //   const file = fileList[0];
-  //   if (!file) return;
+  const handleDeleteOrder = () => {
+    mutationDelete.mutate({
+      id: rowSelected,
+      token: user.access_token,
+    });
+  };
 
-  //   if (!file.url && !file.preview) {
-  //     file.preview = await getBase64(file.originFileObj);
-  //   }
+  const handleDeleteManyOrders = (ids) => {
+    setIsFinishDeletedMany(true)
+    mutationDeleteMany.mutate({
+      ids: ids,
+      token: user.access_token
+    })
+  }
 
-  //   // Cập nhật cả state và form
-  //   setStateUser({
-  //     ...stateUser,
-  //     avatar: file.preview
-  //   });
-  //   formAdd.setFieldsValue({
-  //     avatar: file.preview
-  //   });
-  // };
-
-  // const handleOnchangeAvatarDetails = async ({ fileList }) => {
-  //   const file = fileList[0];
-  //   if (!file.url && !file.preview) {
-  //     file.preview = await getBase64(file.originFileObj);
-  //   }
-  //   setStateUserDetails({
-  //     ...stateUserDetails,
-  //     avatar: file.preview
-  //   });
-  // };
-
-  // const handleDeleteUser = () => {
-  //   mutationDelete.mutate({
-  //     id: rowSelected,
-  //     token: user.access_token,
-  //   });
-  // };
-
-  // const handleDeleteManyUsers = (ids) => {
-  //   setIsFinishDeletedMany(true)
-  //   mutationDeleteMany.mutate({
-  //     ids: ids,
-  //     token: user.access_token
-  //   })
-  // }
-
-  // const onFinish = () => {
-  //   mutation.mutate({
-  //     ...stateUser,
-  //   });
-  // };
   const handleGetUserEmail = async (id, access_token) => {
     try {
       const res = await UserService.getUserEmail(id, access_token);
-
       if (res?.status === "OK") {
         return res.data.email; // Trả về chuỗi email
       }
@@ -497,42 +450,67 @@ const AdminOrder = () => {
     }
   }, [isSuccessUpdated, isErrorUpdated]);
 
-  // useEffect(() => {
-  //   if (isSuccessDeleted && dataDeleted?.status === 'OK') {
-  //     message.success('Xóa người dùng thành công!');
-  //     queryClient.invalidateQueries(['users']);
-  //     setIsModalOpenDelete(false);
-  //   } else if (isErrorDeleted) {
-  //     message.error('Xóa người dùng thất bại!');
-  //   }
-  // }, [isSuccessDeleted, isErrorDeleted]);
+  useEffect(() => {
+    if (isSuccessDeleted && dataDeleted?.status === 'OK') {
+      message.success('Xóa đơn hàng thành công!');
+      queryClient.invalidateQueries(['orders']);
+      setIsModalOpenDelete(false);
+    } else if (isErrorDeleted) {
+      message.error('Xóa đơn hàng thất bại!');
+    }
+  }, [isSuccessDeleted, isErrorDeleted]);
 
-  // useEffect(() => {
-  //   if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
-  //     message.success('Xóa các người dùng thành công!');
-  //     queryClient.invalidateQueries(['user']);
-  //     setIsFinishDeletedMany(false);
-  //   } else if (isErrorDeletedMany) {
-  //     message.error('Xóa các người dùng thất bại!');
-  //   }
-  // }, [isSuccessDeletedMany, isErrorDeletedMany]);
+  useEffect(() => {
+    if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
+      message.success('Xóa các đơn hàng thành công!');
+      queryClient.invalidateQueries(['orders']);
+      setIsFinishDeletedMany(false);
+    } else if (isErrorDeletedMany) {
+      message.error('Xóa các đơn hàng thất bại!');
+    }
+  }, [isSuccessDeletedMany, isErrorDeletedMany]);
 
+  const items = [
+    {
+      key: '1',
+      label: 'Danh sách đơn hàng',
+      children: (
+        <div style={{ marginTop: '20px' }}>
+          <TableComponent
+            deleteAll={handleDeleteManyOrders}
+            forceRender
+            columns={columns}
+            isLoading={isLoadingOrder || isFinishDeletedMany}
+            data={dataTable}
+            onRow={(record) => ({
+              onClick: () => setRowSelected(record._id)
+            })}
+            exportFileName="orders_list"
+          />
+        </div>
+      ),
+    },
+    {
+      key: '2',
+      label: 'Báo cáo thống kê tổng quát',
+      children: <OrderReports orders={orders} access_token={user?.access_token} isLoading={isLoadingOrder || isFinishDeletedMany}/>,
+    },
+    {
+      key: '3',
+      label: 'Top sản phẩm bán chạy',
+      children: <ProductSalesChart orders={orders} isLoading={isLoadingOrder || isFinishDeletedMany}/>,
+    },
+    {
+      key: '4',
+      label: 'Hiệu suất bán hàng theo thời gian',
+      children: <PerformanceChart orders={orders}isLoading={isLoadingOrder || isFinishDeletedMany} />,
+    },
+  
+  ];
   return (
     <div>
       <WrapperHeader>Quản lý đơn hàng</WrapperHeader>
-      <div style={{ marginTop: '20px' }}>
-        <TableComponent
-          //deleteAll={handleDeleteManyUsers}
-          forceRender
-          columns={columns}
-          isLoading={isLoadingOrder || isFinishDeletedMany}
-          data={dataTable}
-          onRow={(record) => ({
-            onClick: () => setRowSelected(record._id)
-          })}
-          exportFileName="orders_list"
-        />
-      </div>
+      <Tabs defaultActiveKey="1" items={items} />
       <DrawerComponent
         title="Chi tiết đơn hàng"
         isOpen={isOpenDrawer}
@@ -680,8 +658,6 @@ const AdminOrder = () => {
                   align: 'right',
                   render: (price) => `${price?.toLocaleString('vi-VN')} ₫`
                 },
-
-
               ]}
               pagination={false}
               rowKey="_id"
@@ -689,20 +665,17 @@ const AdminOrder = () => {
           </Form>
         </Loading>
       </DrawerComponent>
-
-
-      {/* <ModalComponent
-        title="Xóa người dùng"
+      <ModalComponent
+        title="Xóa đơn hàng"
         open={isModalOpenDelete}
         onCancel={() => setIsModalOpenDelete(false)}
-        onOk={handleDeleteUser}
+        onOk={handleDeleteOrder}
       >
         <Loading isLoading={isLoadingDeleted}>
-          <div>Bạn có chắc chắn muốn xóa người dùng này không?</div>
+          <div>Bạn có chắc chắn muốn xóa đơn hàng này không?</div>
         </Loading>
-      </ModalComponent>   */}
+      </ModalComponent>  
     </div>
   );
 };
-
 export default AdminOrder;

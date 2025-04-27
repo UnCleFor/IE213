@@ -251,7 +251,6 @@ const AdminProduct = () => {
     });
   };
 
-
   const handleOnchangeImages = async ({ fileList }) => {
     const newImages = await Promise.all(fileList.map(file => getBase64(file.originFileObj)));
     setStateProduct({
