@@ -503,7 +503,7 @@ const AdminOrder = () => {
     {
       key: '4',
       label: 'Hiệu suất bán hàng theo thời gian',
-      children: <PerformanceChart orders={orders}isLoading={isLoadingOrder || isFinishDeletedMany} />,
+      children: <PerformanceChart orders={orders} isLoading={isLoadingOrder || isFinishDeletedMany} />,
     },
   
   ];
