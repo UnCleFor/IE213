@@ -17,15 +17,17 @@ import Loading from '../LoadingComponent/Loading'
 import SliderComponent from '../SliderComponent/SliderComponent'
 import ProductImageGallery from '../ProductImageGallery/ProductImageGallery'
 import ContainerComponent from '../ContainerComponent/ContainerComponent'
+import * as message from '../Message/Message'
 
 const ProductDetailsComponent = ({ idProduct }) => {
     const [quantity, setQuantity] = useState(1);
     const user = useSelector((state) => state.user)
+    const order = useSelector((state) => state.order)
     const navigate = useNavigate()
     const location = useLocation()
     const dispatch = useDispatch()
     const [selectedColor, setSelectedColor] = useState(null);
-    const [isLoadingDetail,setIsLoadingDetail] = useState(false);
+    const [isLoadingDetail, setIsLoadingDetail] = useState(false);
     const fetchGetDetailsProduct = async (context) => {
         setIsLoadingDetail(true)
         const id = context?.queryKey && context?.queryKey[1]
@@ -45,7 +47,12 @@ const ProductDetailsComponent = ({ idProduct }) => {
         queryFn: fetchGetDetailsProduct,
         enabled: !!idProduct
     });
-    
+
+    // useEffect(() => {
+    //      if (order.isSucessOrder) {
+    //         message.success('Đã thêm vào giỏ hàng')
+    //      }
+    // })
 
     const handleIncrease = () => {
         setQuantity(prev => prev + 1);
@@ -75,6 +82,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
             //         required: true,
             //     },
             // },
+            // console.log('productDetails', quantity, order.orderItems)
             dispatch(addOrderProduct({
                 orderItem: {
                     name: productDetails?.name,
@@ -83,7 +91,8 @@ const ProductDetailsComponent = ({ idProduct }) => {
                     image: productDetails?.image,
                     price: productDetails?.price,
                     product: productDetails?._id,
-                    discount: productDetails?.discount
+                    discount: productDetails?.discount,
+                    countInStock: productDetails?.countInStock
                 }
             }))
         }
@@ -96,13 +105,13 @@ const ProductDetailsComponent = ({ idProduct }) => {
         }
     }, [productDetails]);
     return (
-        <isLoading isLoading={isLoading ||isLoadingDetail}>
+        <isLoading isLoading={isLoading || isLoadingDetail}>
             <div>
                 <Row style={{ padding: '16px 0px', background: 'white' }} gutter={[16, 16]}>
-                   
-                        {/* Căn giữa slide trong cột */}
-                        <ProductImageGallery productDetails={productDetails} />
-                    
+
+                    {/* Căn giữa slide trong cột */}
+                    <ProductImageGallery productDetails={productDetails} />
+
                     <Col xs={24} sm={12} md={14} lg={14} style={{ padding: '0px 20px' }}>
                         <WrapperStyleNameProduct>{productDetails?.name}</WrapperStyleNameProduct>
                         {/* <p><strong>Mã sản phẩm:</strong> {product.code}</p> */}
@@ -131,7 +140,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                 </div>
                             )}
                         </WrapperStylePriceProduct>
-
+                        <LikeButtonComponent dataHref={"https://developers.facebook.com/docs/plugins/"} />
                         <SizeProduct>
                             <p><strong>Kích thước</strong></p>
                             {productDetails?.size && (
@@ -227,25 +236,27 @@ const ProductDetailsComponent = ({ idProduct }) => {
 
 
                         <WrapperBtnBuy>
-                            <ButtonComponent
-                                size="large"
-                                styleButton={{
-                                    backgroundColor: 'brown',
-                                    padding: '12px 28px',
-                                    border: 'none',
-                                    borderRadius: '0px',
-                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                                    transition: 'all 0.3s ease',
-                                    cursor: 'pointer',
-                                }}
-                                styleTextButton={{
-                                    color: 'white',
-                                    fontSize: '16px',
-                                    fontWeight: 'bold',
-                                }}
-                                textButton="Mua ngay"
-
-                            />
+                            <div>
+                                <ButtonComponent
+                                    size="large"
+                                    styleButton={{
+                                        backgroundColor: 'brown',
+                                        padding: '12px 28px',
+                                        border: 'none',
+                                        borderRadius: '0px',
+                                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                        transition: 'all 0.3s ease',
+                                        cursor: 'pointer',
+                                    }}
+                                    textButton="Mua ngay"
+                                    styleTextButton={{
+                                        color: 'white',
+                                        fontSize: '16px',
+                                        fontWeight: 'bold',
+                                    }}
+                                ></ButtonComponent>
+                                {/* {order?.isErrorOrder && <div style={{marginTop: '8px', color: 'red'}}>Sản phẩm đã hết hàng</div>}  */}
+                            </div>
                             <ButtonComponent
                                 size="large"
                                 styleButton={{
@@ -257,18 +268,18 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                     transition: 'all 0.3s ease',
                                     cursor: 'pointer',
                                 }}
+                                onClick={handleAddOrderProduct}
+                                textButton="Thêm vào giỏ hàng"
                                 styleTextButton={{
                                     color: 'white',
                                     fontSize: '16px',
                                     fontWeight: 'bold',
                                 }}
-                                textButton="Thêm vào giỏ hàng"
-                                onClick={handleAddOrderProduct}
-                            />
+                            ></ButtonComponent>
                         </WrapperBtnBuy>
                     </Col>
                 </Row>
-                <LikeButtonComponent dataHref={"https://developers.facebook.com/docs/plugins/"} />
+
                 <h2>Mô tả sản phẩm</h2>
                 <div className="border border-gray-300 rounded-md" style={{ paddingBottom: "20px" }}>
                     <TableProductDetails>

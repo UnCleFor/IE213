@@ -15,7 +15,9 @@ const initialState = {
     isPaid: false,
     paidAt: '',
     isDelivered: false,
-    delivered: '',
+    deliveredAt: '',
+    isErrorOrder: false,
+    isSucessOrder: false
 }
 
 export const orderSlide = createSlice({
@@ -25,9 +27,16 @@ export const orderSlide = createSlice({
         addOrderProduct: (state, action) => {
             const { orderItem } = action.payload
             const itemOrder = state?.orderItems?.find((item) => item?.product === orderItem.product)
+            console.log('itemOrder', itemOrder)
             if (itemOrder) {
-                itemOrder.amount += orderItem.amount
-            } else {
+                // if (itemOrder.amount <= itemOrder.countInStock){
+                itemOrder.amount += orderItem?.amount
+                // state.isSucessOrder = true
+                // } else {
+                //      state.isErrorOrder = true
+                // }
+            }
+            else {
                 state.orderItems.push(orderItem)
             }
         },
@@ -71,10 +80,10 @@ export const orderSlide = createSlice({
             state.orderItemsSelected = itemOrdersSelected
         },
         selectedOrder: (state, action) => {
-            const {listChecked} = action.payload
+            const { listChecked } = action.payload
             const orderSelected = []
             state.orderItems.forEach((order) => {
-                if(listChecked.includes(order.product)) {
+                if (listChecked.includes(order.product)) {
                     orderSelected.push(order)
                 }
             })
@@ -86,6 +95,6 @@ export const orderSlide = createSlice({
 )
 
 // Action creators are generated for each case reducer function
-export const { addOrderProduct, increaseAmount, decreaseAmount, removeOrderProduct, removeAllOrderProduct, selectedOrder, resetOrder  } = orderSlide.actions
+export const { addOrderProduct, increaseAmount, decreaseAmount, removeOrderProduct, removeAllOrderProduct, selectedOrder, resetOrder } = orderSlide.actions
 
 export default orderSlide.reducer
