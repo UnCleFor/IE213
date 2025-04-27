@@ -18,6 +18,9 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const navigate = useNavigate();
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <ColorFooter>
@@ -31,11 +34,10 @@ const Footer = () => {
               <FooterTitle>BeauteHome</FooterTitle>
               <FooterLink onClick={() => {
                 navigate("/aboutus");
-                window.scrollTo(0, 0);
+                handleScrollToTop();
               }}>
                 Về chúng tôi
               </FooterLink>
-
             </FooterSection>
           </Col>
 
@@ -43,11 +45,50 @@ const Footer = () => {
           <Col xs={24} sm={12} md={6}>
             <FooterSection>
               <FooterTitle>Khám phá</FooterTitle>
-              <FooterLink to="/product/phong-khach" as={Link}>Phòng khách</FooterLink>
-              <FooterLink to="/product/phong-an" as={Link}>Phòng ăn</FooterLink>
-              <FooterLink to="/product/phong-ngu" as={Link}>Phòng ngủ</FooterLink>
-              <FooterLink to="/product/phong-lam-viec" as={Link}>Phòng làm việc</FooterLink>
-              <FooterLink to="/product/trang-tri-nha-cua" as={Link}>Trang trí nhà cửa</FooterLink>
+              <FooterLink
+                to="/product/phong-khach"
+                as={Link}
+                state={{ label: "Phòng khách", filterBy: "room" }}
+                onClick={handleScrollToTop}
+              >
+                Phòng khách
+              </FooterLink>
+
+              <FooterLink
+                to="/product/phong-an"
+                as={Link}
+                state={{ label: "Phòng ăn", filterBy: "room" }}
+                onClick={handleScrollToTop}
+              >
+                Phòng ăn
+              </FooterLink>
+
+              <FooterLink
+                to="/product/phong-ngu"
+                as={Link}
+                state={{ label: "Phòng ngủ", filterBy: "room" }}
+                onClick={handleScrollToTop}
+              >
+                Phòng ngủ
+              </FooterLink>
+
+              <FooterLink
+                to="/product/phong-lam-viec"
+                as={Link}
+                state={{ label: "Phòng làm việc", filterBy: "room" }}
+                onClick={handleScrollToTop}
+              >
+                Phòng làm việc
+              </FooterLink>
+              
+              <FooterLink
+                to="/product/trang-tri-nha-cua"
+                as={Link}
+                state={{ label: "Trang trí nhà cửa", filterBy: "room" }}
+                onClick={handleScrollToTop}
+              >
+                Trang trí nhà cửa
+              </FooterLink>
             </FooterSection>
           </Col>
 
@@ -57,21 +98,21 @@ const Footer = () => {
               <FooterTitle>Chính sách</FooterTitle>
               <FooterLink onClick={() => {
                 navigate("/chinhsachdoitra");
-                window.scrollTo(0, 0);
+                handleScrollToTop();
               }}>
                 Chính sách đổi trả
               </FooterLink>
 
               <FooterLink onClick={() => {
                 navigate("/chinhsachbaomat");
-                window.scrollTo(0, 0);
+                handleScrollToTop();
               }}>
                 Chính sách bảo mật
               </FooterLink>
 
               <FooterLink onClick={() => {
                 navigate("/dieukhoandichvu");
-                window.scrollTo(0, 0);
+                handleScrollToTop();
               }}>
                 Điều khoản dịch vụ
               </FooterLink>
@@ -101,8 +142,6 @@ const Footer = () => {
             
           </Col>
           
-      
-
         {/* Footer Bottom */}
         <FooterBottom>
           <p>© 2025 BeauteHome. All rights reserved.</p>
