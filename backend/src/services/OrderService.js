@@ -7,10 +7,6 @@ const createOrder = (newOrder) => {
   return new Promise(async (resolve, reject) => {
     const { orderItems, paymentMethod, shippingMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, phone, user, totalDiscount, email } = newOrder;
     try {
-      // console.log('orderItems', {orderItems})
-      // const product = await Product.findOneAndUpdate({
-      //   _id: product,
-      // })
       const createdOrder = await Order.create({
         orderItems,
         shippingAddress: {
@@ -110,6 +106,9 @@ const updateOrder = (id, data) => {
         });
         return;
       }
+      if (data.state === 'Đã hủy') {
+        data.cancelledAt = new Date();
+      }
       const updatedOrder = await Order.findByIdAndUpdate(
         id,
         {
@@ -166,6 +165,27 @@ const deleteManyOrder = (ids) => {
   })
 }
 
+const getOrderByUser = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const orders = await Order.find({
+        user: userId
+      }).sort({
+        createdAt: -1
+      });
+      resolve({
+        status: 'OK',
+        message: 'Thành công',
+        data: orders
+      });
+    } catch (error) {
+      reject({
+        status: 'ERR',
+        message: error.message
+      });
+    }
+  });
+};
 
 module.exports = {
   createOrder,
@@ -173,5 +193,6 @@ module.exports = {
   getAllOrders,
   updateOrder,
   deleteOrder,
-  deleteManyOrder
+  deleteManyOrder,
+  getOrderByUser
 }

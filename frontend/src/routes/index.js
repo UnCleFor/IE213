@@ -103,7 +103,7 @@ export const routes = [
         isShowHeader: true
     },
     {
-        path: '/order_detail',
+        path: '/order_detail/:orderId',
         page: OrderDetailPage,
         isShowHeader: true
     },

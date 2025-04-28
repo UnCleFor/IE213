@@ -8,7 +8,7 @@ router.get('/get_order/:id', authUserMiddleWare, OrderController.getOrderDetails
 router.get('/get-all-order',authMiddleWare,OrderController.getAllOrders)
 router.put("/update/:id", authUserMiddleWare, OrderController.updatedOrder)
 router.get('/get_order/:id', authMiddleWare, OrderController.getOrderDetails)
-// router.get('/my_order/:userId', authUserMiddleWare, OrderController.myOrder)
+router.get('/get_order_byuser/:userId', authUserMiddleWare, OrderController.getOrderByUser)
 router.delete("/delete/:id", authMiddleWare, OrderController.deleteOrder)
 router.post("/delete-many",authMiddleWare, OrderController.deleteManyOrder)
 module.exports = router

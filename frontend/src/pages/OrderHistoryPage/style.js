@@ -54,3 +54,4 @@ export const ProductImage = styled.img`
     height: 70px;
   }
 `;
+

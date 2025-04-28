@@ -74,3 +74,15 @@ export const deleteManyOrder = async (data, access_token) => {
   );
   return res.data;
 };
+
+export const getOrderByUserId = async (userId, access_token) => {
+  const res = await axiosJWT.get(
+    `${process.env.REACT_APP_API_URL}/order/get_order_byuser/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    }
+  );
+  return res.data;
+};

@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Card, Row, Col, Typography, Radio, Input, Button, Form, Divider, Avatar } from "antd";
 import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 import { OrderDetailWrapper } from "./style";
-import pic from "./pic.png"; // ảnh mặc định sản phẩm
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import { useMutationHooks } from "../../hooks/useMutationHook";
 import * as OrderService from "../../services/OrderService"
@@ -30,8 +29,8 @@ const paymentMethods = Object.keys(orderConstant.payment).map((key) => ({
 
 const CheckoutPage = () => {
   const [form] = Form.useForm(); // Tạo form instance
-  const [ delivery, setDelivery ] = useState('fast')
-  const [ payment, setPayment ] = useState('cod')
+  const [delivery, setDelivery] = useState('fast')
+  const [payment, setPayment] = useState('cod')
   const navigate = useNavigate()
   const order = useSelector((state) => state.order);
   const user = useSelector((state) => state.user);
@@ -40,20 +39,16 @@ const CheckoutPage = () => {
     return order?.orderItemsSelected?.reduce((total, item) => total + item.price * item.amount, 0);
   }, [order]);
   const totalDiscount = useMemo(() => {
-    return order?.orderItemsSelected?.reduce((total, item) => total + item.price * item.amount * item.discount / 100, 0);
+    return order?.orderItemsSelected?.reduce((total, item) => {
+      const discount = item.discount || 0;
+      return total + item.price * item.amount * discount / 100;
+    }, 0);
   }, [order]);
   const shippingFee = useMemo(() => {
     const selected = shippingMethods.find((s) => s.id === delivery);
     return selected ? selected.fee : 0;
   }, [delivery]);
   const total = subtotal + shippingFee - totalDiscount;
-
-  const [stateUserDetails, setStateUserDetails] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-  });
 
   const mutationUpdate = useMutationHooks((data) => {
     const { id, token, ...rests } = data
@@ -70,21 +65,14 @@ const CheckoutPage = () => {
   const { isLoading, data } = mutationUpdate
   const { data: dataAdd, isLoading: isLoadingAddOrder, isSuccess, isError } = mutationAddOrder
 
-    useEffect(() => {
-      if (isSuccess && dataAdd?.status === 'OK') {
-        message.success('Đặt hàng thành công')
-        navigate('/order_history',
-        {
-          state: {
-            delivery,
-            payment,
-            orders: order?.orderItemsSelected
-          }
-        })
-      } else if (isError) {
-        message.error('Đặt hàng thất bại');
-      }
-    }, [isSuccess, isError]);
+  useEffect(() => {
+    if (isSuccess && dataAdd?.status === 'OK') {
+      message.success('Đặt hàng thành công')
+      navigate('/order_history')
+    } else if (isError) {
+      message.error('Đặt hàng thất bại');
+    }
+  }, [isSuccess, isError]);
 
   const handleAddOrder = () => {
     form.validateFields().then((values) => {
@@ -112,9 +100,11 @@ const CheckoutPage = () => {
     });
   }
 
+  console.log('order', order)
+
   return (
     <ContainerComponent>
-      <Loading isLoading = {isLoadingAddOrder}>
+      <Loading isLoading={isLoadingAddOrder}>
         <OrderDetailWrapper>
           <Title level={3}>Thanh toán</Title>
           <Form form={form} layout="vertical">
@@ -172,9 +162,9 @@ const CheckoutPage = () => {
             </Card>
 
             {/* Danh sách sản phẩm + Tổng tiền */}
-            <Card title="Đơn hàng của bạn" style={{ marginBottom: 16 }}>
+            <Card title="Đơn hàng của bạn" style={{ marginBottom: "16px" }}>
               {order?.orderItemsSelected?.map((orderItem) => (
-                <Row key={orderItem?.product} justify="space-between" align="middle" style={{ marginBottom: 12 }}>
+                <Row key={orderItem?.product} justify="space-between" align="middle" style={{ marginBottom: "10px" }}>
                   <Col span={16} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <Avatar shape="square" size={48} src={orderItem?.image} alt={orderItem?.name} />
                     <div>
@@ -186,7 +176,7 @@ const CheckoutPage = () => {
                   </Col>
                   <Col span={8} style={{ textAlign: "right" }}>
                     <p>{convertPrice(orderItem?.price * orderItem?.amount)}</p>
-                    {orderItem?.discount && (
+                    {orderItem?.discount > 0 && (
                       <p>
                         - {convertPrice(orderItem?.price * orderItem?.amount * orderItem?.discount / 100)}
                       </p>
@@ -199,10 +189,12 @@ const CheckoutPage = () => {
                 <Text>Tạm tính:</Text>
                 <Text>{convertPrice(subtotal)}</Text>
               </Row>
-              <Row justify="space-between">
-                <Text>Giảm giá:</Text>
-                <Text>{convertPrice(totalDiscount)}</Text>
-              </Row>
+              {order?.discount > 0 && (
+                <Row justify="space-between">
+                  <Text>Giảm giá:</Text>
+                  <Text>{convertPrice(totalDiscount)}</Text>
+                </Row>
+              )}
               <Row justify="space-between">
                 <Text>Phí giao hàng:</Text>
                 <Text>{convertPrice(shippingFee)}</Text>
@@ -238,7 +230,7 @@ const CheckoutPage = () => {
         </OrderDetailWrapper>
       </Loading>
 
-    </ContainerComponent>
+    </ContainerComponent >
   );
 };
 
