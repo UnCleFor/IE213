@@ -95,6 +95,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                     countInStock: productDetails?.countInStock
                 }
             }))
+            message.success('Thêm vào giỏ hàng thành công');
         }
     }
 

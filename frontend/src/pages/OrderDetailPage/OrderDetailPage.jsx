@@ -8,6 +8,9 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { convertPrice } from "../../utils.js";
 import Loading from "../../components/LoadingComponent/Loading.jsx";
+import { useLocation } from "react-router-dom";
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
 
 const { Title, Text } = Typography;
 
@@ -74,10 +77,17 @@ const OrderDetailPage = () => {
   return (
     <ContainerComponent>
       <OrderDetailWrapper>
-        <div style={{ width: "100%" }}>
-          <Title level={3} style={{ marginBottom: 16 }}>
-            Chi tiết đơn hàng #{orderDetail.id}
-          </Title>
+      <BreadcrumbComponent
+            breadcrumbs={[
+              { name: 'Trang chủ', link: '/' },
+              { name: 'Lịch sử mua hàng', link: '/order_history' },
+              { name: 'Chi tiết đơn hàng', isCurrent: true }
+            ]}
+          />  
+      <div style={{ width: "100%" }}>
+        <Title level={3} style={{ marginBottom: 16 }}>
+          Chi tiết đơn hàng #{orderDetail.id}
+        </Title>
 
           <Card title="Thông tin giao hàng" bordered={false} style={{ marginBottom: 16 }}>
             <Row gutter={[16, 16]}>

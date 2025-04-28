@@ -11,9 +11,12 @@ import "./style.css";
 import { useMutationHooks } from "../../hooks/useMutationHook.js";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/LoadingComponent/Loading.jsx";
+import { useLocation } from "react-router-dom";
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
+const { TabPane } = Tabs;
 
 const OrderHistoryPage = () => {
-    const { TabPane } = Tabs;
     const user = useSelector((state) => state.user);
     const queryClient = useQueryClient();
     const [loading, setLoading] = useState(false);
@@ -249,9 +252,25 @@ const OrderHistoryPage = () => {
             </div>
         );
     }
+    const styles = {
+        breadcrumbWrapper: {
+          marginBottom: 20,  // Điều chỉnh khoảng cách nếu cần
+            // Đảm bảo rằng breadcrumb căn chỉnh với navbar
+        },
+      };
 
     return (
         <ContainerComponent>
+
+            <div style={styles.breadcrumbWrapper}>
+                <BreadcrumbComponent
+                        breadcrumbs={[
+                            { name: "Trang chủ", link: "/" },
+                            { name: "Lịch sử mua hàng", isCurrent: true },
+                        ]}
+                    />
+                </div>
+                
             <div style={{ width: '100%' }}>
                 <h2 style={{ marginBottom: 16 }}>Đơn hàng của bạn</h2>
                 <Tabs defaultActiveKey="1" type="line">

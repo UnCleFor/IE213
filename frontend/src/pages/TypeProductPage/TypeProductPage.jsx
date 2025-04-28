@@ -10,6 +10,7 @@ import LoadingComponent from '../../components/LoadingComponent/Loading'
 import { current } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
 import { useDebounce } from '../../hooks/useDebounce';
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
 
 
 const { Option } = Select;
@@ -20,7 +21,10 @@ const TypeProduct = () => {
   const searchDebounce = useDebounce(searchProduct, 500)
   const [products, setProducts] = useState([]);
   const { state } = useLocation()
-  const { label, filterBy } = state || {}
+  console.log('Received state:', state);
+  const { label, filterBy, parentLabel, key, keyPath } = state || {}
+  console.log('parentLabel:', parentLabel); // In giá trị của parentLabel
+  console.log('keyPath:', keyPath);
   const [loading, setLoading] = useState(false)
   //console.log('state nè (label)', state?.label)
   // const fetchProducts = async () => {
@@ -89,9 +93,20 @@ const TypeProduct = () => {
     // TODO: gọi API hoặc filter dữ liệu tại đây
   };
 
+  const breadcrumbs = [
+    { name: 'Trang chủ', link: '/' },
+    ...(parentLabel
+      ? [{ name: parentLabel, link: keyPath && keyPath.length > 0 ? `/product/${keyPath[0]}` : '' }]
+      : []),
+    ...(label ? [{ name: label, isCurrent: true }] : []),
+  ];
+  
+  console.log('breadcrumbs:', breadcrumbs);  // In ra breadcrumbs để kiểm tra kết quả
+  
   return (
     <ContainerComponent>
       <div style={{ padding: "16px 0" }}>
+      <BreadcrumbComponent breadcrumbs={breadcrumbs} />
         <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>{label}</Title>
 
         {/* Bộ lọc + sắp xếp */}
