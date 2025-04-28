@@ -285,13 +285,13 @@ const OrderHistoryPage = () => {
                     <TabPane tab="Đã xác nhận" key="3">
                         {getOrdersByState("Đã xác nhận").map(renderOrder)}
                     </TabPane>
-                    <TabPane tab="Đang giao hàng" key="3">
+                    <TabPane tab="Đang giao hàng" key="4">
                         {getOrdersByState("Đang giao hàng").map(renderOrder)}
                     </TabPane>
-                    <TabPane tab="Đã giao hàng" key="4">
+                    <TabPane tab="Đã giao hàng" key="5">
                         {getOrdersByState("Đã giao hàng").map(renderOrder)}
                     </TabPane>
-                    <TabPane tab="Đã hủy" key="5">
+                    <TabPane tab="Đã hủy" key="6">
                         {getOrdersByState("Đã hủy").map(renderOrder)}
                     </TabPane>
                 </Tabs>
