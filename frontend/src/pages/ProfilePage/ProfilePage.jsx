@@ -10,6 +10,7 @@ import Loading from '../../components/LoadingComponent/Loading'
 import { updateUser } from '../../redux/slices/userSlide'
 import { UploadOutlined } from '@ant-design/icons'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent.jsx'
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
 
 const ProfilePage = () => {
     const user = useSelector((state) => state.user)
@@ -135,8 +136,17 @@ const ProfilePage = () => {
             access_token: user?.access_token 
         })
     }
-
+    const breadcrumbs = [
+        { name: 'Trang chủ', link: '/' },
+        { name: 'Thông tin người dùng', link: '/profile', isCurrent: true },
+    ];
     return (
+    <div>
+        <div style={{ marginLeft: '185px' }}>  {/* Di chuyển breadcrumb sang phải */}
+        <BreadcrumbComponent 
+            breadcrumbs={breadcrumbs}
+        />
+    </div>
         <div style={{ maxWidth: '700px', margin: '40px auto', padding: '40px', backgroundColor: '#fff', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)' }}>
             <h2 style={{ textAlign: 'center', fontSize: '28px', marginBottom: '30px' }}>
                 Thông tin người dùng
@@ -229,6 +239,7 @@ const ProfilePage = () => {
                 </div>
             </Loading>
         </div>
+    </div>
     )
 }
 

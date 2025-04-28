@@ -1,11 +1,22 @@
 import React from "react";
 import { PolicyContainer, Title, SectionTitle, Content } from "./style";
-
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
+import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 const ChinhSachBanHang = () => {
   return (
+    <ContainerComponent>
+    <BreadcrumbWrapper>
+      {/* Breadcrumb Component */}
+      <BreadcrumbComponent
+        breadcrumbs={[
+          { name: 'Trang chủ', link: '/' },
+          { name: 'Điều khoản dịch vụ', isCurrent: true }
+        ]}
+      />
+    </BreadcrumbWrapper>  
     <PolicyContainer>
       <Title>Chính sách bán hàng</Title>
-      
       <SectionTitle>PHẠM VI ÁP DỤNG</SectionTitle>
       <Content>
         <p>- Chính sách này áp dụng cho tất cả khách hàng mua sắm tại website của chúng tôi.</p>
@@ -25,6 +36,7 @@ const ChinhSachBanHang = () => {
         <p>- Hỗ trợ thanh toán qua ví điện tử và cổng thanh toán trực tuyến.</p>
       </Content>
     </PolicyContainer>
+  </ContainerComponent>
   );
 };
 

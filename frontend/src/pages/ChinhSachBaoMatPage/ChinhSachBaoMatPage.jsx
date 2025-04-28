@@ -1,8 +1,20 @@
 import React from "react";
 import { PrivacyContainer, PrivacyTitle, PrivacyContent } from "./style";
-
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
+import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 const ChinhSachBaoMat = () => {
   return (
+    <ContainerComponent>
+    <BreadcrumbWrapper>
+      {/* Breadcrumb Component */}
+      <BreadcrumbComponent
+        breadcrumbs={[
+          { name: 'Trang chủ', link: '/' },
+          { name: 'Chính sách bảo mật', isCurrent: true }
+        ]}
+      />
+    </BreadcrumbWrapper>  
     <PrivacyContainer>
       <PrivacyTitle>Chính sách bảo mật</PrivacyTitle>
       <PrivacyContent>
@@ -20,6 +32,7 @@ const ChinhSachBaoMat = () => {
         </p>
       </PrivacyContent>
     </PrivacyContainer>
+    </ContainerComponent>
   );
 };
 

@@ -6,6 +6,8 @@ import {orderCardStyle,ProductImage} from "./style.js"; // Giả sử bạn đã
 import pic from "./pic.png"
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent.jsx";
 import { useLocation } from "react-router-dom";
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
 const { TabPane } = Tabs;
 
 const OrderHistoryPage = () => {
@@ -116,8 +118,25 @@ const OrderHistoryPage = () => {
         return orders.filter((o) => o.status === status);
     };
 
+    const styles = {
+        breadcrumbWrapper: {
+          marginBottom: 20,  // Điều chỉnh khoảng cách nếu cần
+            // Đảm bảo rằng breadcrumb căn chỉnh với navbar
+        },
+      };
+
     return (
         <ContainerComponent>
+
+            <div style={styles.breadcrumbWrapper}>
+                <BreadcrumbComponent
+                        breadcrumbs={[
+                            { name: "Trang chủ", link: "/" },
+                            { name: "Lịch sử mua hàng", isCurrent: true },
+                        ]}
+                    />
+                </div>
+                
             <div style={{ width: '100%' }}>
                 <h2 style={{ marginBottom: 16 }}>Đơn hàng của bạn</h2>
                 <Tabs defaultActiveKey="1" type="line">

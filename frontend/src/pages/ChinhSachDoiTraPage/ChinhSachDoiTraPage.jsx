@@ -1,12 +1,23 @@
 import React from "react";
 import { PolicyContainer, Title, SectionTitle, Content } from "./style";
-
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
+import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 
 const ReturnPolicyPage = () => {
   return (
+    <ContainerComponent>
+    <BreadcrumbWrapper>
+      {/* Breadcrumb Component */}
+      <BreadcrumbComponent
+        breadcrumbs={[
+          { name: 'Trang chủ', link: '/' },
+          { name: 'Chính sách đổi trả', isCurrent: true }
+        ]}
+      />
+    </BreadcrumbWrapper>  
       <PolicyContainer>
         <Title>Chính sách đổi trả</Title>
-
         <SectionTitle>1. Điều kiện đổi trả</SectionTitle>
         <Content>
           <p>* Khách hàng có thể đổi trả sản phẩm trong vòng 7 ngày kể từ ngày nhận hàng.</p>
@@ -23,7 +34,7 @@ const ReturnPolicyPage = () => {
           <p>Nếu có thắc mắc, vui lòng liên hệ với bộ phận chăm sóc khách hàng để được hỗ trợ.</p>
         </Content>
       </PolicyContainer>
-
+    </ContainerComponent>
   );
 };
 

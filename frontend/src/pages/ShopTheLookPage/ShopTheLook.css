@@ -327,3 +327,9 @@
     margin-bottom: 5px;
   }
 }
+.breadcrumb-wrapper {
+  padding-top: 0;
+  padding-left: 0;
+  margin-top: -16px;
+  margin-left: -12px;
+}

@@ -4,7 +4,7 @@ import { InputNumber, Checkbox as AntCheckbox } from 'antd';
 export const PageContainer = styled.div`
   background: #f8f9fa;
   min-height: 100vh;
-  padding: 40px 0;
+  padding: 10px 0;
 `;
 
 export const ContentContainer = styled.div`

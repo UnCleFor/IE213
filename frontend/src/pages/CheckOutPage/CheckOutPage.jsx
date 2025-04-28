@@ -13,6 +13,8 @@ import Loading from '../../components/LoadingComponent/Loading'
 import { useNavigate } from "react-router-dom";
 import * as message from '../../components/Message/Message';
 import { orderConstant } from "../../constant";
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
 
 const { Title, Text } = Typography;
 
@@ -116,6 +118,13 @@ const CheckoutPage = () => {
     <ContainerComponent>
       <Loading isLoading = {isLoadingAddOrder}>
         <OrderDetailWrapper>
+        <BreadcrumbComponent
+            breadcrumbs={[
+              { name: 'Trang chủ', link: '/' },
+              { name: 'Giỏ hàng', link: '/order' },
+              { name: 'Thanh toán', isCurrent: true }
+            ]}
+          />  
           <Title level={3}>Thanh toán</Title>
           <Form form={form} layout="vertical">
             {/* Thông tin người nhận */}
@@ -237,7 +246,6 @@ const CheckoutPage = () => {
           </Form>
         </OrderDetailWrapper>
       </Loading>
-
     </ContainerComponent>
   );
 };

@@ -40,6 +40,8 @@ import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { convertPrice } from '../../utils';
 import { useNavigate } from "react-router-dom";
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
 
 const OrderPage = () => {
   const order = useSelector((state) => state.order);
@@ -132,9 +134,25 @@ const OrderPage = () => {
     navigate('/checkout')
   }
 
+  const styles = {
+    breadcrumbWrapper: {
+      marginBottom: 20,  // Điều chỉnh khoảng cách nếu cần
+      marginLeft: '20px',  // Căn giữa nếu cần
+      marginRight: 'auto',  // Căn giữa nếu cần
+    },
+  };
   return (
     <PageContainer>
       <ContentContainer>
+      <div style={styles.breadcrumbWrapper}>
+                <BreadcrumbComponent
+                        breadcrumbs={[
+                            { name: "Trang chủ", link: "/" },
+                            { name: "Giỏ hàng", isCurrent: true },
+                        ]}
+                    />
+          </div>
+
         <CartTitle>Giỏ hàng của bạn</CartTitle>
 
         {order?.orderItems?.length > 0 ? (

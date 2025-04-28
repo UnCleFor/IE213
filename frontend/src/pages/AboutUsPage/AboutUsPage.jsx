@@ -1,9 +1,20 @@
 import React from "react";
 import { AboutContainer, AboutContent, AboutTitle } from "./style";
-
-
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
+import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 const AboutUs = () => {
   return (
+    <ContainerComponent>
+      <BreadcrumbWrapper>
+        {/* Breadcrumb Component */}
+        <BreadcrumbComponent
+          breadcrumbs={[
+            { name: 'Trang chủ', link: '/' },
+            { name: 'Về Chúng Tôi', isCurrent: true }
+          ]}
+        />
+      </BreadcrumbWrapper>
     <AboutContainer>
       <AboutTitle>Về Chúng Tôi</AboutTitle>
       <AboutContent>
@@ -27,6 +38,7 @@ const AboutUs = () => {
         </p>
       </AboutContent>
     </AboutContainer>
+    </ContainerComponent>
   );
 };
 

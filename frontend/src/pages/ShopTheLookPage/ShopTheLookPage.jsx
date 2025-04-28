@@ -5,6 +5,7 @@ import './ShopTheLook.css';
 import pic from "./pic.png";
 import phong from "./phong 1.jpg";
 import ContainerComponent from '../../components/ContainerComponent/ContainerComponent';
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
 
 const ShopTheLook = () => {
   const [selectedLook, setSelectedLook] = useState(0);
@@ -79,10 +80,20 @@ const ShopTheLook = () => {
     e.stopPropagation();
     setActiveProduct(productId === activeProduct ? null : productId);
   };
-
+  const breadcrumbs = [
+    { name: 'Trang chủ', link: '/' },
+    { name: 'Shop the look', link: '/shop-the-look', isCurrent: true },
+];
   return (
     <ContainerComponent>
- <div className="shop-the-look-container">
+    <div className="shop-the-look-container">
+      <div className="breadcrumb-wrapper">
+        <BreadcrumbComponent 
+          breadcrumbs={breadcrumbs} 
+          className="breadcrumb-adjust" 
+        />
+      </div>
+
       {/* Header */}
       <div className="shop-the-look-header">
         <h1>SHOP THE LOOK</h1>

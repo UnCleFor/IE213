@@ -4,6 +4,8 @@ import ContainerComponent from "../../components/ContainerComponent/ContainerCom
 import { OrderDetailWrapper } from "./style.js";
 import pic from "./pic.png"
 import { useLocation } from "react-router-dom";
+import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
 
 const { Title, Text } = Typography;
 
@@ -28,6 +30,13 @@ const OrderDetailPage = ({ orderId }) => {
   return (
     <ContainerComponent>
       <OrderDetailWrapper>
+      <BreadcrumbComponent
+            breadcrumbs={[
+              { name: 'Trang chủ', link: '/' },
+              { name: 'Lịch sử mua hàng', link: '/order_history' },
+              { name: 'Chi tiết đơn hàng', isCurrent: true }
+            ]}
+          />  
       <div style={{ width: "100%" }}>
         <Title level={3} style={{ marginBottom: 16 }}>
           Chi tiết đơn hàng #{orderDetail.id}
