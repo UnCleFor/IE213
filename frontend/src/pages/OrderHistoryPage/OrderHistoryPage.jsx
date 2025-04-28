@@ -232,8 +232,10 @@ const OrderHistoryPage = () => {
                 return "blue";
             case "Đã xác nhận":
                 return "green";
+            case "Đang giao hàng":
+                return "green";
             case "Đã giao hàng":
-                return "purple";
+                return "orange";
             case "Đã hủy":
                 return "red";
             default:
@@ -282,6 +284,9 @@ const OrderHistoryPage = () => {
                     </TabPane>
                     <TabPane tab="Đã xác nhận" key="3">
                         {getOrdersByState("Đã xác nhận").map(renderOrder)}
+                    </TabPane>
+                    <TabPane tab="Đang giao hàng" key="3">
+                        {getOrdersByState("Đang giao hàng").map(renderOrder)}
                     </TabPane>
                     <TabPane tab="Đã giao hàng" key="4">
                         {getOrdersByState("Đã giao hàng").map(renderOrder)}
