@@ -48,6 +48,27 @@ const sendEmailCreateOrder = async (email, orderItems, totalPrice, totalDiscount
         `, // html body
     });
 }
+
+const sendOTPEmail = async ({ to, subject, text }) => {
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.MAIL_ACCOUNT,
+            pass: process.env.MAIL_PASSWORD,
+        },
+    });
+
+    await transporter.sendMail({
+        from: `"BeautyHome" <${process.env.MAIL_ACCOUNT}>`,
+        to: to,
+        subject,
+        text,
+    });
+};
+
 module.exports = {
-    sendEmailCreateOrder
+    sendEmailCreateOrder,
+    sendOTPEmail
 }
