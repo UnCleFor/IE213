@@ -118,6 +118,7 @@ const ForgotPasswordPage = () => {
                                 disabled={!email}
                                 onClick={handleSendOTP}
                                 size="large"
+                                loading={loading}
                                 styleButton={{
                                     backgroundColor: 'brown',
                                     padding: '10px',
@@ -202,6 +203,7 @@ const ForgotPasswordPage = () => {
                                 disabled={!newPassword || !confirmPassword}
                                 onClick={handleResetPassword}
                                 size="large"
+                                loading={loading}
                                 styleButton={{
                                     backgroundColor: 'brown',
                                     padding: '10px',

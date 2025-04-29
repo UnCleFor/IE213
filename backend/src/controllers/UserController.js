@@ -329,6 +329,20 @@ const resetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
 
+        // Kiểm tra có đủ thông tin không
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({ status: 'ERR', message: 'Thiếu thông tin yêu cầu' });
+        }
+
+        // Ràng buộc độ mạnh của mật khẩu
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            return res.status(400).json({
+                status: 'ERR',
+                message: 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt'
+            });
+        }
+
         // Tìm user theo email
         const user = await UserModel.findOne({ email });
 
