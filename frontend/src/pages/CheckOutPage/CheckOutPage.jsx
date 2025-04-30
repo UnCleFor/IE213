@@ -7,13 +7,14 @@ import { useMutationHooks } from "../../hooks/useMutationHook";
 import * as OrderService from "../../services/OrderService"
 import * as UserService from "../../services/UserService"
 import { useSelector } from "react-redux";
-import { convertPrice } from "../../utils";
+import { convertPrice, convertVNDToUSD } from "../../utils";
 import Loading from '../../components/LoadingComponent/Loading'
 import { useNavigate } from "react-router-dom";
 import * as message from '../../components/Message/Message';
 import { orderConstant } from "../../constant";
 import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
 import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
+import PayPalButtonComponent from "../../components/PaypalButtonComponent/PaypalButtonComponent";
 
 const { Title, Text } = Typography;
 
@@ -102,19 +103,17 @@ const CheckoutPage = () => {
     });
   }
 
-  console.log('order', order)
-
   return (
     <ContainerComponent>
       <Loading isLoading={isLoadingAddOrder}>
         <OrderDetailWrapper>
-        <BreadcrumbComponent
+          <BreadcrumbComponent
             breadcrumbs={[
               { name: 'Trang chủ', link: '/' },
               { name: 'Giỏ hàng', link: '/order' },
               { name: 'Thanh toán', isCurrent: true }
             ]}
-          />  
+          />
           <Title level={3}>Thanh toán</Title>
           <Form form={form} layout="vertical">
             {/* Thông tin người nhận */}
@@ -216,29 +215,37 @@ const CheckoutPage = () => {
 
             {/* Nút đặt hàng */}
             <Row justify="end">
-              <ButtonComponent
-                onClick={() => { handleAddOrder() }}
-                size="large"
-                styleButton={{
-                  backgroundColor: 'brown',
-                  padding: '12px 28px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                  marginBottom: '10px'
-                }}
-                styleTextButton={{
-                  color: 'white',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                }}
-                textButton="THANH TOÁN"
-              />
+              {payment === "paypal" ? (
+                <PayPalButtonComponent
+                  amount={convertVNDToUSD(total)}
+                  onSuccess={() => {
+                    handleAddOrder();  // Thực hiện hành động khi thanh toán thành công
+                  }}
+                />
+              ) : (
+                <ButtonComponent
+                  onClick={() => { handleAddOrder() }}
+                  size="large"
+                  styleButton={{
+                    backgroundColor: 'brown',
+                    padding: '12px 28px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    marginBottom: '10px',
+                  }}
+                  styleTextButton={{
+                    color: 'white',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                  }}
+                  textButton="ĐẶT HÀNG"
+                />
+              )}
             </Row>
           </Form>
         </OrderDetailWrapper>
       </Loading>
-
     </ContainerComponent>
   );
 };

@@ -62,3 +62,8 @@ export const convertPrice = (price) => {
     return null
   }
 }
+
+export const convertVNDToUSD = (vnd) => {
+  const exchangeRate = 25000; // hoặc dùng tỷ giá thực nếu bạn có API
+  return (vnd / exchangeRate).toFixed(2); // làm tròn 2 chữ số thập phân
+};

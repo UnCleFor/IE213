@@ -38,6 +38,7 @@ const OrderHistoryPage = () => {
     });
 
     console.log('orders', orders)
+    console.log('user.access_token', user.access_token)
 
     const mutationUpdate = useMutationHooks(({ id, token, ...rests }) => {
         return OrderService.updatedOrder(id, rests, token);
@@ -94,7 +95,7 @@ const OrderHistoryPage = () => {
             okText: "Xóa",
             cancelText: "Đóng",
             cancelButtonProps: {
-                className: 'modal-cancel-btn',
+                className: 'modal-cancel-btn'
             },
             okButtonProps: {
                 style: {

@@ -38,12 +38,13 @@ export const getAllOrders = async (access_token) => {
   }
   
 export const updatedOrder = async (id, data, access_token) => {
+  console.log('token nhận được', access_token)
   const res = await axiosJWT.put(
     `${process.env.REACT_APP_API_URL}/order/update/${id}`,
     data,
     {
       headers: {
-        token: `Bearer ${access_token}`,
+        Authorization: `Bearer ${access_token}`,
       },
     }
   );

@@ -4,7 +4,7 @@ dotenv.config()
 
 const authMiddleWare = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
-    //console.log("Token nhận được:", token);
+    console.log("Token nhận được:", token);
   
     jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
       if (err) {

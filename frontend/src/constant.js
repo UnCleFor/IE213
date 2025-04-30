@@ -5,7 +5,6 @@ export const orderConstant = {
       },
       payment: {
         cod: 'Thanh toán khi nhận hàng',
-        bank: 'Chuyển khoản ngân hàng',
-        momo: 'Thanh toán qua Momo'
+        paypal: 'Thanh toán qua Paypal',
       }
 }
