@@ -26,7 +26,7 @@ const TypeProduct = () => {
   console.log('parentLabel:', parentLabel); // In giá trị của parentLabel
   console.log('keyPath:', keyPath);
   const [loading, setLoading] = useState(false)
-
+  const user = useSelector((state) => state.user)
   const { type } = useParams(); 
   const location = useLocation();
   const filterBy = location.state?.filterBy || 'type';
@@ -260,6 +260,9 @@ const TypeProduct = () => {
                     discount={product.discount}
                     size={product.size}
                     colors={product.colors}
+                    countInStock={product.countInStock}
+                    _id = {product._id}
+                    user = {user?.id}
                   />
                 </Col>
               ))

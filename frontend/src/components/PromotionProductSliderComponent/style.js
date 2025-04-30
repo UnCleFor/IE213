@@ -181,7 +181,7 @@ export const SwipeHint = styled.div`
 `;
 export const DiscountBadge = styled.div`
   position: absolute;
-  top: 15px;
+  
   right: 15px;
   background: #ff4d4f;
   color: white;

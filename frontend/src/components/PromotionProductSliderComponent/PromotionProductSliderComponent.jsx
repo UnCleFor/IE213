@@ -18,7 +18,10 @@ import Slider from "react-slick";
 import { useQuery } from '@tanstack/react-query';
 import * as ProductService from '../../services/ProductService';
 import { convertPrice } from '../../utils';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { buyNowProduct } from '../../redux/slices/orderSlide';
+import { useDispatch, useSelector } from 'react-redux';
+import { message } from 'antd';
 
 // Custom arrows
 const NextArrow = ({ onClick }) => (
@@ -30,10 +33,13 @@ const PrevArrow = ({ onClick }) => (
 );
 
 const PromotionProductSliderComponent = () => {
-  const navigate = useNavigate(); // Đã di chuyển vào trong component
+  const navigate = useNavigate(); 
+  const dispatch = useDispatch()
+  const location = useLocation()
+  const user = useSelector((state) => state.user);
   const { data: products } = useQuery({
     queryKey: ['products-promotion'],
-    queryFn: () => ProductService.getAllProduct({ discount: { $gt: 0 } }, 6)
+    queryFn: () => ProductService.getDiscountedProducts(6, 0) 
   });
 
   const handleDetailsProduct = (id) => {
@@ -52,8 +58,29 @@ const PromotionProductSliderComponent = () => {
     prevArrow: <PrevArrow />,
   };
 
-  if (!products?.data) return <div>Loading...</div>;
-
+  if (!products?.data) return <div style={{alignContent:'center'}}>Loading...</div>;
+  const handleBuyNow = (product) => {
+    if (!user?.id) {
+      navigate('/sign_in', { state: location?.pathname });
+      message.warning('Vui lòng đăng nhập để mua hàng');
+    } else if (product.countInStock === 0) {
+      message.error('Sản phẩm đã hết hàng');
+    } else {
+      dispatch(buyNowProduct({
+        orderItem: {
+          name: product.name,
+          amount: 1,
+          image: product.image,
+          price: product.price,
+          product: product._id,
+          discount: product.discount,
+          countInStock: product.countInStock
+        }
+      }));
+      navigate('/checkout'); 
+     
+    }
+  };
   return (
     <SliderWrapper>
       <Slider {...settings}>
@@ -61,14 +88,12 @@ const PromotionProductSliderComponent = () => {
           <div key={product._id}>
             <PromotionWrapper>
               <ProductImage src={product.image} alt={product.name} />
-              {product.discount > 0 && (
-                <DiscountBadge>-{product.discount}%</DiscountBadge>
-              )}
+
               
               <ProductInfo>
                 <ProductName>{product.name}</ProductName>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  <ProductPrice>{convertPrice(product.price * (1 - product.discount/100))}</ProductPrice>
+                  <ProductPrice>{convertPrice(product.price * (1 - product.discount/100))} (-{product.discount}%)</ProductPrice>
                   {product.discount > 0 && (
                     <span style={{ 
                       textDecoration: 'line-through', 
@@ -105,7 +130,7 @@ const PromotionProductSliderComponent = () => {
                 </InfoTable>
 
                 <ActionsWrapper>
-                  <button>Mua ngay</button>
+                <button onClick={() => handleBuyNow(product)}>Mua ngay</button>
                   <button 
                     onClick={() => handleDetailsProduct(product._id)} // Sửa thành arrow function
                   >

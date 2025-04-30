@@ -158,12 +158,12 @@ const HomePage = () => {
       </ContainerComponent>
 
       {/* Sản phẩm bán chạy */}
-      <ContainerComponent>
+      {/* <ContainerComponent>
         <SectionWrapper>
           <SectionTitle>Sản Phẩm Bán Chạy</SectionTitle>
           <ProductSliderComponent limit={limit} />
         </SectionWrapper>
-      </ContainerComponent>
+      </ContainerComponent> */}
 
       {/* Sản phẩm khuyến mãi */}
       <ContainerComponent>
@@ -180,7 +180,7 @@ const HomePage = () => {
       <ContainerComponent>
         <SectionWrapper>
           <SectionTitle>Sản Phẩm Mới Về</SectionTitle>
-          <ProductSliderComponent limit={limit}/>
+          <ProductSliderComponent type='newest' limit={limit}/>
         </SectionWrapper>
       </ContainerComponent>
 

@@ -23,4 +23,8 @@ router.get('/colors', ProductController.getAllColors);
 
 router.get('/filter', ProductController.filterProducts);
 
+router.get("/get-newest", ProductController.getNewestProducts)
+
+router.get("/get-discounted", ProductController.getDiscountedProducts)
+
 module.exports = router

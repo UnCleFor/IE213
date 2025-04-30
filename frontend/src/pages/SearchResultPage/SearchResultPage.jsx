@@ -7,13 +7,14 @@ import CardComponent from "../../components/CardComponent/CardComponent";
 import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 import { Typography, Pagination } from "antd"
 import LoadingComponent from '../../components/LoadingComponent/Loading'
+import { useSelector } from "react-redux";
 
 const SearchResultPage = () => {
   const { state } = useLocation(); // { keyword: 'sofa' }
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const { Title } = Typography;
-
+  const user = useSelector((state) => state.user)
   useEffect(() => {
     if (state?.keyword) {
       fetchProducts();
@@ -55,10 +56,17 @@ const SearchResultPage = () => {
             products.map((product) => (
               <Col key={product._id} xs={12} sm={12} md={8} lg={6}>
                 <CardComponent 
-                  name={product.name}
-                  price={product.price}
-                  image={product.image}
-                  description={product.description} 
+                   name={product.name}
+                   price={product.price}
+                   image={product.image}
+                   description={product.description}
+                   id={product._id}
+                   discount={product.discount}
+                   size={product.size}
+                   colors={product.colors}
+                   countInStock={product.countInStock}
+                   _id = {product._id}
+                   user = {user?.id}
                 />
               </Col>
             ))

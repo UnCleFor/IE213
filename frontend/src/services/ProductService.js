@@ -154,3 +154,12 @@ export const filterProducts = async (filters = {}) => {
     throw error;
   }
 };
+
+export const getDiscountedProducts = async () => {
+  const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-discounted`)
+  return res.data
+}
+export const getNewestProducts = async () => {
+  const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-newest`)
+  return res.data
+}

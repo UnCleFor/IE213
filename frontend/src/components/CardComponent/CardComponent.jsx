@@ -1,84 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Button, Tooltip, Modal } from "antd";
+import { Button, Tooltip, Modal, message } from "antd";
 import { ShoppingCartOutlined, EyeOutlined, HeartOutlined, PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import { StyledCard, CardWrapper, ImageWrapper, HoverActions, WrapperTitle, WrapperPrice, SizeBox, SizeProduct, WrapperQuantity } from "./style";
 import tu_giay from "./tu_giay.webp";
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { convertPrice } from "../../utils";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
+import { addOrderProduct, buyNowProduct } from "../../redux/slices/orderSlide";
+import { useDispatch } from "react-redux";
 
-// const CardComponent = () => {
-//   const [isModalVisible, setIsModalVisible] = useState(false);
 
-//   const showQuickView = () => {
-//     setIsModalVisible(true);
-//   };
-
-//   const handleClose = () => {
-//     setIsModalVisible(false);
-//   };
-
-//   return (
-//     <CardWrapper>
-//       <StyledCard
-//         variant="borderless"
-//         style={{ borderRadius: "0px", boxShadow: "none" }}
-//         cover={
-//           <ImageWrapper style={{ overflow: "hidden", borderRadius: "0px" }}>
-//             <img
-//               alt="product"
-//               src={tu_giay}
-//               style={{ objectFit: "cover", width: "100%", borderRadius: "0px" }}
-//             />
-//             <HoverActions className="hover-actions">
-//               <Tooltip title="Thêm vào giỏ hàng" placement="left">
-//                 <Button shape="circle" icon={<ShoppingCartOutlined />} />
-//               </Tooltip>
-//               <Tooltip title="Xem nhanh" placement="left">
-//                 <Button shape="circle" icon={<EyeOutlined />} onClick={showQuickView} />
-//               </Tooltip>
-//               <Tooltip title="Yêu thích" placement="left">
-//                 <Button shape="circle" icon={<HeartOutlined />} />
-//               </Tooltip>
-//             </HoverActions>
-//           </ImageWrapper>
-//         }
-//       >
-//         <WrapperTitle>Teddy - Tủ để giày</WrapperTitle>
-//         <WrapperPrice>10,188,000đ</WrapperPrice>
-//       </StyledCard>
-
-//       {/* Modal Xem nhanh */}
-//       <Modal
-//         title="Teddy - Tủ để giày"
-//         open={isModalVisible}
-//         onCancel={handleClose}
-//         footer={[
-//           <Button key="add-cart" type="default" icon={<ShoppingCartOutlined />}>
-//             Thêm vào giỏ
-//           </Button>,
-//           <Button key="buy-now" type="primary" style={{ backgroundColor: 'brown', borderColor: 'brown' }}>
-//             Mua ngay
-//           </Button>,
-//         ]}
-//       >
-//         <img src={tu_giay} alt="product" style={{ width: '100%', marginBottom: 16 }} />
-//         <p><strong>Giá:</strong> 10,188,000đ</p>
-//         <p><strong>Mô tả:</strong> Tủ giày hiện đại phù hợp với mọi không gian nội thất.</p>
-//       </Modal>
-//     </CardWrapper>
-//   );
-// };
-
-const CardComponent = ({ name, price, image, description, id, discount = 0, size, colors }) => {
+const CardComponent = ({ name, price, image, description, id, discount = 0, size, colors,countInStock,_id ,user }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const showQuickView = () => setIsModalVisible(true);
-  const handleClose = () => setIsModalVisible(false);
-
+  const location = useLocation()
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(null);
+  const showQuickView = () => setIsModalVisible(true);
+  const handleClose = () => {setIsModalVisible(false); setQuantity(1);}
   useEffect(() => {
     // Mặc định chọn màu đầu tiên trong mảng màu nếu có
     if (colors && colors.length > 0) {
@@ -89,8 +29,12 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
     navigate(`/product_details/${id}`)
   }
   const handleIncrease = () => {
-    setQuantity(prev => prev + 1);
-  };
+          if (countInStock > quantity) {
+              setQuantity(prev => prev + 1);
+          } else {
+              message.warning('Số lượng mua vượt quá số lượng tồn kho');
+          }
+      };
 
 
   const handleDecrease = () => {
@@ -98,6 +42,69 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
       setQuantity(prev => prev - 1);
     }
   };
+  const handleAddOrderProduct = () => {
+    console.log(user)
+          if (!user) {
+              navigate('/sign_in', { state: location?.pathname })
+          } else if (countInStock === 0) {
+              message.error('Sản phẩm đã hết hàng');
+          } else {
+              dispatch(addOrderProduct({
+                  orderItem: {
+                      name: name,
+                      amount: quantity,
+                      image: image,
+                      price: price,
+                      product: _id,
+                      discount: discount,
+                      countInStock: countInStock
+                  }
+              }))
+              message.success('Thêm vào giỏ hàng thành công');
+          }
+      }
+      const handleAddOrderOneProduct = () => {
+        console.log(user)
+              if (!user) {
+                  navigate('/sign_in', { state: location?.pathname })
+              } else if (countInStock === 0) {
+                  message.error('Sản phẩm đã hết hàng');
+              } else {
+                  dispatch(addOrderProduct({
+                      orderItem: {
+                          name: name,
+                          amount: 1,
+                          image: image,
+                          price: price,
+                          product: _id,
+                          discount: discount,
+                          countInStock: countInStock
+                      }
+                  }))
+                  message.success('Thêm vào giỏ hàng thành công');
+              }
+          }
+  
+      const handleBuyNow = () => {
+          if (!user) {
+              navigate('/sign_in', { state: location?.pathname })
+          } else if (countInStock === 0) {
+              message.error('Sản phẩm đã hết hàng');
+          } else {
+              dispatch(buyNowProduct({
+                  orderItem: {
+                      name: name,
+                      amount: quantity,
+                      image: image,
+                      price: price,
+                      product: _id,
+                      discount: discount,
+                      countInStock: countInStock
+                  }
+              }))
+              navigate('/checkout')
+          }
+      }
   return (
     <CardWrapper>
       <StyledCard
@@ -135,7 +142,11 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
               <Tooltip title="Thêm vào giỏ hàng" placement="left">
                 <Button
                   shape="circle"
-                  icon={<ShoppingCartOutlined />} />
+                  icon={<ShoppingCartOutlined />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddOrderOneProduct();
+                  }} />
               </Tooltip>
               <Tooltip title="Xem nhanh" placement="left">
                 <Button
@@ -180,10 +191,10 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
         onCancel={handleClose}
         width={800} // Increased width to accommodate two columns
         footer={[
-          <Button key="add-cart" type="default" icon={<ShoppingCartOutlined />}>
+          <Button onClick={handleAddOrderProduct} key="add-cart" type="default" icon={<ShoppingCartOutlined />}>
             Thêm vào giỏ
           </Button>,
-          <Button key="buy-now" type="primary" style={{ backgroundColor: 'brown', borderColor: 'brown' }}>
+          <Button onClick={handleBuyNow} key="buy-now" type="primary" style={{ backgroundColor: 'brown', borderColor: 'brown' }}>
             Mua ngay
           </Button>,
         ]}
@@ -205,6 +216,7 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
 
           {/* Right Column - Product Details */}
           <div style={{ flex: 1 }}>
+          <p><strong>Số lượng còn lại:</strong> {countInStock}</p>
             <SizeProduct>
               {size && (
                 <>

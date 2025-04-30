@@ -218,7 +218,40 @@ const filterProducts = async (req, res) => {
     }
   };
   
-
+  const getNewestProducts = async (req, res) => {
+    try {
+        const { limit, page } = req.query;
+        const response = await ProductService.getNewestProducts(
+            limit ? Number(limit) : null,
+            page ? Number(page) : 0
+        );
+        
+        return res.status(200).json(response);
+    } catch (e) {
+        console.error('Error in getNewestProducts:', e);
+        return res.status(404).json({
+            status: 'ERR',
+            message: e.message || 'Lỗi khi lấy sản phẩm mới nhất'
+        });
+    }
+};
+const getDiscountedProducts = async (req, res) => {
+    try {
+        const { limit, page } = req.query;
+        const response = await ProductService.getDiscountedProducts(
+            limit ? Number(limit) : null,
+            page ? Number(page) : 0
+        );
+        
+        return res.status(200).json(response);
+    } catch (e) {
+        console.error('Error in getDiscountedProducts:', e);
+        return res.status(404).json({
+            status: 'ERR',
+            message: e.message || 'Lỗi khi lấy sản phẩm giảm giá'
+        });
+    }
+};
 module.exports = {
     createProduct,
     updateProduct,
@@ -229,5 +262,7 @@ module.exports = {
     deleteManyProduct,
     searchProducts,
     getAllColors,
-    filterProducts
+    filterProducts,
+    getDiscountedProducts,
+    getNewestProducts
 }

@@ -360,7 +360,65 @@ const filterProducts = async (filters) => {
 
   return products;
 };  
-  
+const getNewestProducts = (limit, page) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const totalProduct = await Product.countDocuments();
+            const objectSort = { createdAt: -1 }; // -1 để sắp xếp từ mới nhất đến cũ nhất
+            
+            let products;
+            if (!limit) {
+                products = await Product.find().sort(objectSort);
+            } else {
+                products = await Product.find()
+                    .sort(objectSort)
+                    .limit(limit)
+                    .skip(page * limit);
+            }
+            
+            resolve({
+                status: 'OK',
+                message: 'Lấy sản phẩm mới nhất thành công',
+                data: products,
+                total: totalProduct,
+                pageCurrent: Number(page + 1),
+                totalPage: limit ? Math.ceil(totalProduct / limit) : 1
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+const getDiscountedProducts = (limit, page) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Chỉ đếm sản phẩm có discount > 0
+            const totalProduct = await Product.countDocuments({ discount: { $gt: 0 } });
+            const objectSort = { discount: -1 }; // -1 để sắp xếp từ cao nhất đến thấp nhất
+            
+            let products;
+            if (!limit) {
+                products = await Product.find({ discount: { $gt: 0 } }).sort(objectSort);
+            } else {
+                products = await Product.find({ discount: { $gt: 0 } })
+                    .sort(objectSort)
+                    .limit(limit)
+                    .skip(page * limit);
+            }
+            
+            resolve({
+                status: 'OK',
+                message: 'Lấy sản phẩm giảm giá thành công',
+                data: products,
+                total: totalProduct,
+                pageCurrent: Number(page + 1),
+                totalPage: limit ? Math.ceil(totalProduct / limit) : 1
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
 module.exports = {
     createProduct,
     updateProduct,
@@ -371,5 +429,7 @@ module.exports = {
     deleteManyProduct,
     searchProducts,
     getAllColors,
-    filterProducts
+    filterProducts,
+    getNewestProducts,
+    getDiscountedProducts
 }
