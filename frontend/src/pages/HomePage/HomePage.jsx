@@ -4,6 +4,15 @@ import ContainerComponent from '../../components/ContainerComponent/ContainerCom
 import slider1 from '../../assets/images/slide1.webp';
 import slider2 from '../../assets/images/slide2.webp';
 import slider3 from '../../assets/images/slide3.webp';
+import slider4 from '../../assets/images/slide4.jpeg';
+import slider5 from '../../assets/images/slide5.jpeg';
+import img1 from '../../assets/images/img1.jpeg';
+import img2 from '../../assets/images/img2.jpeg';
+import img3 from '../../assets/images/img3.jpeg';
+import img4 from '../../assets/images/img4.jpeg';
+import img5 from '../../assets/images/img5.jpeg';
+import img6 from '../../assets/images/img6.jpeg';
+
 import ProductSliderComponent from '../../components/ProductSliderComponent/ProductSliderComponent';
 import PromotionProductSliderComponent from '../../components/PromotionProductSliderComponent/PromotionProductSliderComponent';
 import * as ProductService from '../../services/ProductService';
@@ -41,18 +50,18 @@ const HomePage = () => {
   const [typeProducts, setTypeProducts] = useState([]);
   const [isScrolled, setIsScrolled] = useState(false);
   const categories = [
-    { id: 1, name: 'Phòng khách', image: slider1},
-    { id: 2, name: 'Phòng ăn', image: slider2},
-    { id: 3, name: 'Phòng ngủ', image: slider3},
-    { id: 4, name: 'Phòng làm việc', image: slider1 },
-    { id: 5, name: 'Trang trí nhà cửa', image: slider1 }
+    { id: 1, name: 'Phòng khách', image: slider3 },
+    { id: 2, name: 'Phòng ăn', image: slider1 },
+    { id: 3, name: 'Phòng ngủ', image: slider2 },
+    { id: 4, name: 'Phòng làm việc', image: slider5 },
+    { id: 5, name: 'Trang trí nhà cửa', image: slider4 }
   ];
 
   const navigate = useNavigate();
   const handleNavigateRoom = (name) => {
     return () => { // Trả về một hàm mới
       if (name) {
-        navigate(`/product/${name}`,{state: {filterBy: 'room' }});
+        navigate(`/product/${name}`, { state: { filterBy: 'room' } });
       }
     };
   };
@@ -64,7 +73,7 @@ const HomePage = () => {
         setIsScrolled(false);
       }
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -76,28 +85,32 @@ const HomePage = () => {
     return res;
   };
 
-  const [limit, setLimit] = useState(10); 
+  const [limit, setLimit] = useState(10);
   const testimonials = [
     { id: 1, name: 'Ngọc Anh', comment: 'Nội thất đẹp, chất lượng tốt, lắp đặt chuyên nghiệp!', rating: 5 },
     { id: 2, name: 'Minh Tuấn', comment: 'Thiết kế hiện đại, đúng như hình ảnh, giao hàng đúng hẹn.', rating: 5 },
     { id: 3, name: 'Thanh Hà', comment: 'Rất hài lòng với dịch vụ và sản phẩm của cửa hàng.', rating: 4 }
   ];
 
-  const instagramPosts = Array(6).fill().map((_, i) => ({ id: i + 1, image: i % 2 === 0 ? slider2 : slider3 }));
+  const images = [img1, img2, img3, img4, img5, img6];
+  const instagramPosts = images.map((image, i) => ({
+    id: i + 1,
+    image: image
+  }));
 
   return (
     <div style={{ overflowX: 'hidden' }}>
       {/* Hero Banner */}
       <HeroSection>
-        <SliderComponent 
-          arrImages={[slider1, slider2, slider3]} 
-          autoPlay={true} 
+        <SliderComponent
+          arrImages={[slider1, slider2, slider3]}
+          autoPlay={true}
           interval={5000}
         />
         <HeroContent>
           <HeroTitle>The Beauté Home</HeroTitle>
           <HeroSubtitle>Tôn vinh vẻ đẹp trong từng không gian sống</HeroSubtitle>
-          
+
         </HeroContent>
       </HeroSection>
 
@@ -180,28 +193,28 @@ const HomePage = () => {
       <ContainerComponent>
         <SectionWrapper>
           <SectionTitle>Sản Phẩm Mới Về</SectionTitle>
-          <ProductSliderComponent type='newest' limit={limit}/>
+          <ProductSliderComponent type='newest' limit={limit} />
         </SectionWrapper>
       </ContainerComponent>
 
       {/* Phản hồi khách hàng */}
       <NewsletterSection>
-      <ContainerComponent>
-        <TestimonialSection>
-          <SectionTitle>Khách Hàng Nói Về Chúng Tôi</SectionTitle>
-          <div style={{ display: 'flex', gap: '20px', overflowX: 'auto', padding: '20px 0' }}>
-            {testimonials.map(testimonial => (
-              <TestimonialCard key={testimonial.id}>
-                <div className="rating">
-                  {'★'.repeat(testimonial.rating)}{'☆'.repeat(5 - testimonial.rating)}
-                </div>
-                <p className="comment">"{testimonial.comment}"</p>
-                <p className="name">- {testimonial.name}</p>
-              </TestimonialCard>
-            ))}
-          </div>
-        </TestimonialSection>
-      </ContainerComponent>
+        <ContainerComponent>
+          <TestimonialSection>
+            <SectionTitle>Khách Hàng Nói Về Chúng Tôi</SectionTitle>
+            <div style={{ display: 'flex', gap: '20px', overflowX: 'auto', padding: '20px 0' }}>
+              {testimonials.map(testimonial => (
+                <TestimonialCard key={testimonial.id}>
+                  <div className="rating">
+                    {'★'.repeat(testimonial.rating)}{'☆'.repeat(5 - testimonial.rating)}
+                  </div>
+                  <p className="comment">"{testimonial.comment}"</p>
+                  <p className="name">- {testimonial.name}</p>
+                </TestimonialCard>
+              ))}
+            </div>
+          </TestimonialSection>
+        </ContainerComponent>
       </NewsletterSection>
       {/* Instagram */}
       <ContainerComponent>
@@ -281,18 +294,18 @@ const CountdownTimer = ({ targetDate }) => {
   }, [targetDate]);
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      gap: '15px', 
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '15px',
       margin: '20px 0',
       fontFamily: 'sans-serif'
     }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ 
-          backgroundColor: '#8B4513', 
-          color: 'white', 
-          padding: '10px', 
+        <div style={{
+          backgroundColor: '#8B4513',
+          color: 'white',
+          padding: '10px',
           borderRadius: '5px',
           fontSize: '24px',
           fontWeight: 'bold',
@@ -303,10 +316,10 @@ const CountdownTimer = ({ targetDate }) => {
         <div style={{ fontSize: '12px', marginTop: '5px' }}>Ngày</div>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ 
-          backgroundColor: '#8B4513', 
-          color: 'white', 
-          padding: '10px', 
+        <div style={{
+          backgroundColor: '#8B4513',
+          color: 'white',
+          padding: '10px',
           borderRadius: '5px',
           fontSize: '24px',
           fontWeight: 'bold',
@@ -317,10 +330,10 @@ const CountdownTimer = ({ targetDate }) => {
         <div style={{ fontSize: '12px', marginTop: '5px' }}>Giờ</div>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ 
-          backgroundColor: '#8B4513', 
-          color: 'white', 
-          padding: '10px', 
+        <div style={{
+          backgroundColor: '#8B4513',
+          color: 'white',
+          padding: '10px',
           borderRadius: '5px',
           fontSize: '24px',
           fontWeight: 'bold',
@@ -331,10 +344,10 @@ const CountdownTimer = ({ targetDate }) => {
         <div style={{ fontSize: '12px', marginTop: '5px' }}>Phút</div>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ 
-          backgroundColor: '#8B4513', 
-          color: 'white', 
-          padding: '10px', 
+        <div style={{
+          backgroundColor: '#8B4513',
+          color: 'white',
+          padding: '10px',
           borderRadius: '5px',
           fontSize: '24px',
           fontWeight: 'bold',
