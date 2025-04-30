@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Typography, Select, InputNumber, Pagination, Slider } from 'antd';
+import { Row, Col, Typography, Select, InputNumber, Pagination, Slider, Breadcrumb } from 'antd';
 import axios from 'axios';
 import CardComponent from '../../components/CardComponent/CardComponent';
 import ContainerComponent from '../../components/ContainerComponent/ContainerComponent';
@@ -11,6 +11,7 @@ import { current } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
 import { useDebounce } from '../../hooks/useDebounce';
 import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import BreadCrumbForType from "../../components/BreadCrumbForType/BreadCrumbForType";
 
 const { Option } = Select;
 const { Title } = Typography;

@@ -317,14 +317,9 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
               </div>
             </WrapperQuantity>
           </div>
-
-
-
         </div>
       </Modal>
     </CardWrapper>
   );
 };
-
-
 export default CardComponent;

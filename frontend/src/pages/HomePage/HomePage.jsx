@@ -230,7 +230,7 @@ const HomePage = () => {
               <h3>Nhận Ưu Đãi Đặc Biệt</h3>
               <p>Đăng ký để nhận thông tin mới nhất và khuyến mãi từ chúng tôi</p>
             </div>
-            <NewsletterForm>
+            {/* <NewsletterForm>
               <input type="email" placeholder="Nhập email của bạn" />
               <ButtonComponent
                 textButton="Đăng ký"
@@ -242,7 +242,7 @@ const HomePage = () => {
                 }}
                 styleTextButton={{ color: 'white' }}
               />
-            </NewsletterForm>
+            </NewsletterForm> */}
           </div>
         </ContainerComponent>
       </NewsletterSection>

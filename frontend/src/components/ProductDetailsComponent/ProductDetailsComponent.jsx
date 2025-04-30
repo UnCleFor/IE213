@@ -7,7 +7,7 @@ import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import ButtonComponent from '../ButtonComponent/ButtonComponent'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { addOrderProduct } from '../../redux/slices/orderSlide'
+import { addOrderProduct, buyNowProduct } from '../../redux/slices/orderSlide'
 import * as ProductService from '../../services/ProductService'
 import { useQuery } from '@tanstack/react-query'
 import LikeButtonComponent from '../LikeButtonComponent/LikeButtonComponent'
@@ -56,7 +56,11 @@ const ProductDetailsComponent = ({ idProduct }) => {
     // })
 
     const handleIncrease = () => {
-        setQuantity(prev => prev + 1);
+        if (productDetails?.countInStock > quantity) {
+            setQuantity(prev => prev + 1);
+        } else {
+            message.warning('Số lượng mua vượt quá số lượng tồn kho');
+        }
     };
 
     console.log('location', location)
@@ -70,25 +74,13 @@ const ProductDetailsComponent = ({ idProduct }) => {
     const handleAddOrderProduct = () => {
         if (!user?.id) {
             navigate('/sign_in', { state: location?.pathname })
+        } else if (productDetails?.countInStock === 0) {
+            message.error('Sản phẩm đã hết hàng');
         } else {
-            // {
-            //     name: { type: String, required: true },
-            //     amount: { type: Number, required: true },
-            //     image: { type: String, required: true },
-            //     price: { type: Number, required: true },
-            //     // tham chiếu đến bảng Product
-            //     product: {
-            //         type: mongoose.Schema.Types.ObjectId,
-            //         ref: 'Product',
-            //         required: true,
-            //     },
-            // },
-            // console.log('productDetails', quantity, order.orderItems)
             dispatch(addOrderProduct({
                 orderItem: {
                     name: productDetails?.name,
                     amount: quantity,
-                    //color:selectedColor,
                     image: productDetails?.image,
                     price: productDetails?.price,
                     product: productDetails?._id,
@@ -100,6 +92,26 @@ const ProductDetailsComponent = ({ idProduct }) => {
         }
     }
 
+    const handleBuyNow = () => {
+        if (!user?.id) {
+            navigate('/sign_in', { state: location?.pathname })
+        } else if (productDetails?.countInStock === 0) {
+            message.error('Sản phẩm đã hết hàng');
+        } else {
+            dispatch(buyNowProduct({
+                orderItem: {
+                    name: productDetails?.name,
+                    amount: quantity,
+                    image: productDetails?.image,
+                    price: productDetails?.price,
+                    product: productDetails?._id,
+                    discount: productDetails?.discount,
+                    countInStock: productDetails?.countInStock
+                }
+            }))
+            navigate('/checkout')
+        }
+    }
     useEffect(() => {
         // Mặc định chọn màu đầu tiên trong mảng màu nếu có
         if (productDetails?.colors && productDetails?.colors.length > 0) {
@@ -108,14 +120,16 @@ const ProductDetailsComponent = ({ idProduct }) => {
     }, [productDetails]);
     const breadcrumbs = [
         { name: 'Trang chủ', link: '/' },
-        // { 
-        //   name: productDetails?.room, 
-        //   link: `/product/${productDetails?.room}`
-        // },
-        // {
-        //   name: productDetails?.type,
-        //   link: `/product/${productDetails?.type}`
-        // },
+        { 
+          name: productDetails?.room, 
+          link: `/product/${productDetails?.room}`,
+          navigateOptions: { state: { filterBy: 'room' } }
+        },
+        {
+          name: productDetails?.type,
+          link: `/product/${productDetails?.type}`,
+          navigateOptions: { state: { filterBy: 'type' } }
+        },
         {
           name: productDetails?.name,
           isCurrent: true
@@ -276,6 +290,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                     cursor: 'pointer',
                                 }}
                                 textButton="Mua ngay"
+                                onClick={handleBuyNow}
                                 styleTextButton={{
                                     color: 'white',
                                     fontSize: '16px',

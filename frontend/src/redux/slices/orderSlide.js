@@ -17,7 +17,8 @@ const initialState = {
     isDelivered: false,
     deliveredAt: '',
     isErrorOrder: false,
-    isSucessOrder: false
+    isSucessOrder: false,
+    isBuyNow: false // Thêm trạng thái mua ngay
 }
 
 export const orderSlide = createSlice({
@@ -29,16 +30,21 @@ export const orderSlide = createSlice({
             const itemOrder = state?.orderItems?.find((item) => item?.product === orderItem.product)
             console.log('itemOrder', itemOrder)
             if (itemOrder) {
-                // if (itemOrder.amount <= itemOrder.countInStock){
                 itemOrder.amount += orderItem?.amount
-                // state.isSucessOrder = true
-                // } else {
-                //      state.isErrorOrder = true
-                // }
-            }
-            else {
+            } else {
                 state.orderItems.push(orderItem)
             }
+            state.isBuyNow = false // Đánh dấu không phải mua ngay
+        },
+        // Thêm reducer mới cho chức năng mua ngay
+        buyNowProduct: (state, action) => {
+            const { orderItem } = action.payload
+            // Xóa tất cả sản phẩm hiện có trong giỏ hàng
+            state.orderItems = [orderItem]
+            // Chọn sản phẩm này để thanh toán ngay
+            state.orderItemsSelected = [orderItem]
+            // Đánh dấu là mua ngay
+            state.isBuyNow = true
         },
         increaseAmount: (state, action) => {
             const { idProduct } = action.payload
@@ -91,10 +97,18 @@ export const orderSlide = createSlice({
         },
         resetOrder: () => initialState,
     }
-},
-)
+})
 
 // Action creators are generated for each case reducer function
-export const { addOrderProduct, increaseAmount, decreaseAmount, removeOrderProduct, removeAllOrderProduct, selectedOrder, resetOrder } = orderSlide.actions
+export const { 
+    addOrderProduct, 
+    buyNowProduct, // Thêm action buyNowProduct vào exports
+    increaseAmount, 
+    decreaseAmount, 
+    removeOrderProduct, 
+    removeAllOrderProduct, 
+    selectedOrder, 
+    resetOrder 
+} = orderSlide.actions
 
 export default orderSlide.reducer
