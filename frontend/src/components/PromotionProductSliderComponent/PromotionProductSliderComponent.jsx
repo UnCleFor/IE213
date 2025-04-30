@@ -38,6 +38,10 @@ const PromotionProductSliderComponent = () => {
 
   const handleDetailsProduct = (id) => {
     navigate(`/product_details/${id}`);
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth' // Cuộn mượt
+    });
   };
 
   const settings = {
@@ -104,11 +108,6 @@ const PromotionProductSliderComponent = () => {
                   <button>Mua ngay</button>
                   <button 
                     onClick={() => handleDetailsProduct(product._id)} // Sửa thành arrow function
-                    style={{ 
-                      backgroundColor: 'transparent', 
-                      border: '1px solid #8B4513',
-                      color: '#8B4513'
-                    }}
                   >
                     Xem chi tiết
                   </button>

@@ -89,6 +89,7 @@ export const ActionsWrapper = styled.div`
   flex-wrap: wrap;
 
   button {
+    font-family: 'Roboto', sans-serif;
     background-color: white;
     border: 1px solid #a6836d;
     color: #a6836d;
@@ -98,10 +99,10 @@ export const ActionsWrapper = styled.div`
     cursor: pointer;
     transition: all 0.3s ease;
 
-    &:hover {
-      background-color: #a6836d;
-      color: white;
-    }
+    // &:hover {
+    //   background-color: #a6836d;
+    //   color: white;
+    // }
 
     &:nth-child(2) {
       background-color: #a6836d;

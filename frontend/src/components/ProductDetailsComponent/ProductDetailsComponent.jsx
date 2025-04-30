@@ -164,8 +164,10 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                 </span>
                             </div>
                         )}
+                        {/* Nút chia sẻ - đã điều chỉnh margin */}
+                        <LikeButtonComponent dataHref={"https://developers.facebook.com/docs/plugins/"} />
                     </WrapperStylePriceProduct>
-                    <LikeButtonComponent dataHref={"https://developers.facebook.com/docs/plugins/"} />
+
                     <SizeProduct>
                         <p><strong>Kích thước</strong></p>
                         {productDetails?.size && (
