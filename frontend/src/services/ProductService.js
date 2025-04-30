@@ -102,3 +102,55 @@ export const fetchProductsByName = async (keyword) => {
   );
   return res.data;
 };
+
+// export const filterProducts = async (filters) => {
+//   try {
+//     const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/filter`, {
+//       params: {
+//         colors: filters.colors?.join(','),
+//         minPrice: filters.minPrice,
+//         maxPrice: filters.maxPrice,
+//         sortBy: filters.sortBy,
+//         type: filters.type
+//       }
+//     });
+//     return res.data.data;
+//   } catch (error) {
+//     console.error("Lỗi khi lọc sản phẩm:", error);
+//     throw error;
+//   }
+// };
+
+export const filterProducts = async (filters = {}) => {
+  try {
+    // Chuẩn bị params
+    const params = {
+      ...(filters.colors && { colors: filters.colors }), // Đã được xử lý từ component
+      ...(filters.type && { type: filters.type }),
+      ...(filters.room && { room: filters.room }),      
+      ...(filters.minPrice && { minPrice: filters.minPrice }),
+      ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
+      ...(filters.sortBy && { sortBy: filters.sortBy })
+    };
+
+    console.log('[FRONTEND] Params gửi đi:', params);
+
+    // Gọi API với params đầy đủ
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/filter`, {
+      params
+    });
+
+    if (!res.data?.data) {
+      throw new Error('API trả về dữ liệu không hợp lệ');
+    }
+
+    return res.data.data;
+  } catch (error) {
+    console.error('[FRONTEND ERROR]', {
+      url: `${process.env.REACT_APP_API_URL}/product/filter`,
+      error: error.response?.data || error.message,
+      stack: error.stack
+    });
+    throw error;
+  }
+};

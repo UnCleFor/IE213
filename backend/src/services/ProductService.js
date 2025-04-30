@@ -303,8 +303,63 @@ const searchProducts = async (keyword) => {
         reject(e);
       }
     });
-  };  
-  
+  };
+
+  const getAllColors = () => {
+    return new Promise(async (resolve, reject) => {
+        try {  
+            const allColors = await Product.distinct('colors')
+            return resolve({
+                status: 'OK',
+                message: 'Tìm thành công',
+                data: allColors, 
+            })
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
+const filterProducts = async (filters) => {
+  const { colors, type, room, minPrice, maxPrice, sortBy } = filters;
+
+  const query = {};
+
+  // Lọc theo loại sản phẩm
+  if (type) {
+    query.type = type;
+  }
+  if (room) {
+    query.room = room;
+  }  
+
+  // Lọc theo màu sắc
+  if (colors) {
+    const colorArray = typeof colors === 'string' ? colors.split(',') : colors;
+    query.colors = { $in: colorArray.filter(Boolean) };
+  }
+
+  // Lọc theo giá
+  if (minPrice || maxPrice) {
+    query.price = {};
+    if (minPrice) query.price.$gte = Number(minPrice);
+    if (maxPrice) query.price.$lte = Number(maxPrice);
+  }
+
+  // Sắp xếp
+  const sortOptions = {
+    price_asc: { price: 1 },
+    price_desc: { price: -1 },
+    name_asc: { name: 1 },
+    name_desc: { name: -1 },
+  };
+  const sort = sortOptions[sortBy] || { createdAt: -1 };
+
+  // Thực hiện truy vấn
+  const products = await Product.find(query).sort(sort).lean();
+
+  return products;
+};  
   
 module.exports = {
     createProduct,
@@ -314,5 +369,7 @@ module.exports = {
     getAllProduct,
     getAllType,
     deleteManyProduct,
-    searchProducts
+    searchProducts,
+    getAllColors,
+    filterProducts
 }

@@ -137,6 +137,88 @@ const searchProducts = async (req, res) => {
     }
   };
 
+const getAllColors = async (req, res) => {
+    try {
+        const colors = await ProductService.getAllColors();
+        
+        return res.status(200).json({
+            status: 'OK',
+            data: colors,
+        });
+    } catch (error) {
+        console.error('Lỗi lấy màu sắc:', error);
+        return res.status(500).json({
+            status: 'ERR',
+            message: 'Lỗi server khi lấy danh sách màu sắc'
+        });
+    }
+}; 
+
+const filterProducts = async (req, res) => {
+    try {
+      console.log('[BACKEND] Query nhận được:', req.query);
+      
+      const { colors, type, room, minPrice, maxPrice, sortBy } = req.query;
+      const query = {};
+  
+      // 1. Lọc theo type
+      if (type) {
+        query.type = type;
+      }
+      if (room) {
+        query.room = room;
+      }  
+      // 2. Lọc theo màu (xử lý cả string và array)
+      if (colors) {
+        const colorArray = typeof colors === 'string' ? colors.split(',') : colors;
+        query.colors = { $in: colorArray.filter(Boolean) };
+      }
+  
+      // 3. Lọc theo giá
+      if (minPrice || maxPrice) {
+        query.price = {};
+        if (minPrice) query.price.$gte = Number(minPrice);
+        if (maxPrice) query.price.$lte = Number(maxPrice);
+      }
+  
+      // 4. Sắp xếp
+      const sortOptions = {
+        price_asc: { price: 1 },
+        price_desc: { price: -1 },
+        name_asc: { name: 1 },
+        name_desc: { name: -1 }
+      };
+      const sort = sortOptions[sortBy] || { createdAt: -1 };
+  
+      console.log('[BACKEND] Query cuối cùng:', { query, sort });
+  
+      // 5. Thực hiện query
+      const products = await ProductService.filterProducts(req.query);
+  
+      return res.status(200).json({
+        status: 'OK',
+        data: products,
+        meta: {
+          total: products.length,
+          filters: { colors, type, priceRange: { minPrice, maxPrice } }
+        }
+      });
+  
+    } catch (error) {
+      console.error('[BACKEND ERROR]', {
+        message: error.message,
+        stack: error.stack,
+        query: req.query
+      });
+      return res.status(500).json({
+        status: 'ERR',
+        message: 'Lỗi khi lọc sản phẩm',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  };
+  
+
 module.exports = {
     createProduct,
     updateProduct,
@@ -145,5 +227,7 @@ module.exports = {
     getAllProduct,
     getAllType,
     deleteManyProduct,
-    searchProducts
+    searchProducts,
+    getAllColors,
+    filterProducts
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Typography, Select, InputNumber, Pagination } from 'antd';
+import { Row, Col, Typography, Select, InputNumber, Pagination, Slider } from 'antd';
 import axios from 'axios';
 import CardComponent from '../../components/CardComponent/CardComponent';
 import ContainerComponent from '../../components/ContainerComponent/ContainerComponent';
@@ -11,7 +11,6 @@ import { current } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
 import { useDebounce } from '../../hooks/useDebounce';
 import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
-
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -84,14 +83,69 @@ const TypeProduct = () => {
 
   console.log('filter nè:', filterBy)
 
+  const [colorsAvailable, setColorsAvailable] = useState('');
+  const [colorOptions, setColorOptions] = useState([]);
   const [category, setCategory] = useState(null);
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
   const [sortBy, setSortBy] = useState(null);
-  const handleFilter = () => {
-    console.log("Lọc theo:", { category, minPrice, maxPrice, sortBy });
-    // TODO: gọi API hoặc filter dữ liệu tại đây
+
+  // useEffect(() => {
+  //   const fetchColors = async () => {
+  //     try {
+  //       const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/colors`);
+        
+  //       console.log('API Response:', res.data);
+  //       const colors = Array.isArray(res.data?.data) ? res.data.data : [];
+  //       setColorOptions(colors);
+        
+  //     } catch (err) {
+  //       console.error('Lỗi lấy màu sắc:', err);
+  //       setColorOptions([]);
+  //     }
+  //   };
+  
+  //   fetchColors();
+  // }, []);
+
+  useEffect(() => {
+    const fetchColors = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/colors`);
+  
+        const colorsArray = res.data?.data?.data || [];
+        setColorOptions(colorsArray);
+  
+      } catch (err) {
+        console.error('Lỗi API:', err);
+        setColorOptions([]);
+      }
+    };
+  
+    fetchColors();
+  }, []);
+
+  useEffect(() => {
+    console.log('Color Options:', colorOptions);
+  }, [colorOptions]);
+
+  const handleFilter = async () => {
+    try {
+      setLoading(true);
+      const filtered = await ProductService.filterProducts({
+        colors: colorsAvailable,
+        minPrice,
+        maxPrice,
+        sortBy,
+        [filterBy]: label
+      });
+      setProducts(filtered);
+      setLoading(false)
+    } catch (err) {
+      console.error("Lỗi khi lọc ở typeproduct:", err);
+    }
   };
+   
 
   const breadcrumbs = [
     { name: 'Trang chủ', link: '/' },
@@ -102,6 +156,7 @@ const TypeProduct = () => {
   ];
   
   console.log('breadcrumbs:', breadcrumbs);  // In ra breadcrumbs để kiểm tra kết quả
+
   
   return (
     <ContainerComponent>
@@ -113,34 +168,36 @@ const TypeProduct = () => {
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }} justify="start">
           <Col xs={24} sm={12} md={6}>
             <Select
-              placeholder="Loại sản phẩm"
+              placeholder="Chọn màu sắc"
               style={{ width: '100%' }}
-              onChange={(value) => setCategory(value)}
+              value={colorsAvailable}
+              onChange={(value) => setColorsAvailable(value)}
               allowClear
             >
-              <Option value="sofa">Sofa</Option>
-              <Option value="ban">Bàn</Option>
-              <Option value="ghe">Ghế</Option>
-              <Option value="giuong">Giường</Option>
+              {colorOptions.map((color) => (
+                <Option key={color} value={color}>
+                  {color}
+                </Option>
+              ))}
             </Select>
           </Col>
 
-          <Col xs={12} sm={6} md={4}>
-            <InputNumber
-              placeholder="Giá từ"
-              style={{ width: '100%' }}
-              min={0}
-              onChange={(value) => setMinPrice(value)}
-            />
-          </Col>
-
-          <Col xs={12} sm={6} md={4}>
-            <InputNumber
-              placeholder="Giá đến"
-              style={{ width: '100%' }}
-              min={0}
-              onChange={(value) => setMaxPrice(value)}
-            />
+          <Col xs={24} sm={12} md={6}>
+            <div style={{ padding: '0 8px' }}>
+              <span>Khoảng giá:</span>
+              <Slider
+                range
+                min={0}
+                max={100000000}
+                step={100000}
+                defaultValue={[0, 50000000]}
+                onChange={(value) => {
+                  setMinPrice(value[0]);
+                  setMaxPrice(value[1]);
+                }}
+                tooltip={{ formatter: (val) => `${val.toLocaleString()} đ` }}
+              />
+            </div>
           </Col>
 
           <Col xs={24} sm={12} md={6}>
@@ -178,7 +235,8 @@ const TypeProduct = () => {
                 fontSize: '16px',
                 fontWeight: 'bold',
               }}
-              textButton="Xem chi tiết"
+              textButton={loading ? 'Đang lọc...' : 'Lọc'}
+              disabled={loading}
               onClick={handleFilter}
             />
           </Col>
