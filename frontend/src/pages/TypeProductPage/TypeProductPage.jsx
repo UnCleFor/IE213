@@ -4,7 +4,7 @@ import axios from 'axios';
 import CardComponent from '../../components/CardComponent/CardComponent';
 import ContainerComponent from '../../components/ContainerComponent/ContainerComponent';
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import * as ProductService from '../../services/ProductService'
 import LoadingComponent from '../../components/LoadingComponent/Loading'
 import { current } from '@reduxjs/toolkit';
@@ -21,10 +21,15 @@ const TypeProduct = () => {
   const [products, setProducts] = useState([]);
   const { state } = useLocation()
   console.log('Received state:', state);
-  const { label, filterBy, parentLabel, key, keyPath } = state || {}
+  const {  parentLabel, key, keyPath } = state || {}
   console.log('parentLabel:', parentLabel); // In giá trị của parentLabel
   console.log('keyPath:', keyPath);
   const [loading, setLoading] = useState(false)
+
+  const { type } = useParams(); 
+  const location = useLocation();
+  const filterBy = location.state?.filterBy || 'type';
+  const label = location.state?.label || type; // Fallback nếu không có state
   //console.log('state nè (label)', state?.label)
   // const fetchProducts = async () => {
   //   try {
@@ -50,32 +55,23 @@ const TypeProduct = () => {
   })
 
   const fetchProductType = async (filterBy, label, page, limit) => {
-    setLoading(true)
-    const res = await ProductService.getProductType(filterBy, label, page, limit)
-    if (res?.status == 'OK') {
-      setLoading(false)
-      setProducts(res?.data)
-      setPanigate({ ...panigate, total: res?.totalPage })
-    } else {
-      setLoading(false)
+    setLoading(true);
+    try {
+      const res = await ProductService.getProductType(filterBy, label, page, limit);
+      if (res?.status === 'OK') {
+        setProducts(res?.data);
+        setPanigate({ ...panigate, total: res?.totalPage });
+      }
+    } finally {
+      setLoading(false);
     }
-  }
-
-  // useEffect(() => {
-  //   let newProduct = []
-  //   if (searchDebounce) {
-  //     newProduct = products?.filter((pro) => pro?.name === searchDebounce)
-  //     console.log('newProducts', newProduct)
-  //     setProducts(newProduct)
-  //   }
-  // }, [searchDebounce])
-  // console.log('searchProduct', searchProduct)
+  };
 
   useEffect(() => {
-    if (label && filterBy) {
-      fetchProductType(filterBy, label, panigate.page, panigate.limit)
+    if (type) { // Sử dụng type từ URL params thay vì chỉ phụ thuộc vào state
+      fetchProductType(filterBy, label, panigate.page, panigate.limit);
     }
-  }, [filterBy, label, panigate.page, panigate.limit])
+  }, [type, filterBy, label, panigate.page, panigate.limit]);
 
   const onChange = (current, pageSize) => {
     setPanigate({ ...panigate, page: current - 1, limit: [pageSize] })

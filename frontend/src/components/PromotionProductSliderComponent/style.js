@@ -178,3 +178,15 @@ export const SwipeHint = styled.div`
     display: block;
   }
 `;
+export const DiscountBadge = styled.div`
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #ff4d4f;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px;
+  z-index: 2;
+`;

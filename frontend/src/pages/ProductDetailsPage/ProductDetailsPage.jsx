@@ -9,12 +9,7 @@ import BreadcrumbComponent from "../../components/BreadcrumbComponent/Breadcrumb
 const ProductDetailsPage = () => {
     const {id} = useParams()
     const navigate = useNavigate()
-
-    // Chuẩn bị dữ liệu cho breadcrumb
-    const breadcrumbs = [
-        { name: "Trang chủ", link: "/", isCurrent: false },
-        { name: "Chi tiết sản phẩm", link: "#", isCurrent: true },
-    ];
+    
     return (
         <div>
             {/* Phân loại sản phẩm
@@ -28,7 +23,7 @@ const ProductDetailsPage = () => {
 
             <ContainerComponent>
                 {/*breadcrumb <h5><span style={{cursor: 'pointer'}} onClick={() => {navigate('/')}}>Trang chủ</span> - Chi tiết sản phẩm</h5> */}
-                <BreadcrumbComponent breadcrumbs={breadcrumbs} />
+                
                 <ProductDetailsComponent idProduct={id}/>
             </ContainerComponent>
                

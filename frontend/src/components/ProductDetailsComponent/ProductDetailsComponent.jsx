@@ -18,6 +18,7 @@ import SliderComponent from '../SliderComponent/SliderComponent'
 import ProductImageGallery from '../ProductImageGallery/ProductImageGallery'
 import ContainerComponent from '../ContainerComponent/ContainerComponent'
 import * as message from '../Message/Message'
+import BreadcrumbComponent from '../BreadcrumbComponent/BreadcrumbComponent'
 
 const ProductDetailsComponent = ({ idProduct }) => {
     const [quantity, setQuantity] = useState(1);
@@ -105,6 +106,21 @@ const ProductDetailsComponent = ({ idProduct }) => {
             setSelectedColor(productDetails.colors[0]);
         }
     }, [productDetails]);
+    const breadcrumbs = [
+        { name: 'Trang chủ', link: '/' },
+        // { 
+        //   name: productDetails?.room, 
+        //   link: `/product/${productDetails?.room}`
+        // },
+        // {
+        //   name: productDetails?.type,
+        //   link: `/product/${productDetails?.type}`
+        // },
+        {
+          name: productDetails?.name,
+          isCurrent: true
+        }
+      ];
     return (
         isLoading  ? (
             <div style={{
@@ -115,7 +131,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
             }}>
                 <Spin size="large" />
             </div>
-        ) : (<div>
+        ) : (<div> <BreadcrumbComponent breadcrumbs={breadcrumbs}/>
             <Row style={{ padding: '16px 0px', background: 'white' }} gutter={[16, 16]}>
 
                 {/* Căn giữa slide trong cột */}
