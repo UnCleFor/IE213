@@ -146,7 +146,7 @@ const HomePage = () => {
           <SectionTitle>Danh Mục Nội Thất</SectionTitle>
           <CategoryGrid>
             {categories.map(category => (
-              <CategoryCard key={category.id} bgImage={category.image}>
+              <CategoryCard key={category.id} bgimage={category.image}>
                 <div className="overlay"></div>
                 <h3>{category.name}</h3>
                 <ButtonComponent
@@ -225,7 +225,7 @@ const HomePage = () => {
           </SectionTitle>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
             {instagramPosts.map(post => (
-              <InstagramPost key={post.id} bgImage={post.image}>
+              <InstagramPost key={post.id} bgimage={post.image}>
                 <div className="overlay">
                   <BsInstagram size={24} />
                 </div>

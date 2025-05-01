@@ -79,12 +79,14 @@ const OrderPage = () => {
     }
   };
 
-  const handleChangeCount = (type, idProduct) => {
+  const handleChangeCount = (type, idProduct, max) => {
     if (type === 'increase') {
-      dispatch(increaseAmount({ idProduct }));
+      if(!max) {
+        dispatch(increaseAmount({ idProduct }));
+      }
     } else {
       const product = order.orderItems.find(item => item.product === idProduct);
-      if (product && product.amount > 1) {
+      if (product && product.amount > 1 && !max) {
         dispatch(decreaseAmount({ idProduct }));
       }
     }
@@ -210,7 +212,7 @@ const OrderPage = () => {
                           </DisabledQuantityButton>
                         ) : (
                           <QuantityButton
-                            onClick={() => handleChangeCount('decrease', orderItem?.product)}
+                            onClick={() => handleChangeCount('decrease', orderItem?.product, false)}
                           >
                             <MinusOutlined style={{ fontSize: '12px' }} />
                           </QuantityButton>
@@ -219,13 +221,14 @@ const OrderPage = () => {
                         <QuantityInputWrapper>
                           <QuantityInput
                             min={1}
+                            max={orderItem?.countInStock}
                             value={orderItem.amount}
                             onChange={(value) => handleInputChange(value, orderItem.product)}
                           />
                         </QuantityInputWrapper>
 
                         <QuantityButton
-                          onClick={() => handleChangeCount('increase', orderItem?.product)}
+                          onClick={() => handleChangeCount('increase', orderItem?.product, orderItem?.amount === orderItem.countInStock)}
                         >
                           <PlusOutlined style={{ fontSize: '12px' }} />
                         </QuantityButton>

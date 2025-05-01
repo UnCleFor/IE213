@@ -211,7 +211,7 @@ export const CategoryCard = styled.div`
   align-items: center;
   justify-content: center;
   color: white;
-  background-image: url(${props => props.bgImage});
+  background-image: url(${props => props.bgimage});
   background-size: cover;
   background-position: center;
   transition: all 0.3s ease;
@@ -296,7 +296,7 @@ export const InstagramSection = styled.div`
 export const InstagramPost = styled.div`
   position: relative;
   height: 200px;
-  background-image: url(${props => props.bgImage});
+  background-image: url(${props => props.bgimage});
   background-size: cover;
   background-position: center;
   cursor: pointer;
