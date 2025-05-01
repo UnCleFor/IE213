@@ -108,6 +108,11 @@ const updateOrder = (id, data) => {
       }
       if (data.state === 'Đã hủy') {
         data.cancelledAt = new Date();
+        for (const item of checkOrder.orderItems) {
+          await Product.findByIdAndUpdate(item.product, {
+            $inc: { countInStock: item.amount }
+          });
+        }
       }
       const updatedOrder = await Order.findByIdAndUpdate(
         id,

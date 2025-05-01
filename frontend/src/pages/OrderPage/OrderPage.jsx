@@ -60,9 +60,10 @@ const OrderPage = () => {
 
   const priceDiscountMemo = useMemo(() => {
     return order?.orderItems?.reduce((total, curr) => {
+      if (!listChecked.includes(curr.product)) return total;
       return curr.discount ? total + (curr.price * curr.amount * (curr.discount / 100)) : total;
     }, 0);
-  }, [order]);
+  }, [order, listChecked]);  
 
   const totalQuantity = useMemo(() => {
     return order?.orderItems?.reduce((total, item) => {

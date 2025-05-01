@@ -138,9 +138,9 @@ export const ProductActions = styled.div`
 `;
 
 export const PriceColumn = styled.div`
-  width: 25%; 
+  width: 35%; 
   text-align: center;
-  padding-right: 20px;
+  padding-left: 30px;
 `;
 
 export const QuantityColumn = styled.div`
