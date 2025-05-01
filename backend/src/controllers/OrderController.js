@@ -17,19 +17,36 @@ const createOrder = async (req, res) => {
       totalDiscount
     } = req.body
     // nếu thiếu 1 trường thì báo lỗi
-    if (!paymentMethod ||
-       !itemsPrice ||
-      !shippingPrice || 
-      !totalPrice || 
-      !fullName || 
-      !address || 
-      !phone || 
-      totalDiscount === undefined || 
-      totalDiscount === null) {
+    // if (!paymentMethod ||
+    //    !itemsPrice ||
+    //   !shippingPrice || 
+    //   !totalPrice || 
+    //   !fullName || 
+    //   !address || 
+    //   !phone || 
+    //   totalDiscount === undefined || 
+    //   totalDiscount === null) {
+    //   return res.status(200).json({
+    //     status: 'Lỗi',
+    //     message: 'Cần điền đầy đủ thông tin'
+    //   })
+    // }
+    const missingFields = [];
+
+    if (!paymentMethod) missingFields.push('paymentMethod');
+    if (!itemsPrice) missingFields.push('itemsPrice');
+    if (!shippingPrice) missingFields.push('shippingPrice');
+    if (!totalPrice) missingFields.push('totalPrice');
+    if (!fullName) missingFields.push('fullName');
+    if (!address) missingFields.push('address');
+    if (!phone) missingFields.push('phone');
+    if (totalDiscount === undefined || totalDiscount === null) missingFields.push('totalDiscount');
+
+    if (missingFields.length > 0) {
       return res.status(200).json({
         status: 'Lỗi',
-        message: 'Cần điền đầy đủ thông tin'
-      })
+        message: `Thiếu thông tin: ${missingFields.join(', ')}`
+      });
     }
     // Kiểm tra tồn kho
     for (const item of orderItems) {

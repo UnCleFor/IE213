@@ -9,12 +9,13 @@ import * as UserService from "../../services/UserService"
 import { useSelector } from "react-redux";
 import { convertPrice, convertVNDToUSD } from "../../utils";
 import Loading from '../../components/LoadingComponent/Loading'
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as message from '../../components/Message/Message';
 import { orderConstant } from "../../constant";
 import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
 import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
 import PayPalButtonComponent from "../../components/PaypalButtonComponent/PaypalButtonComponent";
+import VNPayButton from "../../components/VNPayButton/VNPayButton";
 
 const { Title, Text } = Typography;
 
@@ -37,6 +38,8 @@ const CheckoutPage = () => {
   const navigate = useNavigate()
   const order = useSelector((state) => state.order);
   const user = useSelector((state) => state.user);
+  const [pendingOrderData, setPendingOrderData] = useState(null);
+  const location = useLocation();
 
   const subtotal = useMemo(() => {
     return order?.orderItemsSelected?.reduce((total, item) => total + item.price * item.amount, 0);
@@ -102,6 +105,76 @@ const CheckoutPage = () => {
       console.log('Validation Failed:', errorInfo);
     });
   }
+
+  const getOrderData = (values) => ({
+    token: user?.access_token,
+    orderItems: order?.orderItemsSelected,
+    fullName: values.name,
+    address: values.address,
+    phone: values.phone,
+    paymentMethod: paymentMethods.find((p) => p.id === payment).name,
+    shippingMethod: shippingMethods.find((s) => s.id === delivery).name,
+    itemsPrice: subtotal,
+    totalDiscount: totalDiscount,
+    shippingPrice: shippingFee,
+    totalPrice: total,
+    user: user?.id,
+    email: user?.email
+  });
+
+  console.log('orderdata', getOrderData(form.getFieldsValue()))
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const paymentStatus = params.get('vnp_ResponseCode'); // Sửa thành vnp_ResponseCode thay vì payment_status
+  
+    if (paymentStatus) {
+      const transactionData = {
+        amount: params.get('vnp_Amount'),
+        bankCode: params.get('vnp_BankCode'),
+        transactionNo: params.get('vnp_TransactionNo'),
+        responseCode: paymentStatus,
+        orderInfo: params.get('vnp_OrderInfo'),
+        payDate: params.get('vnp_PayDate')
+      };
+  
+      if (paymentStatus === '00') {
+        message.success('Thanh toán thành công');
+        // Xử lý tạo đơn hàng
+        handleVNPaySuccess(transactionData);
+      } 
+      else if (paymentStatus === '24') {
+        message.warning('Bạn đã hủy thanh toán');
+      }
+      else {
+        message.error(`Thanh toán thất bại: Mã lỗi ${paymentStatus}`);
+      }
+  
+      // Xóa query string
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate]);
+  
+  const handleVNPaySuccess = async (transactionData) => {
+    try {
+      const values = form.getFieldsValue();
+      const orderData = {
+        token: user?.access_token,
+        ...getOrderData(values),
+        isPaid: true,
+      };
+  
+      const response = await mutationAddOrder.mutateAsync(orderData);
+      if (response?.status === 'OK') {
+        navigate('/order_history');
+      } else {
+        throw new Error(response?.message || 'Tạo đơn hàng thất bại');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      message.error('Xử lý đơn hàng thất bại: ' + error.message);
+    }
+  };
 
   return (
     <ContainerComponent>
@@ -218,9 +291,17 @@ const CheckoutPage = () => {
               {payment === "paypal" ? (
                 <PayPalButtonComponent
                   amount={convertVNDToUSD(total)}
-                  onSuccess={() => {
-                    handleAddOrder();  // Thực hiện hành động khi thanh toán thành công
-                  }}
+                  onSuccess={handleAddOrder}
+                />
+              ) : payment === "vnpay" ? (
+                <VNPayButton
+                  amount={total}
+                  orderInfo={`Thanh toán đơn hàng từ ${user?.email}`}
+                  orderType="other"
+                  orderData={getOrderData(form.getFieldsValue())}
+                  setPendingOrder={setPendingOrderData} // Truyền hàm setState từ component cha
+                  onSuccess={() => navigate('/order_history')}
+                  onError={() => message.error('Lỗi thanh toán VNPay')}
                 />
               ) : (
                 <ButtonComponent

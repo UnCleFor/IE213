@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
     axiosJWT
 } from "./UserService";
@@ -86,4 +87,9 @@ export const getOrderByUserId = async (userId, access_token) => {
     }
   );
   return res.data;
+};
+
+export const createPaymentUrl = async (data) => {
+  const res = await axios.post(`${process.env.REACT_APP_API_URL}/payment/vnpay/create_payment_url`, data);
+  return res;
 };
