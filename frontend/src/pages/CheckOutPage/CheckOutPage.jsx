@@ -80,7 +80,7 @@ const CheckoutPage = () => {
     }
   }, [isSuccess, isError]);
 
-  const handleAddOrder = () => {
+  const handleAddOrder = (isPaid) => {
     form.validateFields().then((values) => {
       if (user?.access_token && order?.orderItemsSelected) {
         mutationAddOrder.mutate(
@@ -97,12 +97,42 @@ const CheckoutPage = () => {
             shippingPrice: shippingFee,
             totalPrice: total,
             user: user?.id,
-            email: user?.email
+            email: user?.email,
+            isPaid: isPaid // Thêm trường isPaid
           }
         );
       }
     }).catch((errorInfo) => {
       console.log('Validation Failed:', errorInfo);
+    });
+  }
+
+  const handlePayPalSuccess = () => {
+    form.validateFields().then((values) => {
+      if (user?.access_token && order?.orderItemsSelected) {
+        mutationAddOrder.mutate(
+          {
+            token: user?.access_token,
+            orderItems: order?.orderItemsSelected,
+            fullName: values.name,
+            address: values.address,
+            phone: values.phone,
+            paymentMethod: 'PayPal', // Có thể hardcode nếu muốn
+            shippingMethod: shippingMethods.find((s) => s.id === delivery).name,
+            itemsPrice: subtotal,
+            totalDiscount: totalDiscount,
+            shippingPrice: shippingFee,
+            totalPrice: total,
+            user: user?.id,
+            email: user?.email,
+            isPaid: true, // Đánh dấu đã thanh toán
+            paymentDetails: {
+              method: 'PayPal',
+              status: 'completed'
+            }
+          }
+        );
+      }
     });
   }
 
@@ -290,9 +320,13 @@ const CheckoutPage = () => {
             <Row justify="end">
               {payment === "paypal" ? (
                 <PayPalButtonComponent
-                  amount={convertVNDToUSD(total)}
-                  onSuccess={handleAddOrder}
-                />
+                amount={convertVNDToUSD(total)}
+                onSuccess={() => handleAddOrder(true)} // Truyền true khi thanh toán thành công
+                onError={() => {
+                  message.error('Thanh toán PayPal thất bại');
+                  handleAddOrder(false); // Truyền false nếu thanh toán thất bại
+                }}
+              />
               ) : payment === "vnpay" ? (
                 <VNPayButton
                   amount={total}
@@ -305,7 +339,7 @@ const CheckoutPage = () => {
                 />
               ) : (
                 <ButtonComponent
-                  onClick={() => { handleAddOrder() }}
+                  onClick={() => { handleAddOrder(false) }}
                   size="large"
                   styleButton={{
                     backgroundColor: 'brown',

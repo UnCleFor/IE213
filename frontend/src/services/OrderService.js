@@ -32,7 +32,7 @@ export const getAllOrders = async (access_token) => {
   export const getDetailOrder = async (id, access_token) => {
     const res = await axiosJWT.get(`${process.env.REACT_APP_API_URL}/order/get_order/${id}`, {
       headers: {
-        token: `Bearer ${access_token}`,
+        Authorization: `Bearer ${access_token}`,
       }
     })
     return res.data

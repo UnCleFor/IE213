@@ -64,6 +64,7 @@ const createOrder = async (req, res) => {
     for (const item of orderItems) {
       const product = await Products.findById(item.product);
       product.countInStock -= item.amount;
+      product.selled += item.amount
       await product.save();
     }
     // // thực hiện gọi dịch vụ tạo proudct mới

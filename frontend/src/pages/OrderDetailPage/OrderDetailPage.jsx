@@ -18,7 +18,7 @@ const OrderDetailPage = () => {
   const user = useSelector((state) => state.user)
   const { orderId } = useParams();
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
-  console.log('token', user?.access_token)
+
   console.log('orderId', orderId)
 
   const fetchOrderDetail = async (context) => {
@@ -68,30 +68,41 @@ const OrderDetailPage = () => {
 
   if (!orderDetail) {
     return (
-        <div style={{ textAlign: 'center', marginTop: 50, marginBottom: 50 }}>
-            <Spin tip="Đang tải thông tin đơn hàng..." size="large" />
-        </div>
+      <div style={{ textAlign: 'center', marginTop: 50, marginBottom: 50 }}>
+        <Spin tip="Đang tải thông tin đơn hàng..." size="large" />
+      </div>
     );
-}
+  }
 
   return (
     <ContainerComponent>
       <OrderDetailWrapper>
-      <BreadcrumbComponent
-            breadcrumbs={[
-              { name: 'Trang chủ', link: '/' },
-              { name: 'Lịch sử mua hàng', link: '/order_history' },
-              { name: 'Chi tiết đơn hàng', isCurrent: true }
-            ]}
-          />  
-      <div style={{ width: "100%" }}>
-        <Title level={3} style={{ marginBottom: 16 }}>
-          Chi tiết đơn hàng #{orderDetail._id}
-        </Title>
+        <BreadcrumbComponent
+          breadcrumbs={[
+            { name: 'Trang chủ', link: '/' },
+            { name: 'Lịch sử mua hàng', link: '/order_history' },
+            { name: 'Chi tiết đơn hàng', isCurrent: true }
+          ]}
+        />
+        <div style={{ width: "100%" }}>
+          <Title level={3} style={{ marginBottom: 16 }}>
+            Chi tiết đơn hàng #{orderDetail._id}
+          </Title>
 
           <Card title="Thông tin giao hàng" bordered={false} style={{ marginBottom: 16 }}>
             <Row gutter={[16, 16]}>
               <Col xs={24} md={12}>
+                <Text strong>Ngày tạo đơn:</Text>
+                <p>
+                  {new Date(orderDetail.createdAt).toLocaleString('vi-VN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                  })}
+                </p>
                 <Text strong>Người nhận:</Text>
                 <p>{orderDetail.shippingAddress.fullName}</p>
                 <Text strong>Số điện thoại:</Text>
@@ -128,7 +139,8 @@ const OrderDetailPage = () => {
               <Col md={6}>Sản phẩm</Col>
               <Col md={4}>Số lượng</Col>
               <Col md={6}>Đơn giá</Col>
-              <Col md={8}>Thành tiền</Col>
+              <Col md={4}>Tiết kiệm</Col>
+              <Col md={4}>Thành tiền</Col>
             </Row>
 
             {orderDetail.orderItems.map((product, index) => (
@@ -151,6 +163,14 @@ const OrderDetailPage = () => {
                     <div style={{ marginTop: 8 }}>
                       <div><strong>Số lượng:</strong> {product.amount}</div>
                       <div><strong>Đơn giá:</strong> {convertPrice(product.price)}</div>
+                      <div>
+                        <strong>Tiết kiệm:</strong>
+                        {convertPrice(
+                          product.price *
+                          product.amount *
+                          (product.product?.discount) / 100
+                        )}
+                      </div>
                       <div><strong>Thành tiền:</strong> <strong>{convertPrice((product.price * product.amount))}</strong></div>
                     </div>
                   </Col>
@@ -158,7 +178,10 @@ const OrderDetailPage = () => {
                   {/* PC view: cột riêng biệt */}
                   <Col xs={0} md={4}>{product.amount}</Col>
                   <Col xs={0} md={6}>{convertPrice(product.price)}</Col>
-                  <Col xs={0} md={8} style={{ fontWeight: "bold" }}>
+                  <Col xs={0} md={4}>
+                    {product.product?.discount > 0 ? `${convertPrice(product.product.discount * product.price * product.amount / 100)}` : `${convertPrice(0)}`}
+                  </Col>
+                  <Col xs={0} md={4} style={{ fontWeight: "bold" }}>
                     {convertPrice(product.price * product.amount)}
                   </Col>
                 </Row>
@@ -176,7 +199,7 @@ const OrderDetailPage = () => {
                 {orderDetail.totalDiscount > 0 && (
                   <>
                     <Text strong>Giảm giá: {convertPrice(orderDetail.totalDiscount)}</Text>
-                    <br/>
+                    <br />
                   </>
                 )}
                 <Text strong>Phí giao hàng: {convertPrice(orderDetail.shippingPrice)}</Text>

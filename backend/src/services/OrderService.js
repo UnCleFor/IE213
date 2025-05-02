@@ -5,7 +5,7 @@ const EmailService = require('../services/EmailService')
 
 const createOrder = (newOrder) => {
   return new Promise(async (resolve, reject) => {
-    const { orderItems, paymentMethod, shippingMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, phone, user, totalDiscount, email } = newOrder;
+    const { orderItems, paymentMethod, shippingMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, phone, user, totalDiscount, email, isPaid } = newOrder;
     try {
       const createdOrder = await Order.create({
         orderItems,
@@ -22,6 +22,7 @@ const createOrder = (newOrder) => {
         totalDiscount,
         shippingMethod,
         state: 'Đã đặt',
+        isPaid: isPaid
       });
 
       if (createdOrder) {
