@@ -56,8 +56,14 @@ function App() {
   
   //   return { decoded, storageData }
   // }
-  
+  function testToken() {
+    const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+    console.log('Test decode:', jwtDecode(testToken)); 
+  }
+  testToken();
+  ///
   const handleDecoded = () => {
+    console.log('🛠️ Bắt đầu handleDecoded'); 
     // 1. Lấy token từ nhiều nguồn
     const storageData = user?.access_token || localStorage.getItem('access_token');
     
@@ -97,8 +103,9 @@ function App() {
   
     // 6. Thử decode
     try {
+      console.log('1. Trước khi decode');
       const decoded = jwtDecode(tokenToDecode);
-      console.log('✅ Decoded token:', decoded);
+      console.log('✅ Decoded token xong:', decoded);
       return { decoded, storageData: tokenToDecode };
     } catch (e) {
       console.error('❌ Lỗi decode chi tiết:', {
