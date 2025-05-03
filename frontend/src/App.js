@@ -27,7 +27,7 @@ function App() {
   const handleDecoded = () => {
     let storageData = user?.access_token || localStorage.getItem('access_token')
     let decoded = {}
-  
+    console.log('access_token đây:', storageData)
     // KHÔNG cần JSON.parse nếu token là chuỗi JWT
     try {
       if (storageData && typeof storageData === 'string')
