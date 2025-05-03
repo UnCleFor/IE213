@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { routes } from './routes/index'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { isJsonString } from './utils';
+//import { isJsonString } from './utils';
 import { jwtDecode } from "jwt-decode";
 import * as UserService from './services/UserService'
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUser } from './redux/slices/userSlide';
+import { updateUser, resetUser } from './redux/slices/userSlide';
 import Loading from './components/LoadingComponent/Loading';
 
 function App() {
@@ -25,34 +25,45 @@ function App() {
   }, [])
 
   const handleDecoded = () => {
-    const token = localStorage.getItem('access_token')
+    let storageData = user?.access_token || localStorage.getItem('access_token')
     let decoded = {}
-    if (token) {
-      try {
-        decoded = jwtDecode(token)
-      } catch (err) {
-        console.log('JWT decode error:', err)
-      }
+  
+    // KHÔNG cần JSON.parse nếu token là chuỗi JWT
+    try {
+      decoded = jwtDecode(storageData)
+    } catch (e) {
+      console.error("❌ Lỗi khi decode access_token:", e)
     }
-    return { decoded, storageData: token }
+  
+    return { decoded, storageData }
   }
+  
 
   // Add a request interceptor
   UserService.axiosJWT.interceptors.request.use(async function (config) {
     const currentTime = new Date()
-    const { storageData, decoded } = handleDecoded()
+    const { decoded } = handleDecoded()
+    let storageRefreshToken = localStorage.getItem('refresh_token')
+    const refreshToken = storageRefreshToken
+    const decodedRefreshToken = jwtDecode(refreshToken)
     if (decoded?.exp < currentTime.getTime() / 1000) {
-      const data = await UserService.refreshToken()
-      config.headers['token'] = `Bearer ${data?.access_token}`
-    }
+      if (decodedRefreshToken?.exp > currentTime.getTime() / 1000) {
+        const data = await UserService.refreshToken(refreshToken)
+        config.headers['token'] = `Bearer ${data?.access_token}`
+      } else {
+          dispatch(resetUser())
+      }
+    } 
     return config
   }, function (error) {
     return Promise.reject(error)
   })
 
   const handleGetDetailUser = async (id, token) => {
+    let storageRefreshToken = localStorage.getItem('refresh_token')
+    const refreshToken = storageRefreshToken
     const res = await UserService.getDetailUser(id, token)
-    dispatch(updateUser({ ...res?.data, access_token: token }))
+    dispatch(updateUser({ ...res?.data, access_token: token, refreshToken: refreshToken }))
     setIsLoading(false)
   }
 

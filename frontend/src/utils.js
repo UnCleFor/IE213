@@ -2,8 +2,10 @@ import { error } from "./components/Message/Message";
 
 export const isJsonString = (data) => {
   try {
+    console.log("📌 isJsonString - dữ liệu truyền vào:", data)
     JSON.parse(data)
   } catch (error) {
+    console.error("❌ JSON.parse lỗi với:", data)
     return false
   }
   return true

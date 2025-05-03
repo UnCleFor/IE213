@@ -37,13 +37,22 @@ export const getAllUser = async (access_token) => {
   return res.data
 }
 
-export const refreshToken = async () => {
+// export const refreshToken = async () => {
+//   const res = await axios.post(
+//     `${process.env.REACT_APP_API_URL}/user/refresh-token`, {}, // body
+//     {
+//       withCredentials: true
+//     } // config
+//   )
+//   return res.data
+// }
+export const refreshToken = async (refreshToken) => {
   const res = await axios.post(
-    `${process.env.REACT_APP_API_URL}/user/refresh-token`, {}, // body
-    {
-      withCredentials: true
-    } // config
-  )
+    `${process.env.REACT_APP_API_URL}/user/refresh-token`, {}, {// body
+      headers: {
+        token: `Bearer ${refreshToken}`,
+      }
+    })
   return res.data
 }
 

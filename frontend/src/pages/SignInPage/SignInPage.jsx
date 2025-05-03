@@ -12,7 +12,7 @@ import Loading from "../../components/LoadingComponent/Loading";
 import * as message from '../../components/Message/Message';
 import { jwtDecode } from "jwt-decode";
 import { useDispatch} from 'react-redux'
-import { updateUser } from "../../redux/slices/userSlide";
+import { updateUser, resetUser } from "../../redux/slices/userSlide";
 const SignInPage = () => {
     const [isShowPassword, setIsShowPassword] = useState(false);
     const location = useLocation()
@@ -39,6 +39,7 @@ const SignInPage = () => {
                 navigate('/')
             }
             localStorage.setItem('access_token', data?.access_token)
+            localStorage.setItem('refresh_token', data?.refresh_token)
 
             if(data?.access_token){
                 const decoded = jwtDecode(data?.access_token)
@@ -51,8 +52,10 @@ const SignInPage = () => {
     },[isSuccess])
 
     const handleGetDetailUser = async (id,token) => {
+        const storage = localStorage.getItem('refresh_token')
+        const refreshToken = storage
         const res = await UserService.getDetailUser(id,token)
-        dispatch(updateUser({...res?.data,access_token: token}))
+        dispatch(updateUser({...res?.data,access_token: token, refreshToken}))
         //console.log('res',res)
     }
 
