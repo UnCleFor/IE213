@@ -30,27 +30,51 @@ const SignInPage = () => {
         data => UserService.loginUser(data)
     )
     const { data,isSuccess,isError } = mutation
-    useEffect(()=>{
-        console.log('location', location)
-        if(isSuccess &&  data?.status !== 'ERR'){
-            if(location?.state) {
-                navigate(location?.state)
-            } else {
-                navigate('/')
-            }
+    // useEffect(()=>{
+    //     console.log('location', location)
+    //     if(isSuccess &&  data?.status !== 'ERR'){
+    //         if(location?.state) {
+    //             navigate(location?.state)
+    //         } else {
+    //             navigate('/')
+    //         }
+    //         localStorage.setItem('access_token', data?.access_token)
+    //         localStorage.setItem('refresh_token', data?.refresh_token)
+
+    //         if(data?.access_token){
+    //             const decoded = jwtDecode(data?.access_token)
+    //             console.log('decoded',decoded)
+    //             if(decoded?.id){
+    //                 handleGetDetailUser(decoded?.id,data?.access_token)
+    //             }
+    //         }
+    //     }
+    // },[isSuccess])
+    useEffect(() => {
+        if (isSuccess && data?.status !== 'ERR') {
+          if (data?.access_token) {
+            // Lưu token
             localStorage.setItem('access_token', data?.access_token)
             localStorage.setItem('refresh_token', data?.refresh_token)
-
-            if(data?.access_token){
-                const decoded = jwtDecode(data?.access_token)
-                console.log('decoded',decoded)
-                if(decoded?.id){
-                    handleGetDetailUser(decoded?.id,data?.access_token)
+      
+            // Decode token
+            const decoded = jwtDecode(data?.access_token)
+            console.log('decoded', decoded)
+      
+            if (decoded?.id) {
+              handleGetDetailUser(decoded.id, data?.access_token).then(() => {
+                // Navigate **sau khi** đã dispatch user
+                if (location?.state) {
+                  navigate(location.state)
+                } else {
+                  navigate('/')
                 }
+              })
             }
+          }
         }
-    },[isSuccess])
-
+      }, [isSuccess])
+      
     const handleGetDetailUser = async (id,token) => {
         const storage = localStorage.getItem('refresh_token')
         const refreshToken = storage
