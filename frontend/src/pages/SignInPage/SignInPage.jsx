@@ -52,28 +52,27 @@ const SignInPage = () => {
     // },[isSuccess])
     useEffect(() => {
         if (isSuccess && data?.status !== 'ERR') {
+          console.log('📦 Token trả về từ server:', data?.access_token)
+          console.log('📦 Refresh token:', data?.refresh_token)
+      
+          // Nếu không phải chuỗi, không lưu
+          if (typeof data?.access_token !== 'string') {
+            console.error('❌ access_token không phải chuỗi!')
+          }
+      
           if (data?.access_token) {
-            // Lưu token
-            localStorage.setItem('access_token', data?.access_token)
-            localStorage.setItem('refresh_token', data?.refresh_token)
+            localStorage.setItem('access_token', data.access_token)
+            localStorage.setItem('refresh_token', data.refresh_token)
       
-            // Decode token
-            const decoded = jwtDecode(data?.access_token)
-            console.log('decoded', decoded)
+            const decoded = jwtDecode(data.access_token)
+            console.log('✅ Token decode được:', decoded)
       
-            if (decoded?.id) {
-              handleGetDetailUser(decoded.id, data?.access_token).then(() => {
-                // Navigate **sau khi** đã dispatch user
-                if (location?.state) {
-                  navigate(location.state)
-                } else {
-                  navigate('/')
-                }
-              })
-            }
+            handleGetDetailUser(decoded.id, data.access_token).then(() => {
+              navigate(location?.state || '/')
+            })
           }
         }
-      }, [isSuccess])
+      }, [isSuccess])      
       
     const handleGetDetailUser = async (id,token) => {
         const storage = localStorage.getItem('refresh_token')

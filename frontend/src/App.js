@@ -15,14 +15,24 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
   const user = useSelector((state) => state.user)
 
+  // useEffect(() => {
+  //   const { storageData, decoded } = handleDecoded()
+  //   if (decoded?.id) {
+  //     handleGetDetailUser(decoded?.id, storageData)
+  //   } else {
+  //     setIsLoading(false) // Nếu không có token thì dừng loading luôn
+  //   }
+  // }, [])
+
   useEffect(() => {
-    const { storageData, decoded } = handleDecoded()
-    if (decoded?.id) {
-      handleGetDetailUser(decoded?.id, storageData)
+    if (user?.access_token) {
+      const { decoded } = handleDecoded()
+      console.log("✅ Token sau khi user load:", decoded)
     } else {
-      setIsLoading(false) // Nếu không có token thì dừng loading luôn
+      console.warn("⏳ Chưa có access_token để decode")
     }
-  }, [])
+  }, [user?.access_token])
+  
 
   // const handleDecoded = () => {
   //   let storageData = user?.access_token || localStorage.getItem('access_token')
@@ -79,8 +89,8 @@ function App() {
     console.groupEnd();
   
     // 3. Xử lý token không tồn tại
-    if (!storageData) {
-      console.error('Token không tồn tại trong storage');
+    if (!storageData || typeof storageData !== 'string') {
+      console.error('Token không tồn tại trong storage', storageData);
       return { decoded: {}, storageData: null };
     }
   
