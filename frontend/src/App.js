@@ -30,7 +30,8 @@ function App() {
   
     // KHÔNG cần JSON.parse nếu token là chuỗi JWT
     try {
-      decoded = jwtDecode(storageData)
+      if (storageData && typeof storageData === 'string')
+        {decoded = jwtDecode(storageData)}
     } catch (e) {
       console.error("❌ Lỗi khi decode access_token:", e)
     }
