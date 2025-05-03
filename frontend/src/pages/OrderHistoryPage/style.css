@@ -1,0 +1,9 @@
+.modal-cancel-btn {
+  color: brown;
+  border-color: brown;
+}
+.modal-cancel-btn:hover {
+  background-color: brown;
+  border-color: brown;
+  color: #fff;
+}

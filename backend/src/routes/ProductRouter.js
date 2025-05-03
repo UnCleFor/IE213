@@ -1,0 +1,30 @@
+const express = require("express");
+const router  = express.Router()
+const ProductController = require("../controllers/ProductController")
+const { authMiddleWare } = require("../middleware/authMiddleware")
+
+router.post("/create", authMiddleWare, ProductController.createProduct)
+
+router.put("/update/:id", authMiddleWare, ProductController.updateProduct)
+
+router.get("/get-details/:id", ProductController.getDetailsProduct)
+
+router.delete("/delete/:id", authMiddleWare, ProductController.deleteProduct)
+
+router.get("/get-all", ProductController.getAllProduct)
+
+router.get("/get-all-type", ProductController.getAllType)
+
+router.post("/delete-many",authMiddleWare, ProductController.deleteManyProduct)
+
+router.get('/search', ProductController.searchProducts);
+
+router.get('/colors', ProductController.getAllColors);
+
+router.get('/filter', ProductController.filterProducts);
+
+router.get("/get-newest", ProductController.getNewestProducts)
+
+router.get("/get-discounted", ProductController.getDiscountedProducts)
+
+module.exports = router
