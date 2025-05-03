@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { routes } from './routes/index'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
 import "@fortawesome/fontawesome-free/css/all.min.css";
-//import { isJsonString } from './utils';
+import { isJsonString } from './utils';
 import { jwtDecode } from "jwt-decode";
 import * as UserService from './services/UserService'
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,7 +29,25 @@ function App() {
     let decoded = {}
     console.log('access_token đây:', storageData)
     // KHÔNG cần JSON.parse nếu token là chuỗi JWT
+      //test
+      if (storageData) {
+        console.log('🔍 Token type:', typeof storageData);
+        console.log('🔍 Token length:', storageData.length);
+        console.log('🔍 First 10 chars:', storageData.substring(0, 10));
+        console.log('🔍 Is JSON?', isJsonString(storageData));
+      } else {
+        console.warn('⚠️ Không tìm thấy token nào');
+        return { decoded: {}, storageData: null };
+      }
+    //    
     try {
+      //test
+      const actualToken = isJsonString(storageData) 
+      ? JSON.parse(storageData) 
+      : storageData;
+
+    console.log('🔍 Token trước khi decode:', actualToken);
+      //
       if (storageData && typeof storageData === 'string')
         {decoded = jwtDecode(storageData)}
     } catch (e) {
