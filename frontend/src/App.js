@@ -24,39 +24,91 @@ function App() {
     }
   }, [])
 
-  const handleDecoded = () => {
-    let storageData = user?.access_token || localStorage.getItem('access_token')
-    let decoded = {}
-    console.log('access_token đây:', storageData)
-    // KHÔNG cần JSON.parse nếu token là chuỗi JWT
-      //test
-      if (storageData) {
-        console.log('🔍 Token type:', typeof storageData);
-        console.log('🔍 Token length:', storageData.length);
-        console.log('🔍 First 10 chars:', storageData.substring(0, 10));
-        console.log('🔍 Is JSON?', isJsonString(storageData));
-      } else {
-        console.warn('⚠️ Không tìm thấy token nào');
-        return { decoded: {}, storageData: null };
-      }
-    //    
-    try {
-      //test
-      const actualToken = isJsonString(storageData) 
-      ? JSON.parse(storageData) 
-      : storageData;
+  // const handleDecoded = () => {
+  //   let storageData = user?.access_token || localStorage.getItem('access_token')
+  //   let decoded = {}
 
-    console.log('🔍 Token trước khi decode:', actualToken);
-      //
-      if (storageData && typeof storageData === 'string')
-        {decoded = jwtDecode(storageData)}
-    } catch (e) {
-      console.error("❌ Lỗi khi decode access_token:", e)
+  //   // KHÔNG cần JSON.parse nếu token là chuỗi JWT
+  //     //test
+  //     if (storageData) {
+  //       console.log('🔍 Token type:', typeof storageData);
+  //       console.log('🔍 Token length:', storageData.length);
+  //       console.log('🔍 First 10 chars:', storageData.substring(0, 10));
+  //       console.log('🔍 Is JSON?', isJsonString(storageData));
+  //     } else {
+  //       console.warn('⚠️ Không tìm thấy token nào');
+  //       return { decoded: {}, storageData: null };
+  //     }
+  //   //    
+  //   try {
+  //     //test
+  //     const actualToken = isJsonString(storageData) 
+  //     ? JSON.parse(storageData) 
+  //     : storageData;
+
+  //   console.log('🔍 Token trước khi decode:', actualToken);
+  //     //
+  //     if (storageData && typeof storageData === 'string')
+  //       {decoded = jwtDecode(storageData)}
+  //   } catch (e) {
+  //     console.error("❌ Lỗi khi decode access_token:", e)
+  //   }
+  
+  //   return { decoded, storageData }
+  // }
+  
+  const handleDecoded = () => {
+    // 1. Lấy token từ nhiều nguồn
+    const storageData = user?.access_token || localStorage.getItem('access_token');
+    
+    // 2. Debug chi tiết
+    console.group('[DEBUG] Token Analysis');
+    console.log('Raw token:', storageData);
+    console.log('Type:', typeof storageData);
+    if (typeof storageData === 'string') {
+      console.log('Length:', storageData.length);
+      console.log('First 10 chars:', storageData.substring(0, 10));
+      console.log('Is JWT format:', /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/.test(storageData));
+    }
+    console.groupEnd();
+  
+    // 3. Xử lý token không tồn tại
+    if (!storageData) {
+      console.error('Token không tồn tại trong storage');
+      return { decoded: {}, storageData: null };
     }
   
-    return { decoded, storageData }
-  }
+    // 4. Chuẩn hóa token
+    let tokenToDecode;
+    try {
+      tokenToDecode = typeof storageData === 'string' 
+        ? storageData.trim() 
+        : JSON.stringify(storageData);
+    } catch (e) {
+      console.error('Lỗi chuẩn hóa token:', e);
+      return { decoded: {}, storageData: null };
+    }
   
+    // 5. Kiểm tra JWT format cơ bản
+    if (!tokenToDecode || tokenToDecode.split('.').length !== 3) {
+      console.error('Token không đúng định dạng JWT:', tokenToDecode);
+      return { decoded: {}, storageData: null };
+    }
+  
+    // 6. Thử decode
+    try {
+      const decoded = jwtDecode(tokenToDecode);
+      console.log('✅ Decoded token:', decoded);
+      return { decoded, storageData: tokenToDecode };
+    } catch (e) {
+      console.error('❌ Lỗi decode chi tiết:', {
+        error: e.message,
+        tokenSample: tokenToDecode.substring(0, 10) + '...',
+        tokenLength: tokenToDecode.length
+      });
+      return { decoded: {}, storageData: null };
+    }
+  };
 
   // Add a request interceptor
   UserService.axiosJWT.interceptors.request.use(async function (config) {
