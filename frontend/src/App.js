@@ -17,10 +17,10 @@ function App() {
   
   const handleDecoded = () => {
     let storageData = user?.access_token || localStorage.getItem('access_token')
-    let decoded = {}
+    let decoded = null
   
     try {
-      if (storageData && typeof storageData === 'string')
+      if (storageData.split('.').length === 3 && typeof storageData === 'string')
         {decoded = jwtDecode(storageData)}
     } catch (e) {
       console.error("❌ Lỗi khi decode access_token:", e)

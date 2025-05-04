@@ -13,7 +13,7 @@ const port = process.env.PORT || 3001
 
 //react-query
 app.use(cors({
-    origin: 'https://ie213.vercel.app/',
+    origin: 'https://ie213.vercel.app',
     credentials: true
   }));
 app.use(cookieParser())
