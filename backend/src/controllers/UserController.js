@@ -90,8 +90,8 @@ const loginUser = async (req, res) => {
         //bỏ refresn token vào cookie
         res.cookie('refresh-token', refresh_token, {
             HttpOnly: true,
-            Secure: false,
-            sameSite: 'Strict',
+            Secure: true,
+            sameSite: 'None',
         })
         return res.status(200).json({...newResponse, refresh_token})
     }
