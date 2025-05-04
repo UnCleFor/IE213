@@ -34,7 +34,9 @@ import {
   SummaryValue,
   TotalPrice,
   CheckoutButton,
-  EmptyCart
+  EmptyCart,
+  MobilePriceLabel,
+  MobileQuantityLabel
 } from './style';
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -63,7 +65,7 @@ const OrderPage = () => {
       if (!listChecked.includes(curr.product)) return total;
       return curr.discount ? total + (curr.price * curr.amount * (curr.discount / 100)) : total;
     }, 0);
-  }, [order, listChecked]);  
+  }, [order, listChecked]);
 
   const totalQuantity = useMemo(() => {
     return order?.orderItems?.reduce((total, item) => {
@@ -81,7 +83,7 @@ const OrderPage = () => {
 
   const handleChangeCount = (type, idProduct, max) => {
     if (type === 'increase') {
-      if(!max) {
+      if (!max) {
         dispatch(increaseAmount({ idProduct }));
       }
     } else {
@@ -136,7 +138,9 @@ const OrderPage = () => {
     console.log("alo")
     navigate('/checkout')
   }
-
+  const handleProductClick = (productId) => {
+    navigate(`/product_details/${productId}`);
+  };
   const styles = {
     breadcrumbWrapper: {
       marginBottom: 20,  // Điều chỉnh khoảng cách nếu cần
@@ -147,14 +151,14 @@ const OrderPage = () => {
   return (
     <PageContainer>
       <ContentContainer>
-      <div style={styles.breadcrumbWrapper}>
-                <BreadcrumbComponent
-                        breadcrumbs={[
-                            { name: "Trang chủ", link: "/" },
-                            { name: "Giỏ hàng", isCurrent: true },
-                        ]}
-                    />
-          </div>
+        <div style={styles.breadcrumbWrapper}>
+          <BreadcrumbComponent
+            breadcrumbs={[
+              { name: "Trang chủ", link: "/" },
+              { name: "Giỏ hàng", isCurrent: true },
+            ]}
+          />
+        </div>
 
         <CartTitle>Giỏ hàng của bạn</CartTitle>
 
@@ -189,7 +193,7 @@ const OrderPage = () => {
                     />
                     <ProductImage src={orderItem?.image} alt={orderItem?.name} />
                     <ProductDetails>
-                      <ProductName>{orderItem?.name}</ProductName>
+                      <ProductName  style={{cursor:'pointer'}}onClick={() => handleProductClick(orderItem?.product)}>{orderItem?.name}</ProductName>
                       <DeleteButton onClick={() => handleDeleteOrder(orderItem?.product)}>
                         <DeleteOutlined /> Xóa
                       </DeleteButton>
@@ -198,13 +202,26 @@ const OrderPage = () => {
 
                   <ProductActions>
                     <PriceColumn>
-                      <PriceText>{convertPrice(orderItem?.price)}</PriceText>
+                      <MobilePriceLabel>Đơn giá</MobilePriceLabel>
+                      {orderItem?.discount ? (
+                        <>
+                          <PriceText style={{ color: 'brown' }}>
+                            {convertPrice(orderItem?.price * (1 - orderItem.discount / 100))}
+                          </PriceText>
+                          <OriginalPrice>
+                            {convertPrice(orderItem?.price)}
+                          </OriginalPrice>
+                        </>
+                      ) : (
+                        <PriceText>{convertPrice(orderItem?.price)}</PriceText>
+                      )}
                       {orderItem?.originalPrice && (
                         <OriginalPrice>{convertPrice(orderItem?.originalPrice)}</OriginalPrice>
                       )}
                     </PriceColumn>
 
                     <QuantityColumn>
+                      <MobileQuantityLabel>Số lượng</MobileQuantityLabel>
                       <QuantityControl>
                         {orderItem.amount <= 1 ? (
                           <DisabledQuantityButton>
@@ -240,69 +257,71 @@ const OrderPage = () => {
             </CartLeft>
 
             <CartRight>
-              <SummaryTitle>Thông tin đơn hàng</SummaryTitle>
+              <div style={{ padding: '16px' }}>
+                <SummaryTitle>Thông tin đơn hàng</SummaryTitle>
 
-              {listChecked.length > 0 ? (
-                <>
-                  <SummaryItem>
-                    <SummaryLabel>Tạm tính ({totalQuantity} sản phẩm)</SummaryLabel>
-                    <SummaryValue>
-                      {convertPrice(
-                        order?.orderItems?.reduce((total, item) => {
-                          return listChecked.includes(item?.product)
-                            ? total + (item?.price * item?.amount)
-                            : total;
-                        }, 0)
-                      )}
-                    </SummaryValue>
-                  </SummaryItem>
-
-                  {priceDiscountMemo > 0 && (
+                {listChecked.length > 0 ? (
+                  <>
                     <SummaryItem>
-                      <SummaryLabel>Giảm giá</SummaryLabel>
-                      <SummaryValue style={{ color: '#ff4d4f' }}>
-                        -{convertPrice(priceDiscountMemo)}
+                      <SummaryLabel>Tạm tính ({totalQuantity} sản phẩm)</SummaryLabel>
+                      <SummaryValue>
+                        {convertPrice(
+                          order?.orderItems?.reduce((total, item) => {
+                            return listChecked.includes(item?.product)
+                              ? total + (item?.price * item?.amount)
+                              : total;
+                          }, 0)
+                        )}
                       </SummaryValue>
                     </SummaryItem>
-                  )}
 
-                  <p style={{ color: '#666', fontSize: '14px', margin: '10px 0' }}>
-                    Phí vận chuyển được tính ở trang thanh toán.
+                    {priceDiscountMemo > 0 && (
+                      <SummaryItem>
+                        <SummaryLabel>Giảm giá</SummaryLabel>
+                        <SummaryValue style={{ color: '#ff4d4f' }}>
+                          -{convertPrice(priceDiscountMemo)}
+                        </SummaryValue>
+                      </SummaryItem>
+                    )}
+
+                    <p style={{ color: '#666', fontSize: '14px', margin: '10px 0' }}>
+                      Phí vận chuyển được tính ở trang thanh toán.
+                    </p>
+
+                    <TotalPrice>
+                      <span>Tổng cộng</span>
+                      <span>
+                        {convertPrice(
+                          order?.orderItems?.reduce((total, item) => {
+                            if (listChecked.includes(item?.product)) {
+                              const discount = item.discount
+                                ? (item.price * item.amount * (item.discount / 100))
+                                : 0;
+                              return total + (item.price * item.amount) - discount;
+                            }
+                            return total;
+                          }, 0)
+                        )}
+                      </span>
+                    </TotalPrice>
+                  </>
+                ) : (
+                  <p style={{ color: '#666', fontSize: '14px' }}>
+                    Vui lòng chọn sản phẩm để xem thông tin đơn hàng.
                   </p>
+                )}
 
-                  <TotalPrice>
-                    <span>Tổng cộng</span>
-                    <span>
-                      {convertPrice(
-                        order?.orderItems?.reduce((total, item) => {
-                          if (listChecked.includes(item?.product)) {
-                            const discount = item.discount
-                              ? (item.price * item.amount * (item.discount / 100))
-                              : 0;
-                            return total + (item.price * item.amount) - discount;
-                          }
-                          return total;
-                        }, 0)
-                      )}
-                    </span>
-                  </TotalPrice>
-                </>
-              ) : (
-                <p style={{ color: '#666', fontSize: '14px' }}>
-                  Vui lòng chọn sản phẩm để xem thông tin đơn hàng.
-                </p>
-              )}
-
-              <CheckoutButton
-                disabled={listChecked.length === 0}
-                style={{
-                  position: 'relative',
-                  opacity: listChecked.length === 0 ? 0.7 : 1,
-                }}
-                onClick={handleAddCard}
-              >
-                TIẾN HÀNH THANH TOÁN
-              </CheckoutButton>
+                <CheckoutButton
+                  disabled={listChecked.length === 0}
+                  style={{
+                    position: 'relative',
+                    opacity: listChecked.length === 0 ? 0.7 : 1,
+                  }}
+                  onClick={handleAddCard}
+                >
+                  TIẾN HÀNH THANH TOÁN
+                </CheckoutButton>
+              </div>
             </CartRight>
           </CartLayout>
         ) : (

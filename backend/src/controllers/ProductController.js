@@ -17,7 +17,7 @@ const createProduct = async (req,res) => {
         return res.status(200).json(ketqua)
     } catch(e){
         return res.status(404).json({
-            massage: e
+            message: e
         })
     }
 }

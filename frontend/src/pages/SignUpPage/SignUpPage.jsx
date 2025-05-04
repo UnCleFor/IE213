@@ -57,6 +57,10 @@ const SignUpPage = () => {
 
     }
 
+    const handleLogoClick = () => {
+        navigate('/');
+    };
+
     return (
         <div
             style={{
@@ -87,11 +91,18 @@ const SignUpPage = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         padding: '20px',
+                        cursor: 'pointer' 
                     }}
+                    onClick={() => navigate('/')} 
                 >
-                    <Image src={logo} preview={false} alt="image-logo" width="100%" />
+                    <Image
+                        src={logo}
+                        preview={false}
+                        alt="logo"
+                        width="100%"
+                        style={{ pointerEvents: 'none' }} // Prevent double clicks
+                    />
                 </Col>
-
                 {/* Form đăng ký */}
                 <Col xs={24} md={15} style={{ padding: '20px' }}>
                     <p style={{ textAlign: 'center', fontSize: '20px' }}>ĐĂNG KÝ</p>

@@ -37,9 +37,6 @@ const OrderHistoryPage = () => {
         }
     });
 
-    console.log('orders', orders)
-    console.log('user.access_token', user.access_token)
-
     const mutationUpdate = useMutationHooks(({ id, token, ...rests }) => {
         return OrderService.updatedOrder(id, rests, token);
     });
@@ -51,7 +48,6 @@ const OrderHistoryPage = () => {
     const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
 
     const cancelOrder = (orderId) => {
-        console.log("Hủy đơn:", orderId)
         Modal.confirm({
             title: "Xác nhận hủy đơn",
             content: "Bạn có chắc chắn muốn hủy đơn này không?",
@@ -69,8 +65,9 @@ const OrderHistoryPage = () => {
             },
             onOk: async () => {
                 setLoading(true);
+                setIsFinishUpdated(true);
                 try {
-                    await mutationUpdate.mutate({
+                     mutationUpdate.mutate({
                         id: orderId,
                         token: user.access_token,
                         state: "Đã hủy",
@@ -106,8 +103,9 @@ const OrderHistoryPage = () => {
             },
             onOk: async () => {
                 setLoading(true);
+                setIsFinishUpdated(true);
                 try {
-                    await mutationDelete.mutate({
+                     mutationDelete.mutate({
                         id: orderId,
                         token: user.access_token,
                     });
@@ -124,30 +122,47 @@ const OrderHistoryPage = () => {
         if (isSuccessUpdated && dataUpdated?.status === 'OK') {
             message.success('Hủy đơn thành công');
             queryClient.invalidateQueries(['orders']);
-            setIsFinishUpdated(false);
+           setIsFinishUpdated(false);
         } else if (dataUpdated?.status === 'ERR') {
             setIsFinishUpdated(false);
             message.error('Hủy đơn thất bại!');
         }
 
+    }, [isSuccessUpdated, isErrorUpdated]);
+
+    useEffect(() => {
         if (isSuccessDeleted && dataDeleted?.status === 'OK') {
             message.success('Xóa đơn thành công');
             queryClient.invalidateQueries(['orders']);
+            setIsFinishUpdated(false);
         } else if (dataDeleted?.status === 'ERR') {
             message.error('Xóa đơn thất bại!');
+            setIsFinishUpdated(false);
         }
-    }, [isSuccessUpdated, isErrorUpdated, isSuccessDeleted, isErrorDeleted]);
-
+    }, [isSuccessDeleted, isErrorDeleted]);
+    const formatOrderDate = (dateString) => {
+        const date = new Date(dateString);
+        
+        // Format date: DD/MM/YYYY
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        
+        // Format time: HH:MM
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        
+        return `ngày ${day}/${month}/${year} lúc ${hours}:${minutes}`;
+      };
     const renderOrder = (order) => {
         const firstProduct = order.orderItems[0];
-
+        const formattedDate = formatOrderDate(order.createdAt);
         return (
             <Card
-                key={order._id}
+                key={order.createdAt}
                 style={{ marginBottom: 16 }}
-                title={`Đơn hàng #${order._id}`}
+                title={`Đơn hàng vào ${formattedDate}`}
                 extra={<Tag color={getStateColor(order.state)}>{order.state}</Tag>}
-
             >
                 <Row gutter={[16, 16]} align="middle">
                     {/* Thông tin sản phẩm đầu tiên */}
@@ -264,7 +279,7 @@ const OrderHistoryPage = () => {
 
     return (
         <ContainerComponent>
-
+            
             <div style={styles.breadcrumbWrapper}>
                 <BreadcrumbComponent
                         breadcrumbs={[
@@ -272,8 +287,8 @@ const OrderHistoryPage = () => {
                             { name: "Lịch sử mua hàng", isCurrent: true },
                         ]}
                     />
-                </div>
-                
+                </div>   
+        <Loading isLoading={isLoadingOrder || isFinishUpdated}> 
             <div style={{ width: '100%' }}>
                 <h2 style={{ marginBottom: 16 }}>Đơn hàng của bạn</h2>
                 <Tabs defaultActiveKey="1" type="line">
@@ -297,6 +312,7 @@ const OrderHistoryPage = () => {
                     </TabPane>
                 </Tabs>
             </div>
+            </Loading>
         </ContainerComponent>
     );
 };

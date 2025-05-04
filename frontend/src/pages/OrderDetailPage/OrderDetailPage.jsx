@@ -86,7 +86,7 @@ const OrderDetailPage = () => {
         />
         <div style={{ width: "100%" }}>
           <Title level={3} style={{ marginBottom: 16 }}>
-            Chi tiết đơn hàng #{orderDetail._id}
+            Chi tiết đơn hàng
           </Title>
 
           <Card title="Thông tin giao hàng" bordered={false} style={{ marginBottom: 16 }}>

@@ -11,6 +11,8 @@ import { updateUser } from '../../redux/slices/userSlide'
 import { UploadOutlined } from '@ant-design/icons'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent.jsx'
 import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
+import ContainerComponent from '../../components/ContainerComponent/ContainerComponent.jsx'
+import { useNavigate } from 'react-router-dom'
 
 const ProfilePage = () => {
     const user = useSelector((state) => state.user)
@@ -83,7 +85,7 @@ const ProfilePage = () => {
 
     const handleOnchangeAvatar = async ({ fileList }) => {
         const file = fileList[0]
-        if(!file) return 
+        if (!file) return
         const data = new FormData()
         data.append("file", file.originFileObj)
         data.append("upload_preset", "images")
@@ -126,120 +128,146 @@ const ProfilePage = () => {
         }
 
         setIsUpdating(true)
-        mutation.mutate({ 
-            id: user?.id, 
-            email, 
-            name, 
-            phone, 
-            address, 
-            avatar, 
-            access_token: user?.access_token 
+        mutation.mutate({
+            id: user?.id,
+            email,
+            name,
+            phone,
+            address,
+            avatar,
+            access_token: user?.access_token
         })
     }
     const breadcrumbs = [
         { name: 'Trang chủ', link: '/' },
         { name: 'Thông tin người dùng', link: '/profile', isCurrent: true },
     ];
+    const navigate = useNavigate();
+
+    const handleResetPassword = () => {
+        navigate('/reset-password'); // Or your reset password route
+    };
     return (
-    <div>
-        <div style={{ marginLeft: '185px' }}>  {/* Di chuyển breadcrumb sang phải */}
-        <BreadcrumbComponent 
-            breadcrumbs={breadcrumbs}
-        />
-    </div>
-        <div style={{ maxWidth: '700px', margin: '40px auto', padding: '40px', backgroundColor: '#fff', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)' }}>
-            <h2 style={{ textAlign: 'center', fontSize: '28px', marginBottom: '30px' }}>
-                Thông tin người dùng
-            </h2>
-            <Loading isLoading={isLoading}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <WrapperInput>
-                        <WrapperLabel htmlFor='name'>Họ và tên <span style={{color: 'red'}}>*</span></WrapperLabel>
-                        <InputForm 
-                            id="name" 
-                            value={name} 
-                            onChange={handleOnchangeName} 
-                           
-                        />
-                    </WrapperInput>
+        <div>
+            <ContainerComponent>
+            <BreadcrumbComponent
+                    breadcrumbs={breadcrumbs}
+                />
+            </ContainerComponent>
+            <div style={{ maxWidth: '700px', margin: '40px auto', padding: '40px', backgroundColor: '#fff', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)' }}>
+                <h2 style={{ textAlign: 'center', fontSize: '28px', marginBottom: '30px' }}>
+                    Thông tin người dùng
+                </h2>
+                <Loading isLoading={isLoading}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        <WrapperInput>
+                            <WrapperLabel htmlFor='name'>Họ và tên <span style={{ color: 'red' }}>*</span></WrapperLabel>
+                            <InputForm
+                                id="name"
+                                value={name}
+                                onChange={handleOnchangeName}
 
-                    <WrapperInput>
-                        <WrapperLabel htmlFor='email'>Email <span style={{color: 'red'}}>*</span></WrapperLabel>
-                        <InputForm 
-                            id="email" 
-                            value={email} 
-                            onChange={handleOnchangeEmail} 
-                            
-                            type="email"
-                        />
-                    </WrapperInput>
+                            />
+                        </WrapperInput>
 
-                    <WrapperInput>
-                        <WrapperLabel htmlFor='phone'>Điện thoại <span style={{color: 'red'}}>*</span></WrapperLabel>
-                        <InputForm 
-                            id="phone" 
-                            value={phone} 
-                            onChange={handleOnchangePhone}
-                        />
-                    </WrapperInput>
+                        <WrapperInput>
+                            <WrapperLabel htmlFor='email'>Email <span style={{ color: 'red' }}>*</span></WrapperLabel>
+                            <InputForm
+                                id="email"
+                                value={email}
+                                onChange={handleOnchangeEmail}
 
-                    <WrapperInput>
-                        <WrapperLabel htmlFor='address'>Địa chỉ</WrapperLabel>
-                        <InputForm id="address" value={address} onChange={handleOnchangeAddress} />
-                    </WrapperInput>
+                                type="email"
+                            />
+                        </WrapperInput>
 
-                    <WrapperInput>
-                        <WrapperLabel htmlFor="avatar">Ảnh đại diện</WrapperLabel>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                            <WrapperUploadFile 
-                                customRequest={({ file, onSuccess }) => {
-                                    setTimeout(() => {
-                                    onSuccess("ok")
-                                    }, 0)
-                                }} 
-                                onChange={handleOnchangeAvatar}
-                                maxCount={1}>
-                                <Button icon={<UploadOutlined />}>Chọn file</Button>
-                            </WrapperUploadFile>
-                            {avatar && (
-                                <img
-                                    src={avatar}
-                                    alt="avatar"
-                                    style={{
-                                        height: '80px',
-                                        width: '80px',
-                                        borderRadius: '50%',
-                                        objectFit: 'cover',
-                                        border: '2px solid #ddd',
+                        <WrapperInput>
+                            <WrapperLabel htmlFor='phone'>Điện thoại <span style={{ color: 'red' }}>*</span></WrapperLabel>
+                            <InputForm
+                                id="phone"
+                                value={phone}
+                                onChange={handleOnchangePhone}
+                            />
+                        </WrapperInput>
+
+                        <WrapperInput>
+                            <WrapperLabel htmlFor='address'>Địa chỉ</WrapperLabel>
+                            <InputForm id="address" value={address} onChange={handleOnchangeAddress} />
+                        </WrapperInput>
+
+                        <WrapperInput>
+                            <WrapperLabel htmlFor="avatar">Ảnh đại diện</WrapperLabel>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                <WrapperUploadFile
+                                    customRequest={({ file, onSuccess }) => {
+                                        setTimeout(() => {
+                                            onSuccess("ok")
+                                        }, 0)
                                     }}
-                                />
-                            )}
+                                    onChange={handleOnchangeAvatar}
+                                    maxCount={1}>
+                                    <Button icon={<UploadOutlined />}>Chọn file</Button>
+                                </WrapperUploadFile>
+                                {avatar && (
+                                    <img
+                                        src={avatar}
+                                        alt="avatar"
+                                        style={{
+                                            height: '80px',
+                                            width: '80px',
+                                            borderRadius: '50%',
+                                            objectFit: 'cover',
+                                            border: '2px solid #ddd',
+                                        }}
+                                    />
+                                )}
+                            </div>
+                        </WrapperInput>
+                        <WrapperInput>
+                            <WrapperLabel>Mật khẩu</WrapperLabel>
+                            <ButtonComponent
+                            onClick={handleResetPassword}
+                                size="middle"  
+                                styleButton={{
+                                    backgroundColor: 'white',
+                                    padding: '8px 16px', 
+                                    borderRadius: '6px', 
+                                    border: 'none',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+                                    width: 'fit-content'  
+                                }}
+                                styleTextButton={{
+                                    color: 'brown',
+                                    fontSize: '14px', 
+                                    fontWeight: '600',  
+                                }}
+                                textButton="Đặt lại mật khẩu"
+                            />
+                        </WrapperInput>
+                        <div style={{ textAlign: 'center', marginTop: '24px' }}>
+                            <ButtonComponent
+                                onClick={handleUpdate}
+                                size="large"
+                                styleButton={{
+                                    backgroundColor: 'brown',
+                                    padding: '12px 28px',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                }}
+                                styleTextButton={{
+                                    color: 'white',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                }}
+                                textButton="Cập nhật thông tin"
+                            />
+
                         </div>
-                    </WrapperInput>
-                           
-                    <div style={{ textAlign: 'center', marginTop: '24px' }}>
-                        <ButtonComponent
-                            onClick={handleUpdate}
-                            size="large"
-                            styleButton={{
-                                backgroundColor: 'brown',
-                                padding: '12px 28px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                            }}
-                            styleTextButton={{
-                                color: 'white',
-                                fontSize: '16px',
-                                fontWeight: 'bold',
-                            }}
-                            textButton="Cập nhật thông tin"
-                        />
                     </div>
-                </div>
-            </Loading>
+                </Loading>
+            </div>
         </div>
-    </div>
     )
 }
 

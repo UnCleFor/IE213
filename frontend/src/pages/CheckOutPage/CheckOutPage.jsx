@@ -40,7 +40,7 @@ const CheckoutPage = () => {
   const user = useSelector((state) => state.user);
   const [pendingOrderData, setPendingOrderData] = useState(null);
   const location = useLocation();
-
+  const [loadingCheckOut, setIsLoadingCheckOut] = useState(false);
   const subtotal = useMemo(() => {
     return order?.orderItemsSelected?.reduce((total, item) => total + item.price * item.amount, 0);
   }, [order]);
@@ -74,14 +74,17 @@ const CheckoutPage = () => {
   useEffect(() => {
     if (isSuccess && dataAdd?.status === 'OK') {
       message.success('Đặt hàng thành công')
+      setIsLoadingCheckOut(false)
       navigate('/order_history')
     } else if (isError) {
+      setIsLoadingCheckOut(false)
       message.error('Đặt hàng thất bại');
     }
   }, [isSuccess, isError]);
 
   const handleAddOrder = (isPaid) => {
     form.validateFields().then((values) => {
+      setIsLoadingCheckOut(true)
       if (user?.access_token && order?.orderItemsSelected) {
         mutationAddOrder.mutate(
           {
@@ -208,7 +211,7 @@ const CheckoutPage = () => {
 
   return (
     <ContainerComponent>
-      <Loading isLoading={isLoadingAddOrder}>
+      <Loading isLoading={isLoadingAddOrder || loadingCheckOut}>
         <OrderDetailWrapper>
           <BreadcrumbComponent
             breadcrumbs={[

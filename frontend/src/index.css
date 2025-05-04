@@ -31,10 +31,6 @@ code {
   }
 }
 
-/* Đổi màu gạch dưới khi chọn hoặc hover */
-.custom-navbar .ant-menu-item::after {
-  border-bottom: 2px solid white !important;
-}
 
 
 /* Đổi màu gạch chân khi chọn */

@@ -58,7 +58,7 @@ const PromotionProductSliderComponent = () => {
     prevArrow: <PrevArrow />,
   };
 
-  if (!products?.data) return <div style={{alignContent:'center'}}>Loading...</div>;
+  if (!products?.data) return <div style={{alignContent:'center'}}>Đang tải sản phẩm...</div>;
   const handleBuyNow = (product) => {
     if (!user?.id) {
       navigate('/sign_in', { state: location?.pathname });

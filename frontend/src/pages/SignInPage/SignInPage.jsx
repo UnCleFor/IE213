@@ -11,8 +11,8 @@ import { useMutationHooks } from "../../hooks/useMutationHook";
 import Loading from "../../components/LoadingComponent/Loading";
 import * as message from '../../components/Message/Message';
 import { jwtDecode } from "jwt-decode";
-import { useDispatch} from 'react-redux'
-import { updateUser, resetUser } from "../../redux/slices/userSlide";
+import { useDispatch } from 'react-redux'
+import { updateUser } from "../../redux/slices/userSlide";
 const SignInPage = () => {
     const [isShowPassword, setIsShowPassword] = useState(false);
     const location = useLocation()
@@ -29,56 +29,30 @@ const SignInPage = () => {
     const mutation = useMutationHooks(
         data => UserService.loginUser(data)
     )
-    const { data,isSuccess,isError } = mutation
-    // useEffect(()=>{
-    //     console.log('location', location)
-    //     if(isSuccess &&  data?.status !== 'ERR'){
-    //         if(location?.state) {
-    //             navigate(location?.state)
-    //         } else {
-    //             navigate('/')
-    //         }
-    //         localStorage.setItem('access_token', data?.access_token)
-    //         localStorage.setItem('refresh_token', data?.refresh_token)
-
-    //         if(data?.access_token){
-    //             const decoded = jwtDecode(data?.access_token)
-    //             console.log('decoded',decoded)
-    //             if(decoded?.id){
-    //                 handleGetDetailUser(decoded?.id,data?.access_token)
-    //             }
-    //         }
-    //     }
-    // },[isSuccess])
+    const { data, isSuccess, isError } = mutation
     useEffect(() => {
+        console.log('location', location)
         if (isSuccess && data?.status !== 'ERR') {
-          console.log('📦 Token trả về từ server:', data?.access_token)
-          console.log('📦 Refresh token:', data?.refresh_token)
-      
-          // Nếu không phải chuỗi, không lưu
-          if (typeof data?.access_token !== 'string') {
-            console.error('❌ access_token không phải chuỗi!')
-          }
-      
-          if (data?.access_token) {
-            localStorage.setItem('access_token', data.access_token)
-            localStorage.setItem('refresh_token', data.refresh_token)
-      
-            const decoded = jwtDecode(data.access_token)
-            console.log('✅ Token decode được:', decoded)
-      
-            handleGetDetailUser(decoded.id, data.access_token).then(() => {
-              navigate(location?.state || '/')
-            })
-          }
+            if (location?.state) {
+                navigate(location?.state)
+            } else {
+                navigate('/')
+            }
+            localStorage.setItem('access_token', data?.access_token)
+
+            if (data?.access_token) {
+                const decoded = jwtDecode(data?.access_token)
+                console.log('decoded', decoded)
+                if (decoded?.id) {
+                    handleGetDetailUser(decoded?.id, data?.access_token)
+                }
+            }
         }
-      }, [isSuccess])      
-      
-    const handleGetDetailUser = async (id,token) => {
-        const storage = localStorage.getItem('refresh_token')
-        const refreshToken = storage
-        const res = await UserService.getDetailUser(id,token)
-        dispatch(updateUser({...res?.data,access_token: token, refreshToken}))
+    }, [isSuccess])
+
+    const handleGetDetailUser = async (id, token) => {
+        const res = await UserService.getDetailUser(id, token)
+        dispatch(updateUser({ ...res?.data, access_token: token }))
         //console.log('res',res)
     }
 
@@ -88,11 +62,11 @@ const SignInPage = () => {
 
     useEffect(() => {
         if (isSuccess && data?.status === 'OK') {
-          message.success('Đăng nhập thành công!');
+            message.success('Đăng nhập thành công!');
         } else if (data?.status === 'ERR') {
-          message.error(data?.message);
+            message.error(data?.message);
         }
-      }, [isSuccess, isError]);
+    }, [isSuccess, isError]);
 
     const handleNavigateSignUp = () => {
         navigate('/sign_up')
@@ -106,6 +80,11 @@ const SignInPage = () => {
     const handleForgotPass = () => {
         navigate('/forgot-password')
     }
+
+    const handleLogoClick = () => {
+        navigate('/');
+    };
+
     return (
         <div style={{
             display: 'flex',
@@ -127,7 +106,18 @@ const SignInPage = () => {
             >
                 {/* logo */}
                 <Col xs={24} md={9} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-                    <Image src={logo} preview={false} alt="logo" width="100%" />
+                    <div
+                        onClick={handleLogoClick}
+                        style={{ cursor: 'pointer', width: '100%' }}
+                    >
+                        <Image
+                            src={logo}
+                            preview={false}
+                            alt="logo"
+                            width="100%"
+                            style={{ pointerEvents: 'none' }} // This prevents double clicks
+                        />
+                    </div>
                 </Col>
 
                 {/* nhập liệu */}
@@ -166,7 +156,7 @@ const SignInPage = () => {
                         <span style={{ color: 'red' }}>{data?.message}</span>
                     )}
 
-                    
+
                     <Loading isLoading={isLoading}>
                         {/* Button Đăng nhập */}
                         <ButtonComponent
