@@ -33,6 +33,7 @@ function App() {
     const { storageData, decoded } = handleDecoded()
     if (decoded?.id) {
       handleGetDetailUser(decoded?.id, storageData)
+      setIsLoading(false)
     } else {
       setIsLoading(false) // Nếu không có token thì dừng loading luôn
     }
