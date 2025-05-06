@@ -81,6 +81,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const handleLogOut = async () => {
     try {
       setLoading(true);
+      await UserService.updateLogoutStatus(user?.id,user?.access_token)
       await UserService.logoutUser(); // Gọi API logout
       localStorage.removeItem('access_token'); // Xoá token khỏi localStorage
       dispatch(resetUser()); // Reset user trong Redux
@@ -152,6 +153,25 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     }
   };
 
+  useEffect(() => {
+    // Nếu chưa có user hoặc access_token thì không làm gì
+    if (!user?.id || !user?.access_token) return;
+  
+    const interval = setInterval(async () => {
+      try {
+        const res = await UserService.getDetailUser(user.id, user.access_token);
+        
+        if (res?.data?.isBlocked  || !res?.data?.isLoggedIn) {
+          message.warning('Tài khoản của bạn đã bị chặn. Đăng xuất...');
+          handleLogOut();
+        }
+      } catch (error) {
+        console.error('Lỗi kiểm tra trạng thái chặn:', error);
+      }
+    }, 10000); // kiểm tra mỗi 10s
+  
+    return () => clearInterval(interval); // clear interval khi component unmount
+  }, [user?.id, user?.access_token]); // chỉ chạy khi user đã có dữ liệu
   return (
     <div style={{ position: "relative" }}>
       {/* <div style= {styles.header}> */}

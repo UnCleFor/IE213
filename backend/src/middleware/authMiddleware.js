@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 dotenv.config()
 
+const User = require('../models/UserModel')
+
 const authMiddleWare = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
     console.log("Token nhận được:", token);
@@ -54,7 +56,22 @@ const authUserMiddleWare = (req, res, next) => {
         }
     });
 }
+
+const trackActivity = async (req, res, next) => {
+  if (req.user) {
+      try {
+          await User.findByIdAndUpdate(req.user._id, {
+              lastActive: new Date()
+          });
+      } catch (e) {
+          console.error('Lỗi khi cập nhật hoạt động:', e);
+      }
+  }
+  next();
+};
+
 module.exports = {
     authMiddleWare,
-    authUserMiddleWare
+    authUserMiddleWare,
+    trackActivity
 }

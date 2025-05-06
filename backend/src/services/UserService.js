@@ -3,6 +3,8 @@ const User = require('../models/UserModel')
 const bcrypt = require('bcrypt')
 const { generalAccessToken,generalRefreshToken } = require('./JwtService')
 
+const LoginHistory = require('../models/LoginHistoryModel')
+
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
       const { name, email, password, confirmPassword, phone, avatar } = newUser;
@@ -253,6 +255,40 @@ const getUserEmail = (id) => {
     });
 };
 
+const updateLogoutStatus = async (userId) => {
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return {
+                status: 'ERR',
+                message: 'Không tìm thấy người dùng'
+            };
+        }
+
+        // Nếu có session hiện tại, cập nhật logoutAt
+        if (user.currentSession) {
+            await LoginHistory.findByIdAndUpdate(user.currentSession, {
+                logoutAt: new Date()
+            });
+        }
+
+        // Cập nhật trạng thái user
+        await User.findByIdAndUpdate(userId, {
+            isLoggedIn: false,
+            currentSession: null
+        });
+
+        return {
+            status: 'OK',
+            message: 'Đăng xuất thành công'
+        };
+    } catch (error) {
+        console.error('Lỗi khi cập nhật trạng thái logout:', error);
+        throw new Error('Không thể cập nhật trạng thái logout');
+    }
+};
+
 module.exports = {
     createUser,
     loginUser,
@@ -261,5 +297,6 @@ module.exports = {
     getAllUser,
     getDetailsUser,
     deleteManyUser,
-    getUserEmail
+    getUserEmail,
+    updateLogoutStatus
 }

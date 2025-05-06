@@ -38,44 +38,69 @@ function App() {
       setIsLoading(false) // Nếu không có token thì dừng loading luôn
     }
   }, [])
-
-  // useEffect(() => {
-  //   if (user?.access_token) {
-  //     const { decoded } = handleDecoded()
-  //     console.log("✅ Token sau khi user load:", decoded)
-  //   } else {
-  //     console.warn("⏳ Chưa có access_token để decode")
-  //     setIsLoading(false);
-  //   }
-  // }, [user?.access_token])
   
-  const handleGetDetailUser = async (id, token) => {
-    let storageRefreshToken = localStorage.getItem('refresh_token')
-    const refreshToken = storageRefreshToken
-    const res = await UserService.getDetailUser(id, token)
-    dispatch(updateUser({ ...res?.data, access_token: token, refreshToken: refreshToken }))
-    setIsLoading(false)
-  }
+  // const handleGetDetailUser = async (id, token) => {
+  //   let storageRefreshToken = localStorage.getItem('refresh_token')
+  //   const refreshToken = storageRefreshToken
+  //   console.log('refreshtoken',refreshToken)
+  //   const res = await UserService.getDetailUser(id, token)
+  //   dispatch(updateUser({ ...res?.data, access_token: token, refreshToken: refreshToken }))
+  //   setIsLoading(false)
+  // }
 
   // Add a request interceptor
-  UserService.axiosJWT.interceptors.request.use(async function (config) {
-    const currentTime = new Date()
-    const { decoded } = handleDecoded()
-    let storageRefreshToken = localStorage.getItem('refresh_token')
-    const refreshToken = storageRefreshToken
-    const decodedRefreshToken = jwtDecode(refreshToken)
+//   UserService.axiosJWT.interceptors.request.use(
+//   async function (config) {
+//     const currentTime = new Date();
+//     const { decoded } = handleDecoded(); // decode access token
+
+//     if (decoded?.exp < currentTime.getTime() / 1000) {
+//       try {
+//         // Gọi /refresh, server sẽ lấy refresh_token từ cookie HTTP-only
+//         const data = await UserService.refreshToken(); 
+//         config.headers['token'] = `Bearer ${data?.access_token}`;
+//         localStorage.setItem('access_token', data?.access_token);
+//       } catch (err) {
+//         console.error('Refresh token hết hạn hoặc không hợp lệ:', err);
+//         dispatch(resetUser());
+//       }
+//     }
+
+//     return config;
+//   },
+//   function (error) {
+//     return Promise.reject(error);
+//   }
+// );
+const handleGetDetailUser = async (id, token) => {
+  const res = await UserService.getDetailUser(id, token);
+  dispatch(updateUser({ ...res?.data, access_token: token }));
+  setIsLoading(false);
+};
+
+UserService.axiosJWT.interceptors.request.use(
+  async function (config) {
+    const currentTime = new Date();
+    const { decoded } = handleDecoded(); // decode access token
+
     if (decoded?.exp < currentTime.getTime() / 1000) {
-      if (decodedRefreshToken?.exp > currentTime.getTime() / 1000) {
-        const data = await UserService.refreshToken(refreshToken)
-        config.headers['token'] = `Bearer ${data?.access_token}`
-      } else {
-          dispatch(resetUser())
+      try {
+        // Gọi /refresh, server sẽ lấy refresh_token từ cookie HTTP-only
+        const data = await UserService.refreshToken(); 
+        config.headers['token'] = `Bearer ${data?.access_token}`;
+        localStorage.setItem('access_token', data?.access_token);
+      } catch (err) {
+        console.error('Refresh token hết hạn hoặc không hợp lệ:', err);
+        dispatch(resetUser());
       }
-    } 
-    return config
-  }, function (error) {
-    return Promise.reject(error)
-  })
+    }
+
+    return config;
+  },
+  function (error) {
+    return Promise.reject(error);
+  }
+);
 
   return (
     <div>
@@ -87,7 +112,7 @@ function App() {
               const Page = route.page;
               const Layout = route.isShowHeader ? DefaultComponent : Fragment;
               const ischeckAuth = !route.isPrivate || user?.isAdmin;
-
+              console.log('isAdmin',user?.isAdmin)
               return (
                 <Route
                   key={route.path}

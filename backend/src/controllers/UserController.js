@@ -7,6 +7,10 @@ const crypto = require('crypto')
 const UserModel = require('../models/UserModel')
 const bcrypt = require('bcrypt')
 
+const LoginHistory = require('../models/LoginHistoryModel');
+const User = require('../models/UserModel');
+const mongoose = require('mongoose')
+
 const createUser = async (req, res) => {
     try {
         const { name, email, password, confirmPassword, phone } = req.body;
@@ -83,8 +87,45 @@ const loginUser = async (req, res) => {
                 message: 'Email bị lỗi'
             })
         }
-        // thực hiện gọi dịch vụ tạo user mới
+        // Kiểm tra xem người dùng đã đăng nhập ở nơi khác chưa
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Người dùng không tồn tại'
+            });
+        }
+        
+        if (user.isLoggedIn) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Tài khoản này đã được đăng nhập ở nơi khác'
+            });
+        }
+        if (user.isBlocked) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Tài khoản đã bị chặn'
+            });
+          }
+
         const ketqua = await UserService.loginUser(req.body)
+         // Ghi lịch sử đăng nhập
+         const loginRecord = await LoginHistory.create({
+            user: user._id,
+            ipAddress: req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+            userAgent: req.get('User-Agent'),
+            status: 'success',
+            loginAt: new Date()
+        });
+        // Cập nhật trạng thái người dùng
+        await User.findByIdAndUpdate(user._id, {
+            isLoggedIn: true,
+            lastActive: new Date(),
+            currentSession: loginRecord._id
+        });
+
         //tách phần refresh token ra khỏi kết quả và tạo ra newResponse để lưu lại kết quả sau khi tách
         const { refresh_token, ...newResponse } = ketqua
         //bỏ refresn token vào cookie
@@ -96,6 +137,21 @@ const loginUser = async (req, res) => {
         return res.status(200).json({...newResponse, refresh_token})
     }
     catch (e) {
+        // Ghi lịch sử thất bại nếu có email
+        if (req.body.email) {
+            const user = await UserModel.findOne({ email: req.body.email });
+            if (user) {
+                await LoginHistory.create({
+                    user: user._id,
+                    ipAddress: req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+                    userAgent: req.get('User-Agent'),
+                    status: 'failed',
+                    failureReason: e.message,
+                    loginAt: new Date()
+                });
+            }
+        }
+
         return res.status(404).json({
             message: e
         })
@@ -374,6 +430,69 @@ const resetPassword = async (req, res) => {
     }
 };
 
+const updateLogoutStatus = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        // Kiểm tra đầu vào
+        if (!userId) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Thiếu userId'
+            });
+        }
+
+        // Gọi service xử lý logout
+        const result = await UserService.updateLogoutStatus(userId);
+        return res.status(200).json(result);
+
+    } catch (e) {
+        return res.status(500).json({
+            status: 'ERR',
+            message: e.message || 'Lỗi hệ thống khi cập nhật trạng thái logout'
+        });
+    }
+};
+
+
+const blockUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const isBlocked = req.body.data;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                status: 'ERROR',
+                message: 'ID người dùng không hợp lệ'
+            });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { isBlocked },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                status: 'ERROR',
+                message: 'Không tìm thấy người dùng'
+            });
+        }
+
+        return res.status(200).json({
+            status: 'OK',
+            message: isBlocked ? 'Đã chặn người dùng' : 'Đã bỏ chặn người dùng',
+            data: updatedUser
+        });
+    } catch (e) {
+        return res.status(500).json({
+            status: 'ERROR',
+            message: e.message
+        });
+    }
+};
+
+
 module.exports = {
     createUser,
     loginUser,
@@ -386,5 +505,7 @@ module.exports = {
     deleteManyUser,
     getUserEmail,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    updateLogoutStatus,
+    blockUser
 }

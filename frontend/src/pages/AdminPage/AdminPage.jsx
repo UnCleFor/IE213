@@ -6,27 +6,32 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   ShoppingCartOutlined,
+  LoginOutlined
 } from '@ant-design/icons';
 import HeaderComponent from '../../components/HeaderComponent/HeaderComponent';
 import AdminUser from '../../components/AdminUser/AdminUser';
 import AdminProduct from '../../components/AdminProduct/AdminProduct';
 import { getItem } from '../../utils';
 import AdminOrder from '../../components/AdminOrder/AdminOrder';
+import AdminLogin from '../../components/AdminLogin/AdminLogin';
 
 const { Sider, Content } = Layout;
 
 const AdminPage = () => {
   const items = [
+    getItem('Truy cập', 'login',<LoginOutlined />),
     getItem('Người dùng', 'user', <UserOutlined />),
     getItem('Sản phẩm', 'product', <AppstoreOutlined />),
     getItem('Đơn hàng','order',<ShoppingCartOutlined />)
   ];
 
   const [collapsed, setCollapsed] = useState(false);
-  const [keySelected, setKeySelected] = useState('user');
+  const [keySelected, setKeySelected] = useState('login');
 
   const renderPage = (key) => {
     switch (key) {
+      case 'login':
+        return <AdminLogin/>
       case 'user':
         return <AdminUser />;
       case 'product':

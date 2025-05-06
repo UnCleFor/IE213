@@ -14,6 +14,7 @@ const port = process.env.PORT || 3001
 //react-query
 app.use(cors({
     origin: 'https://ie213.vercel.app',
+    //origin: 'http://localhost:3000',
     credentials: true
   }));
 app.set('trust proxy', 1);  

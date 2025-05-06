@@ -98,3 +98,28 @@ export const getUserEmail = async (id, access_token) => {
   })
   return res.data
 }
+export const updateLogoutStatus = async (id, access_token) => {
+  const res = await axiosJWT.put(
+    `${process.env.REACT_APP_API_URL}/user/log-out-status/${id}`, // route logout/:id
+    {}, // Không cần body
+    {
+      headers: {
+        token: `Bearer ${access_token}`,
+      }
+    }
+  );
+  return res.data;
+};
+
+export const blockUser = async (id, data,access_token) => {
+  const res = await axiosJWT.put(
+    `${process.env.REACT_APP_API_URL}/user/block/${id}`,
+    {data},
+    {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      }
+    }
+  );
+  return res.data;
+};

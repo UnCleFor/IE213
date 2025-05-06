@@ -10,8 +10,16 @@ const userSchema = new mongoose.Schema(
         avatar: { type: String },
         resetPasswordOTP: String,
         resetPasswordExpire: Date,
-        //access_token: {type: String, required:true},
-        //refresh_token: {type: String, required:true},
+        
+        isLoggedIn: { type: Boolean, default: false },
+        lastActive: { type: Date },
+        currentSession: { type: mongoose.Schema.Types.ObjectId, ref: 'LoginHistory' },
+
+        isBlocked: {
+            type: Boolean,
+            default: false
+          },
+          
     },
     {
         timestamps: true
