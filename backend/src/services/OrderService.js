@@ -92,21 +92,6 @@ const updateOrder = (id, data) => {
         });
         return;
       }
-      // Validate order status transitions
-      if (data.isDelivered && !checkOrder.isPaid) {
-        resolve({
-          status: 'ERR',
-          message: 'Không thể giao hàng khi chưa thanh toán'
-        });
-        return;
-      }
-      if (data.paymentMethod && checkOrder.isPaid) {
-        resolve({
-          status: 'ERR',
-          message: 'Không thể thay đổi phương thức thanh toán sau khi đã thanh toán'
-        });
-        return;
-      }
       if (data.state === 'Đã hủy') {
         data.cancelledAt = new Date();
         for (const item of checkOrder.orderItems) {
