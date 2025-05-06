@@ -53,7 +53,8 @@ export const refreshToken = async (refreshToken) => {
     `${process.env.REACT_APP_API_URL}/user/refresh-token`, {}, {// body
       headers: {
         token: `Bearer ${refreshToken}`,
-      }
+      },
+      withCredentials: true,
     })
   return res.data
 }
