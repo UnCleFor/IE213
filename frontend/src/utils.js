@@ -58,7 +58,7 @@ export const initFacebookSDK = () => {
 
 export const convertPrice = (price) => {
   try {
-    const result = price?.toLocaleString('vi-VN').replace(",", ".")
+    const result = price?.toLocaleString('vi-VN', { minimumFractionDigits: 0 });
     return `${result} VNĐ`
   } catch (error) {
     return null

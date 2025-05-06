@@ -51,6 +51,7 @@ const VNPayButton = ({
       }
 
       // Chuyển hướng đến VNPay
+      localStorage.setItem('pendingOrder', JSON.stringify(orderData));
       window.location.href = paymentUrl;
       
     } catch (error) {

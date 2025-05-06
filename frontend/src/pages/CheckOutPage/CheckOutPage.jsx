@@ -159,9 +159,19 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const paymentStatus = params.get('vnp_ResponseCode'); // Sửa thành vnp_ResponseCode thay vì payment_status
+    const paymentStatus = params.get('vnp_ResponseCode');
   
     if (paymentStatus) {
+      const savedForm = localStorage.getItem('checkoutForm');
+      if (savedForm) {
+        const values = JSON.parse(savedForm);
+        form.setFieldsValue({
+          name: values.fullName,
+          address: values.address,
+          phone: values.phone
+        });
+      }
+  
       const transactionData = {
         amount: params.get('vnp_Amount'),
         bankCode: params.get('vnp_BankCode'),
@@ -173,17 +183,28 @@ const CheckoutPage = () => {
   
       if (paymentStatus === '00') {
         message.success('Thanh toán thành công');
-        // Xử lý tạo đơn hàng
-        handleVNPaySuccess(transactionData);
-      } 
-      else if (paymentStatus === '24') {
+  
+        const savedOrderData = localStorage.getItem('pendingOrder');
+        if (savedOrderData) {
+          const restoredOrder = JSON.parse(savedOrderData);
+          const orderData = {
+            ...restoredOrder,
+            token: user?.access_token,
+            isPaid: true,
+          };
+  
+          mutationAddOrder.mutate(orderData);
+          localStorage.removeItem('pendingOrder');
+        }
+  
+      } else if (paymentStatus === '24') {
         message.warning('Bạn đã hủy thanh toán');
-      }
-      else {
+      } else {
         message.error(`Thanh toán thất bại: Mã lỗi ${paymentStatus}`);
       }
   
-      // Xóa query string
+      // Dọn dẹp localStorage và URL
+      localStorage.removeItem('checkoutForm');
       navigate(location.pathname, { replace: true });
     }
   }, [location, navigate]);
