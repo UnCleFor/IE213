@@ -7,7 +7,7 @@ const vnpayConfig = {
   vnp_TmnCode: 'KITVNV3K',
   vnp_HashSecret: '4FM9L8HWF5UXFVB3NSGT6NWBUBE3ZIL3',
   vnp_Url: 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
-  vnp_ReturnUrl: 'http://localhost:3000/checkout',
+  vnp_ReturnUrl: 'https://ie213.vercel.app/checkout',
   vnp_Api: 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction'
 };
 

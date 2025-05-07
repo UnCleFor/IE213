@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, message } from 'antd';
 import { useMutationHooks } from '../../hooks/useMutationHook';
 import * as OrderService from '../../services/OrderService';
-
+import moment from 'moment'
 const VNPayButton = ({ 
   amount,
   orderInfo = `Thanh toán đơn hàng ${Date.now()}`,
@@ -37,7 +37,8 @@ const VNPayButton = ({
         returnUrl: `${window.location.origin}/checkout?payment_method=vnpay`,
         clientIp: '127.0.0.1', // IP của khách hàng
         locale: 'vn', // Ngôn ngữ
-        currency: 'VND'
+        currency: 'VND',
+        expireDate: moment().add(15, 'minutes').format('YYYYMMDDHHmmss'),
       };
 
       // Gọi API tạo URL thanh toán

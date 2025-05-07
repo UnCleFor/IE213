@@ -2,14 +2,18 @@ const userController = require('../backend/src/controllers/UserController');
 const UserService = require('../backend/src/services/UserService');
 const UserModel = require('../backend/src/models/UserModel');
 const EmailService = require('../backend/src/services/EmailService');
-
+const LoginHistory = require('../backend/src/models/LoginHistoryModel');
+const mongoose = require('../backend/node_modules/mongoose');
 // Mock các dependencies
 jest.mock('../backend/src/services/UserService');
 jest.mock('../backend/src/models/UserModel', () => ({
     findOne: jest.fn(),
     updateOne: jest.fn(),
+    findByIdAndUpdate: jest.fn(),
 }));
 jest.mock('../backend/src/services/EmailService');
+jest.mock('../backend/src/models/UserModel');
+jest.mock('../backend/src/models/LoginHistoryModel');
 
 describe('User Controller Tests', () => {
     let req, res;
@@ -161,7 +165,7 @@ describe('User Controller Tests', () => {
 });
 
 describe('loginUser', () => {
-    let req, res; // Định nghĩa req và res ở phạm vi này
+    let req, res;
 
     beforeEach(() => {
         // Reset mocks trước mỗi test
@@ -170,7 +174,10 @@ describe('loginUser', () => {
         req = {
             body: {},
             params: {},
-            cookies: {}
+            cookies: {},
+            ip: '127.0.0.1',
+            get: jest.fn().mockReturnValue('test-user-agent'),
+            headers: {}
         };
 
         res = {
@@ -179,34 +186,97 @@ describe('loginUser', () => {
             cookie: jest.fn(),
             clearCookie: jest.fn()
         };
+
+        // Mock default implementations
+        LoginHistory.create.mockResolvedValue({ _id: 'login123' });
+        UserModel.findByIdAndUpdate.mockResolvedValue(true);
     });
 
     it('should return error when missing email or password', async () => {
         req.body = {}; // Không có email hoặc password trong body
 
-        await userController.loginUser(req, res); // Gọi hàm loginUser
+        await userController.loginUser(req, res);
 
-        // Kiểm tra phản hồi trả về
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith({
             status: 'ERR',
-            message: 'Cần điền đầy đủ thông tin' // Kiểm tra lỗi thiếu thông tin
+            message: 'Cần điền đầy đủ thông tin'
         });
     });
 
     it('should return error for invalid email', async () => {
         req.body = {
-            email: 'invalid-email', // Email không hợp lệ
+            email: 'invalid-email',
             password: 'password'
         };
 
-        await userController.loginUser(req, res); // Gọi hàm loginUser
+        await userController.loginUser(req, res);
 
-        // Kiểm tra phản hồi trả về
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith({
             status: 'ERR',
-            message: 'Email bị lỗi' // Kiểm tra lỗi email không hợp lệ
+            message: 'Email bị lỗi'
+        });
+    });
+
+    it('should return error when user not found', async () => {
+        req.body = {
+            email: 'nonexistent@example.com',
+            password: 'password'
+        };
+
+        UserModel.findOne.mockResolvedValue(null);
+
+        await userController.loginUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'ERR',
+            message: 'Người dùng không tồn tại'
+        });
+    });
+
+    it('should return error when account is already logged in elsewhere', async () => {
+        req.body = {
+            email: 'test@example.com',
+            password: 'password'
+        };
+
+        UserModel.findOne.mockResolvedValue({
+            _id: 'user123',
+            email: 'test@example.com',
+            isLoggedIn: true,
+            isBlocked: false
+        });
+
+        await userController.loginUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'ERR',
+            message: 'Tài khoản này đã được đăng nhập ở nơi khác'
+        });
+    });
+
+    it('should return error when account is blocked', async () => {
+        req.body = {
+            email: 'blocked@example.com',
+            password: 'password'
+        };
+
+        UserModel.findOne.mockResolvedValue({
+            _id: 'user123',
+            email: 'blocked@example.com',
+            isLoggedIn: false,
+            isBlocked: true
+        });
+
+        await userController.loginUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'ERR',
+            message: 'Tài khoản đã bị chặn'
         });
     });
 
@@ -216,52 +286,88 @@ describe('loginUser', () => {
             password: 'password'
         };
 
-        // Mock kết quả trả về khi đăng nhập thành công
+        const mockUser = {
+            _id: 'user123',
+            email: 'test@example.com',
+            isLoggedIn: false,
+            isBlocked: false
+        };
+
         const mockResponse = {
             status: 'OK',
             access_token: 'access-token',
             refresh_token: 'refresh-token',
-            userData: { id: '123' }
+            userData: { id: 'user123' }
         };
 
-        UserService.loginUser.mockResolvedValue(mockResponse); // Mock hàm loginUser
+        UserModel.findOne.mockResolvedValue(mockUser);
+        UserService.loginUser.mockResolvedValue(mockResponse);
 
-        await userController.loginUser(req, res); // Gọi hàm loginUser
+        await userController.loginUser(req, res);
 
-        // Kiểm tra các hành động gọi đến UserService và phản hồi trả về
-        expect(UserService.loginUser).toHaveBeenCalledWith(req.body);
+        // Verify service was called with correct arguments
+        expect(UserService.loginUser).toHaveBeenCalledWith({
+            email: 'test@example.com',
+            password: 'password'
+        });
+
+        // Verify login history was recorded
+        expect(LoginHistory.create).toHaveBeenCalledWith({
+            user: 'user123',
+            ipAddress: '127.0.0.1',
+            userAgent: 'test-user-agent',
+            status: 'success',
+            loginAt: expect.any(Date)
+        });
+
+        // Verify user status was updated
+        expect(UserModel.findByIdAndUpdate).toHaveBeenCalledWith('user123', {
+            isLoggedIn: true,
+            lastActive: expect.any(Date),
+            currentSession: 'login123'
+        });
+
+        // Verify response
         expect(res.cookie).toHaveBeenCalledWith('refresh-token', 'refresh-token', {
             HttpOnly: true,
             Secure: true,
             sameSite: 'None',
         });
-        expect(res.status).toHaveBeenCalledWith(200); // Kiểm tra trạng thái trả về
-        expect(res.json).toHaveBeenCalledWith({
-            status: 'OK',
-            access_token: 'access-token',
-            refresh_token: 'refresh-token',
-            userData: { id: '123' }
-        });
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(mockResponse);
     });
 
-    it('should handle login error', async () => {
+    it('should handle login service error', async () => {
         req.body = {
             email: 'test@example.com',
             password: 'password'
         };
 
-        const error = new Error('Login failed'); // Lỗi đăng nhập
+        const mockUser = {
+            _id: 'user123',
+            email: 'test@example.com',
+            isLoggedIn: false,
+            isBlocked: false
+        };
 
-        UserService.loginUser.mockRejectedValue(error); // Mock lỗi trả về
+        UserModel.findOne.mockResolvedValue(mockUser);
+        UserService.loginUser.mockRejectedValue(new Error('Invalid credentials'));
 
-        await userController.loginUser(req, res); // Gọi hàm loginUser
+        await userController.loginUser(req, res);
 
-        // Kiểm tra phản hồi khi có lỗi
-        expect(res.status).toHaveBeenCalledWith(404); // Kiểm tra trạng thái trả về lỗi
+        // Verify error handling
+        expect(LoginHistory.create).toHaveBeenCalledWith({
+            user: 'user123',
+            ipAddress: '127.0.0.1',
+            userAgent: 'test-user-agent',
+            status: 'failed',
+            failureReason: 'Invalid credentials',
+            loginAt: expect.any(Date)
+        });
+
+        expect(res.status).toHaveBeenCalledWith(404);
         expect(res.json).toHaveBeenCalledWith({
-            message: expect.objectContaining({
-                message: 'Login failed'
-            })
+            message: expect.any(Error)
         });
     });
 });
@@ -923,6 +1029,159 @@ describe('resetPassword', () => {
         expect(res.json).toHaveBeenCalledWith({
             status: 'ERR',
             message: error.message
+        });
+    });
+});
+
+describe('updateLogoutStatus', () => {
+    let req, res;
+
+    beforeEach(() => {
+        req = {
+            params: {}
+        };
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        jest.clearAllMocks();
+    });
+
+    it('should return error if userId is missing', async () => {
+        await userController.updateLogoutStatus(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'ERR',
+            message: 'Thiếu userId'
+        });
+    });
+
+    it('should return success if logout status is updated', async () => {
+        req.params.id = 'user123';
+        UserService.updateLogoutStatus.mockResolvedValue({ status: 'OK', message: 'Đã đăng xuất' });
+
+        await userController.updateLogoutStatus(req, res);
+
+        expect(UserService.updateLogoutStatus).toHaveBeenCalledWith('user123');
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'OK',
+            message: 'Đã đăng xuất'
+        });
+    });
+
+    it('should return error if service throws', async () => {
+        req.params.id = 'user123';
+        UserService.updateLogoutStatus.mockRejectedValue(new Error('Lỗi logout'));
+
+        await userController.updateLogoutStatus(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'ERR',
+            message: 'Lỗi logout'
+        });
+    });
+});
+
+describe('blockUser', () => {
+    let req, res;
+
+    beforeEach(() => {
+        req = {
+            params: {},
+            body: {}
+        };
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        jest.clearAllMocks();
+    });
+
+    it('should return error if user id is invalid', async () => {
+        req.params.id = 'invalid-id';
+        req.body.data = true;
+
+        await userController.blockUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'ERROR',
+            message: 'ID người dùng không hợp lệ'
+        });
+    });
+
+    it('should return error if user not found', async () => {
+        req.params.id = new mongoose.Types.ObjectId().toString();
+        req.body.data = true;
+
+        UserModel.findByIdAndUpdate.mockResolvedValue(null);
+
+        await userController.blockUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'ERROR',
+            message: 'Không tìm thấy người dùng'
+        });
+    });
+
+    it('should return success if user is blocked', async () => {
+        const id = new mongoose.Types.ObjectId().toString();
+        req.params.id = id;
+        req.body.data = true;
+
+        const mockUser = { _id: id, isBlocked: true };
+        UserModel.findByIdAndUpdate.mockResolvedValue(mockUser);
+
+        await userController.blockUser(req, res);
+
+        expect(UserModel.findByIdAndUpdate).toHaveBeenCalledWith(
+            id,
+            { isBlocked: true },
+            { new: true }
+        );
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'OK',
+            message: 'Đã chặn người dùng',
+            data: mockUser
+        });
+    });
+
+    it('should return success if user is unblocked', async () => {
+        const id = new mongoose.Types.ObjectId().toString();
+        req.params.id = id;
+        req.body.data = false;
+
+        const mockUser = { _id: id, isBlocked: false };
+        UserModel.findByIdAndUpdate.mockResolvedValue(mockUser);
+
+        await userController.blockUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'OK',
+            message: 'Đã bỏ chặn người dùng',
+            data: mockUser
+        });
+    });
+
+    it('should handle server error', async () => {
+        const id = new mongoose.Types.ObjectId().toString();
+        req.params.id = id;
+        req.body.data = true;
+
+        UserModel.findByIdAndUpdate.mockRejectedValue(new Error('DB lỗi'));
+
+        await userController.blockUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'ERROR',
+            message: 'DB lỗi'
         });
     });
 });
