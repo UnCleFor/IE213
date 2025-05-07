@@ -161,8 +161,12 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       try {
         const res = await UserService.getDetailUser(user.id, user.access_token);
         
-        if (res?.data?.isBlocked  || !res?.data?.isLoggedIn) {
+        if (res?.data?.isBlocked ) {
           message.warning('Tài khoản của bạn đã bị chặn. Đăng xuất...');
+          handleLogOut();
+        }
+        if (!res?.data?.isLoggedIn) {
+          message.warning('Tài khoản của bạn đã bị buộc đăng xuất. Đăng xuất...');
           handleLogOut();
         }
       } catch (error) {

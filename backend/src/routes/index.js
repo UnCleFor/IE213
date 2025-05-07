@@ -3,11 +3,13 @@ const ProductRouter = require('./ProductRouter')
 const PaymentRouter = require('./PaymentRouter')
 const OrderRouter = require('./OrderRouter')
 const LoginHistoryRouter = require('./LoginHistoryRouter')
+const OpenAiController = require('./OpenAiRouter')
 const routes = (app) => {
     app.use('/api/user', UserRouter)
     app.use('/api/product', ProductRouter)
     app.use('/api/order', OrderRouter)
     app.use('/api/payment', PaymentRouter)
     app.use('/api/login-history', LoginHistoryRouter)
+    app.use('/api/chat', OpenAiController)
 }
 module.exports = routes
