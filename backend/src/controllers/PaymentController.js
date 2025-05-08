@@ -3,6 +3,7 @@ const dotenv = require("dotenv")
 
 dotenv.config()
 
+  // Cấu hình thông tin VNPay
 const vnpayConfig = {
   vnp_TmnCode: 'KITVNV3K',
   vnp_HashSecret: '4FM9L8HWF5UXFVB3NSGT6NWBUBE3ZIL3',
@@ -10,9 +11,10 @@ const vnpayConfig = {
   vnp_ReturnUrl: 'https://ie213.vercel.app/checkout',
   vnp_Api: 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction'
 };
-
+  // Khởi tạo service
 const vnpayService = new PaymentController(vnpayConfig);
 
+  // Tạo URL thanh toán và trả về cho client
 const createPaymentUrl = async (req, res) => {
   try {
     const { amount, orderId, bankCode, orderInfo, orderType } = req.body;
@@ -32,11 +34,12 @@ const createPaymentUrl = async (req, res) => {
       });
     }
 
+    // Lấy địa chỉ IP người dùng
     const ipAddr = req.ip || 
                   req.headers['x-forwarded-for'] || 
                   req.connection.remoteAddress || 
                   req.socket.remoteAddress;
-
+    // Tạo dữ liệu gửi cho VNPay
     const paymentData = {
       amount: parseInt(amount),
       bankCode: bankCode || '',
@@ -46,10 +49,11 @@ const createPaymentUrl = async (req, res) => {
       ipAddr: ipAddr
     };
 
-    console.log('Payment data being processed:', paymentData);
     
+    // Tạo URL thanh toán qua service
     const paymentUrl = await vnpayService.generatePaymentUrl(paymentData);
     
+    // Kiểm tra hợp lệ
     if (!paymentUrl || typeof paymentUrl !== 'string') {
       throw new Error('URL thanh toán không hợp lệ');
     }
@@ -68,6 +72,7 @@ const createPaymentUrl = async (req, res) => {
   }
 };
 
+  // Redirect người dùng sau khi thanh toán xong tùy vào kết quả
 const vnpayReturn = async (req, res) => {
   try {
     const vnp_Params = req.query;

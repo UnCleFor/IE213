@@ -87,11 +87,11 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       dispatch(resetUser()); // Reset user trong Redux
       dispatch(resetOrder())
       navigate('/')
-      message.success('Đăng xuất thành công')
+      
       setLoading(false);
     } catch (error) {
       console.error('Logout error:', error);
-      message.success('Đăng xuất thất bại')
+      
       setLoading(false);
     }
   };
@@ -138,7 +138,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       {user?.isAdmin && (
         <WrapperContentPopup onClick={handleAdmin}>Quản lý hệ thống</WrapperContentPopup>
       )}
-      <WrapperContentPopup onClick={handleLogOut}>Đăng xuất</WrapperContentPopup>
+      <WrapperContentPopup onClick={()=> {handleLogOut(); message.success('Đăng xuất thành công')}}>Đăng xuất</WrapperContentPopup>
     </div>
   )
 

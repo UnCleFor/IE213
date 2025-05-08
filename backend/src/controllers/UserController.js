@@ -11,6 +11,7 @@ const LoginHistory = require('../models/LoginHistoryModel');
 const User = require('../models/UserModel');
 const mongoose = require('mongoose')
 
+    // API tạo người dùng mới
 const createUser = async (req, res) => {
     try {
         const { name, email, password, confirmPassword, phone } = req.body;
@@ -68,13 +69,13 @@ const createUser = async (req, res) => {
     }
 };
 
+    // API đăng nhập người dùng
 const loginUser = async (req, res) => {
     try {
         // lấy ra các thông tin cần thiết từ body của req đc gửi từ ui xuống để tạo user mới 
         const { email, password } = req.body
         // check email có hợp lệ ko
         const isCheckEmail = validator.validate(email);
-        //console.log(email, password)
         // nếu thiếu 1 trường thì báo lỗi
         if (!email || !password) {
             return res.status(200).json({
@@ -158,6 +159,7 @@ const loginUser = async (req, res) => {
     }
 }
 
+    // API cập nhật thông tin người dùng
 const updateUser = async (req, res) => {
     try {
         const userId = req.params.id;
@@ -212,6 +214,7 @@ const updateUser = async (req, res) => {
     }
 };
 
+    // API xóa người dùng theo ID
 const deleteUser = async (req, res) => {
     try {
         const userId = req.params.id
@@ -233,6 +236,7 @@ const deleteUser = async (req, res) => {
     }
 }
 
+    // API lấy danh sách tất cả người dùng
 const getAllUser = async (req, res) => {
     try {
         // thực hiện gọi dịch vụ tạo user mới
@@ -246,6 +250,7 @@ const getAllUser = async (req, res) => {
     }
 }
 
+    // API lấy thông tin chi tiết người dùng theo ID
 const getDetailsUser = async (req, res) => {
     try {
         const userId = req.params.id
@@ -267,8 +272,8 @@ const getDetailsUser = async (req, res) => {
     }
 }
 
+    // API làm mới access token
 const refreshToken = async (req, res) => {
-    console.log('req.cookies', req.cookies)
     try {
         // lấy refresh token trong cookie
         let token = req.headers.token.split(' ')[1]
@@ -289,6 +294,7 @@ const refreshToken = async (req, res) => {
     }
 }
 
+    // API đăng xuất người dùng
 const logoutUser = async (req, res) => {
     try {
         res.clearCookie('refresh-token', {
@@ -306,6 +312,7 @@ const logoutUser = async (req, res) => {
     }
 };
 
+    // API xóa nhiều người dùng theo danh sách ID
 const deleteManyUser = async (req, res) => {
     try {
         const ids = req.body.ids
@@ -327,6 +334,7 @@ const deleteManyUser = async (req, res) => {
     }
 }
 
+    // API lấy email người dùng theo ID
 const getUserEmail = async (req, res) => {
     try {
         const userId = req.params.id
@@ -347,6 +355,7 @@ const getUserEmail = async (req, res) => {
     }
 }
 
+    // API quên mật khẩu
 const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body
@@ -381,6 +390,7 @@ const forgotPassword = async (req, res) => {
     }
 }
 
+    // API đặt lại mật khẩu
 const resetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
@@ -430,6 +440,7 @@ const resetPassword = async (req, res) => {
     }
 };
 
+    // API update trạng thái đăng nhập
 const updateLogoutStatus = async (req, res) => {
     try {
         const userId = req.params.id;
@@ -454,7 +465,7 @@ const updateLogoutStatus = async (req, res) => {
     }
 };
 
-
+    // API chặn hoặc bỏ chặn người dùng
 const blockUser = async (req, res) => {
     try {
         const { id } = req.params;

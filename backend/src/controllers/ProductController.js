@@ -1,5 +1,6 @@
 const ProductService = require('../services/ProductService')
 
+    // Tạo sản phẩm mới
 const createProduct = async (req,res) => {
     try {
         // lấy ra các thông tin cần thiết từ body của req đc gửi từ ui xuống để tạo product mới 
@@ -11,8 +12,7 @@ const createProduct = async (req,res) => {
                 message: 'Cần điền đầy đủ thông tin'
             })
         }
-        // // thực hiện gọi dịch vụ tạo proudct mới
-        console.log('respon', req.body)
+        // thực hiện gọi dịch vụ tạo proudct mới
         const ketqua = await ProductService.createProduct(req.body)
         return res.status(200).json(ketqua)
     } catch(e){
@@ -22,6 +22,7 @@ const createProduct = async (req,res) => {
     }
 }
 
+    // Cập nhật sản phẩm theo ID
 const updateProduct = async (req, res) => {
     try {
         const productId = req.params.id
@@ -43,6 +44,7 @@ const updateProduct = async (req, res) => {
     }
 }
 
+    // Lấy chi tiết sản phẩm theo ID
 const getDetailsProduct = async (req, res) => {
     try {
         const productId = req.params.id
@@ -64,6 +66,7 @@ const getDetailsProduct = async (req, res) => {
     }
 }
 
+    // Xóa sản phẩm theo ID
 const deleteProduct = async (req, res) => {
     try {
         const productId = req.params.id
@@ -83,6 +86,7 @@ const deleteProduct = async (req, res) => {
     }
 }
 
+    // Lấy tất cả sản phẩm (phân trang, lọc, sắp xếp)
 const getAllProduct = async (req, res) => {
     try {
         const { limit, page, sort, filter, label } = req.query
@@ -96,6 +100,7 @@ const getAllProduct = async (req, res) => {
     }
 }
 
+    // Lấy tất cả phân loại sản phẩm
 const getAllType = async (req, res) => {
     try {
         const ketqua = await ProductService.getAllType()
@@ -108,6 +113,7 @@ const getAllType = async (req, res) => {
     }
 }
 
+    // Xóa nhiều sản phẩm theo danh sách ID
 const deleteManyProduct = async (req, res) => {
     try {
         const ids = req.body.ids
@@ -127,6 +133,7 @@ const deleteManyProduct = async (req, res) => {
     }
 }
 
+    // Tìm kiếm sản phẩm theo tên
 const searchProducts = async (req, res) => {
     try {
       const { keyword } = req.query;
@@ -137,6 +144,7 @@ const searchProducts = async (req, res) => {
     }
   };
 
+    // Lấy danh sách màu sắc
 const getAllColors = async (req, res) => {
     try {
         const colors = await ProductService.getAllColors();
@@ -154,10 +162,9 @@ const getAllColors = async (req, res) => {
     }
 }; 
 
+    // Lọc sản phẩm nâng cao
 const filterProducts = async (req, res) => {
-    try {
-      console.log('[BACKEND] Query nhận được:', req.query);
-      
+    try {      
       const { colors, type, room, minPrice, maxPrice, sortBy } = req.query;
       const query = {};
   
@@ -190,8 +197,6 @@ const filterProducts = async (req, res) => {
       };
       const sort = sortOptions[sortBy] || { createdAt: -1 };
   
-      console.log('[BACKEND] Query cuối cùng:', { query, sort });
-  
       // 5. Thực hiện query
       const products = await ProductService.filterProducts(req.query);
   
@@ -218,6 +223,7 @@ const filterProducts = async (req, res) => {
     }
   };
   
+  // Lấy sản phẩm mới nhất
   const getNewestProducts = async (req, res) => {
     try {
         const { limit, page } = req.query;
@@ -235,6 +241,8 @@ const filterProducts = async (req, res) => {
         });
     }
 };
+
+    // Lấy sản phẩm theo giá
 const getDiscountedProducts = async (req, res) => {
     try {
         const { limit, page } = req.query;
@@ -252,6 +260,7 @@ const getDiscountedProducts = async (req, res) => {
         });
     }
 };
+
 module.exports = {
     createProduct,
     updateProduct,

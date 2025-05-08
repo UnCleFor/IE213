@@ -4,12 +4,12 @@ dotenv.config()
 
 const User = require('../models/UserModel')
 
+  // Xác thực và kiểm tra quyền admin
 const authMiddleWare = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
   
     jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
       if (err) {
-        console.log("JWT Error:", err.message);
         return res.status(401).json({
           message: "Token không hợp lệ",
           status: "ERROR"
@@ -28,24 +28,17 @@ const authMiddleWare = (req, res, next) => {
     });
   };
   
+  // Middleware xác thực người dùng
 const authUserMiddleWare = (req, res, next) => {
     
     const token = req.headers.token?.split(' ')[1]; 
-    //console.log("Token nhận được:", token);
     const userId = req.params.id
     jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
         if (err) {
-           // console.log("JWT Error:", err.message); // In lỗi ra console
-            // return res.status(401).json({
-            //     message: "giai ma token sai",
-            //     status: "ERROR",
-            // });
             return next()
         }
-        req.user = user; // ✅ GÁN user VÀO req.user để controller đọc được
-        //const { payload } = user
+        req.user = user; // gán user vào req.user để controller đọc được
         if (user.isAdmin || user.id === userId) {
-            //console.log('true')
             next()
         } else {
             return res.status(404).json({
@@ -56,6 +49,7 @@ const authUserMiddleWare = (req, res, next) => {
     });
 }
 
+  // Middleware theo dõi hoạt động của user
 const trackActivity = async (req, res, next) => {
   if (req.user) {
       try {

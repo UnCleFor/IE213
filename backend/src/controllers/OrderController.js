@@ -16,23 +16,9 @@ const createOrder = async (req, res) => {
       phone,
       totalDiscount
     } = req.body
-    // nếu thiếu 1 trường thì báo lỗi
-    // if (!paymentMethod ||
-    //    !itemsPrice ||
-    //   !shippingPrice || 
-    //   !totalPrice || 
-    //   !fullName || 
-    //   !address || 
-    //   !phone || 
-    //   totalDiscount === undefined || 
-    //   totalDiscount === null) {
-    //   return res.status(200).json({
-    //     status: 'Lỗi',
-    //     message: 'Cần điền đầy đủ thông tin'
-    //   })
-    // }
-    const missingFields = [];
 
+    const missingFields = [];
+    // kiểm tra các trường bắt buộc
     if (!paymentMethod) missingFields.push('paymentMethod');
     if (!itemsPrice) missingFields.push('itemsPrice');
     if (!shippingPrice) missingFields.push('shippingPrice');
@@ -51,7 +37,6 @@ const createOrder = async (req, res) => {
     // Kiểm tra tồn kho
     for (const item of orderItems) {
       const product = await Products.findById(item.product);
-      console.log('product', product)
       if (product.countInStock < item.amount) {
         return res.status(400).json({
           status: 'Lỗi',
@@ -68,7 +53,6 @@ const createOrder = async (req, res) => {
       await product.save();
     }
     // // thực hiện gọi dịch vụ tạo proudct mới
-    console.log('respon', req.body)
     const ketqua = await OrderService.createOrder(req.body)
     return res.status(200).json(ketqua)
   } catch (e) {
@@ -77,6 +61,7 @@ const createOrder = async (req, res) => {
     })
   }
 }
+  // Lấy chi tiết đơn hàng theo ID
 const getOrderDetails = async (req, res) => {
   try {
     const orderId = req.params.id
@@ -95,6 +80,7 @@ const getOrderDetails = async (req, res) => {
   }
 }
 
+  // Lấy toàn bộ đơn hàng
 const getAllOrders = async (req, res) => {
   try {
     const ketqua = await OrderService.getAllOrders()
@@ -107,6 +93,7 @@ const getAllOrders = async (req, res) => {
   }
 }
 
+  // Cập nhật đơn hàng theo ID
 const updatedOrder = async (req, res) => {
   try {
     const OrderId = req.params.id
@@ -126,6 +113,7 @@ const updatedOrder = async (req, res) => {
   }
 }
 
+  // Xóa đơn hàng theo ID
 const deleteOrder = async (req, res) => {
   try {
     const OrderId = req.params.id
@@ -144,6 +132,7 @@ const deleteOrder = async (req, res) => {
   }
 }
 
+  // Xóa nhiều đơn hàng theo danh sách ID
 const deleteManyOrder = async (req, res) => {
   try {
     const ids = req.body.ids
@@ -162,6 +151,7 @@ const deleteManyOrder = async (req, res) => {
   }
 }
 
+  // Lấy danh sách đơn hàng theo từng người dùng (userId)
 const getOrderByUser = async (req, res) => {
   try {
     const userId = req.params.userId;
