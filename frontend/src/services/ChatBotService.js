@@ -12,6 +12,6 @@ export const sendMessageToAI = async (message) => {
       return await response.json();
     } catch (error) {
       console.error('API call failed:', error);
-      return { reply: 'Xin lỗi, có lỗi khi kết nối với ChatBotAI.' };
+      return { reply: 'Xin lỗi, có lỗi khi kết nối với ChatBot.' };
     }
   };
