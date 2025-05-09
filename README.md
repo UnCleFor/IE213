@@ -108,7 +108,7 @@ docker-compose up --build
 
 ### Hướng dẫn sử dụng hệ thống
 
-Truy cập http://localhost:3000/login
+Truy cập http://localhost:3000/sign_in
 
 Tài khoản admin: thanhnha123@gmail.com / 123123
 
