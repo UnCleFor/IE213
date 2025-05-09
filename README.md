@@ -93,6 +93,8 @@ Sau khi khởi chạy:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:3001
 
+### Triển khai với Docker
+
 1. Cài đặt Docker
 Đảm bảo đã cài đặt Docker và Docker Compose
 
