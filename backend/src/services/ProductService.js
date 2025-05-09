@@ -1,32 +1,32 @@
 const Product = require('../models/ProductModel')
 
-const createProduct = (newProduct) => {
+const createProduct = (newProduct) => { // tạo sp mới
     return new Promise(async (resolve, reject) => {
       const {
-        // 🧾 Thông tin cơ bản
+        // Thông tin cơ bản
         name,
         image,
         images=[],
         description = '',
   
-        // 🏷️ Phân loại sản phẩm
+        // Phân loại sản phẩm
         room = '',
         type,
         brand = '',
         origin = '',
   
-        // 📦 Tồn kho và giá
+        // Tồn kho và giá
         price,
         countInStock,
         discount = 0,
         selled = 0,
   
-        // 🎨 Thuộc tính chi tiết
+        // Thuộc tính chi tiết
         colors = [],
         size = {}
       } = newProduct;
   
-      try {
+      try {     // kiểm tra tên sp đã tồn tại chưa
         const checkProduct = await Product.findOne({ name });
   
         if (checkProduct !== null) {
@@ -36,24 +36,24 @@ const createProduct = (newProduct) => {
           });
         }
   
-        const createdProduct = await Product.create({
-          name,
-          image,
-          images,
-          description,
+        const createdProduct = await Product.create({   // tạo mới sp
+          name,     // tên sp
+          image,    // ảnh đại diện
+          images,   // ds ảnh phụ
+          description,  // mô tả sp
   
-          room,
-          type,
-          brand,
-          origin,
+          room,     // phòng (phòng khách, phòng ngủ...)
+          type,     // loại sản phẩm: bàn, ghế, tủ...
+          brand,    // thương hiệu
+          origin,   // xuất xứ
   
-          price,
-          countInStock,
-          discount,
-          selled,
+          price,    // giá sp
+          countInStock, // số lượng trong kho
+          discount, // giảm giá
+          selled,   // số lượng đã bán
   
-          colors,
-          size
+          colors,   // nhiều màu
+          size      // kích thước
         });
   
         resolve({
@@ -67,11 +67,11 @@ const createProduct = (newProduct) => {
       }
     });
   };
-const updateProduct = (id, data) => {
+const updateProduct = (id, data) => {   // cập nhật sp
     // Tạo xử lý bất đồng bộ
     return new Promise(async (resolve, reject) => {
         try {
-            const checkProduct = await Product.findOne({
+            const checkProduct = await Product.findOne({    // kiểm tra sp tồn tại
                 _id: id
             })
             if (checkProduct === null) {
@@ -81,7 +81,7 @@ const updateProduct = (id, data) => {
                 })
             }
 
-            if (data.name) {
+            if (data.name) {    // kiểm tra trùng tên
                 const checkProduct = await Product.findOne({ name: data.name });
                 if (checkProduct && checkProduct._id.toString() !== id) {
                     resolve({
@@ -91,7 +91,7 @@ const updateProduct = (id, data) => {
                     return;
                 }
             }
-            const updatedProduct = await Product.findByIdAndUpdate(id, data, {
+            const updatedProduct = await Product.findByIdAndUpdate(id, data, {  // cập nhật sp
                 new: true
             })
             resolve({
@@ -105,7 +105,7 @@ const updateProduct = (id, data) => {
     })
 }
 
-const getDetailsProduct = (id) => {
+const getDetailsProduct = (id) => {     // lấy thông tin chi tiết 1 sp
     // Tạo xử lý bất đồng bộ
     return new Promise(async (resolve, reject) => {
         try {
@@ -131,7 +131,7 @@ const getDetailsProduct = (id) => {
     })
 }
 
-const deleteProduct = (id) => {
+const deleteProduct = (id) => {     // xóa 1 sp theo ID
     // Tạo xử lý bât đồng bộ
     return new Promise(async (resolve, reject) => {
         try {
@@ -156,6 +156,7 @@ const deleteProduct = (id) => {
     })
 }
 
+// lấy ds sp với phân trang, lọc, sắp xếp
 const getAllProduct = (limit, page, sort, filter, value) => {
     // Tạo xử lý bất đồng bộ
     return new Promise(async (resolve, reject) => {
@@ -176,13 +177,6 @@ const getAllProduct = (limit, page, sort, filter, value) => {
                     { $skip: page * limit },
                     { $limit: limit }
                 ]);
-                  
-                // const allProductFilter = await Product.find({
-                //     [label]: {
-                //         '$regex': value,
-                //         '$options': 'i' //không phân biệt hoa thường
-                //     }
-                // })
 
                 const totalFiltered = await Product.aggregate([
                     {
@@ -220,7 +214,7 @@ const getAllProduct = (limit, page, sort, filter, value) => {
                 })
             }
 
-            if(!limit) {
+            if(!limit) {    // nếu không có sort hay filter
                 allProduct = await Product.find()
             } else {
                 allProduct = await Product.find().limit(limit).skip(page * limit)
@@ -239,7 +233,7 @@ const getAllProduct = (limit, page, sort, filter, value) => {
     })
 }
 
-const getAllType = () => {
+const getAllType = () => {      // lấy tất cả loại sp
     // Tạo xử lý bất đồng bộ
     return new Promise(async (resolve, reject) => {
         try {  
@@ -255,7 +249,7 @@ const getAllType = () => {
     })
 }
 
-const deleteManyProduct = (ids) => {
+const deleteManyProduct = (ids) => {    // xóa nhiều sp theo ds ID
     // Tạo xử lý bât đồng bộ
     return new Promise(async (resolve, reject) => {
         try {
@@ -270,7 +264,7 @@ const deleteManyProduct = (ids) => {
     })
 }
 
-const searchProducts = async (keyword) => {
+const searchProducts = async (keyword) => { // tìm kiếm sp (Atlas Search)
     return new Promise(async (resolve, reject) => {
       try {
         const products = await Product.aggregate([
@@ -305,7 +299,7 @@ const searchProducts = async (keyword) => {
     });
   };
 
-  const getAllColors = () => {
+  const getAllColors = () => {      // lấy ds màu sắc (duy nhất)
     return new Promise(async (resolve, reject) => {
         try {  
             const allColors = await Product.distinct('colors')
@@ -320,7 +314,7 @@ const searchProducts = async (keyword) => {
     })
 }
 
-const filterProducts = async (filters) => {
+const filterProducts = async (filters) => {     // lọc nâng cao
   const { colors, type, room, minPrice, maxPrice, sortBy } = filters;
 
   const query = {};
@@ -360,7 +354,8 @@ const filterProducts = async (filters) => {
 
   return products;
 };  
-const getNewestProducts = (limit, page) => {
+
+const getNewestProducts = (limit, page) => {    // lấy ds sp mới nhất
     return new Promise(async (resolve, reject) => {
         try {
             const totalProduct = await Product.countDocuments();
@@ -389,7 +384,8 @@ const getNewestProducts = (limit, page) => {
         }
     });
 };
-const getDiscountedProducts = (limit, page) => {
+
+const getDiscountedProducts = (limit, page) => {    // lấy sp có giảm giá
     return new Promise(async (resolve, reject) => {
         try {
             // Chỉ đếm sản phẩm có discount > 0

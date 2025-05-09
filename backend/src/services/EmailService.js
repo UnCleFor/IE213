@@ -3,20 +3,22 @@ const dotenv = require('dotenv');
 
 dotenv.config()
 
+    // gửi email xác nhận đặt hàng
 const sendEmailCreateOrder = async (email, orderItems, totalPrice, totalDiscount, shippingFee) => {
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
         secure: true, // true for port 465, false for other ports
         auth: {
-            user: process.env.MAIL_ACCOUNT,
-            pass: process.env.MAIL_PASSWORD,
+            user: process.env.MAIL_ACCOUNT,     // email gửi đi
+            pass: process.env.MAIL_PASSWORD,    // mật khẩu
         },
     });
 
     let listItem = '';
     let totalAmount = 0;
 
+    // duyệt qua ds sp trong đơn hàng
     orderItems.forEach((order) => {
         const itemTotalPrice = order.price * order.amount;
         totalAmount += itemTotalPrice;
@@ -27,6 +29,7 @@ const sendEmailCreateOrder = async (email, orderItems, totalPrice, totalDiscount
         </div>`;
     });
 
+    // làm tròn giá trị
     totalAmount = Math.round(totalAmount);
     totalDiscount = Math.round(totalDiscount);
     shippingFee = Math.round(shippingFee);
@@ -49,6 +52,7 @@ const sendEmailCreateOrder = async (email, orderItems, totalPrice, totalDiscount
     });
 }
 
+    // gửi email chứa mã OTP
 const sendOTPEmail = async ({ to, subject, text }) => {
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",

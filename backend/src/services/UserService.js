@@ -5,7 +5,7 @@ const { generalAccessToken,generalRefreshToken } = require('./JwtService')
 
 const LoginHistory = require('../models/LoginHistoryModel')
 
-const createUser = (newUser) => {
+const createUser = (newUser) => {   // tạo mới người dùng
     return new Promise(async (resolve, reject) => {
       const { name, email, password, confirmPassword, phone, avatar } = newUser;
       try {
@@ -43,7 +43,7 @@ const createUser = (newUser) => {
     });
   };
   
-const loginUser = (userLogin) => {
+const loginUser = (userLogin) => {  // xử lý đăng nhập
     return new Promise( async(resolve,reject) => {
         // lấy các trường ra từ input
         const { email, password } = userLogin
@@ -95,7 +95,7 @@ const loginUser = (userLogin) => {
         }
     })
 }
-const updateUser = (id, data) => {
+const updateUser = (id, data) => {  // cập nhật thông tin
     return new Promise(async (resolve, reject) => {
         try {
             // Kiểm tra xem người dùng có tồn tại không
@@ -138,7 +138,7 @@ const updateUser = (id, data) => {
 };
 
 
-const deleteUser = (id) => {
+const deleteUser = (id) => {    // xóa 1 người dùng theo ID
     return new Promise( async(resolve,reject) => {
         try {
             // biến kiểm tra coi mail có trong database ko
@@ -167,7 +167,7 @@ const deleteUser = (id) => {
     })
 }
 
-const getAllUser = () => {
+const getAllUser = () => {  // lấy ds tất cả user từ database
     return new Promise( async(resolve,reject) => {
         try {
             const allUser = await User.find()
@@ -183,7 +183,7 @@ const getAllUser = () => {
     })
 }
 
-const getDetailsUser = (id) => {
+const getDetailsUser = (id) => {    // lấy thông tin chi tiết của 1 user theo ID
     return new Promise( async(resolve,reject) => {
         try {
             // biến kiểm tra coi mail có trong database ko
@@ -212,7 +212,7 @@ const getDetailsUser = (id) => {
     })
 }
 
-const deleteManyUser = (ids) => {
+const deleteManyUser = (ids) => {   // xóa nhiều user theo ds ID
     return new Promise( async(resolve,reject) => {
         try {
             await User.deleteMany({_id:ids})
@@ -228,7 +228,7 @@ const deleteManyUser = (ids) => {
     })
 }
 
-const getUserEmail = (id) => {
+const getUserEmail = (id) => {  // trả về email user theo ID
     return new Promise(async (resolve, reject) => {
         try {
             const user = await User.findOne(
@@ -255,7 +255,7 @@ const getUserEmail = (id) => {
     });
 };
 
-const updateLogoutStatus = async (userId) => {
+const updateLogoutStatus = async (userId) => {  // cập nhật trạng thái đăng xuất của user
     try {
         const user = await User.findById(userId);
 

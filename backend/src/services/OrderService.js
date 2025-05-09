@@ -3,11 +3,11 @@ const Product = require('../models/ProductModel');
 const product = require('../models/ProductModel')
 const EmailService = require('../services/EmailService')
 
-const createOrder = (newOrder) => {
+const createOrder = (newOrder) => {   // tạo đơn hàng mới
   return new Promise(async (resolve, reject) => {
     const { orderItems, paymentMethod, shippingMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, phone, user, totalDiscount, email, isPaid } = newOrder;
     try {
-      const createdOrder = await Order.create({
+      const createdOrder = await Order.create({ // tạo đơn hàng trong MongoDB
         orderItems,
         shippingAddress: {
           fullName,
@@ -25,7 +25,7 @@ const createOrder = (newOrder) => {
         isPaid: isPaid
       });
 
-      if (createdOrder) {
+      if (createdOrder) {   // gửi mail xác nhận đơn hàng
         await EmailService.sendEmailCreateOrder(email, orderItems, totalPrice, totalDiscount, shippingPrice);
         resolve({
           status: "OK",
@@ -41,7 +41,7 @@ const createOrder = (newOrder) => {
   });
 };
 
-const getOrderDetails = (orderId) => {
+const getOrderDetails = (orderId) => {    // lấy chi tiết đơn hàng
   return new Promise(async (resolve, reject) => {
     try {
       const order = await Order.findById(orderId)
@@ -66,10 +66,10 @@ const getOrderDetails = (orderId) => {
   });
 };
 
-const getAllOrders = () => {
+const getAllOrders = () => {    // lấy tất cả đơn hàng
   return new Promise(async (resolve, reject) => {
     try {
-      const allOrder = await Order.find().sort({ createdAt: -1 }).exec();
+      const allOrder = await Order.find().sort({ createdAt: -1 }).exec(); // mới nhất xếp trước
       resolve({
         status: 'OK',
         message: 'Thành công',
@@ -81,7 +81,7 @@ const getAllOrders = () => {
     }
   })
 }
-const updateOrder = (id, data) => {
+const updateOrder = (id, data) => {   // cập nhật đơn hàng
   return new Promise(async (resolve, reject) => {
     try {
       const checkOrder = await Order.findOne({ _id: id });
@@ -92,7 +92,7 @@ const updateOrder = (id, data) => {
         });
         return;
       }
-      if (data.state === 'Đã hủy') {
+      if (data.state === 'Đã hủy') {    // hoàn lại tồn kho khi hủy đơn
         data.cancelledAt = new Date();
         for (const item of checkOrder.orderItems) {
           await Product.findByIdAndUpdate(item.product, {
@@ -100,7 +100,7 @@ const updateOrder = (id, data) => {
           });
         }
       }
-      const updatedOrder = await Order.findByIdAndUpdate(
+      const updatedOrder = await Order.findByIdAndUpdate( // cập nhật
         id,
         {
           $set: data,
@@ -119,7 +119,7 @@ const updateOrder = (id, data) => {
   });
 };
 
-const deleteOrder = (id) => {
+const deleteOrder = (id) => {   // xóa một đơn hàng
   return new Promise(async (resolve, reject) => {
       try {
           const checkOrder = await Order.findOne({
@@ -142,7 +142,7 @@ const deleteOrder = (id) => {
   })
 }
 
-const deleteManyOrder = (ids) => {
+const deleteManyOrder = (ids) => {    // xóa nhiều đơn hàng cùng lúc
   return new Promise(async (resolve, reject) => {
       try {
           await Order.deleteMany({_id: ids})
@@ -156,7 +156,7 @@ const deleteManyOrder = (ids) => {
   })
 }
 
-const getOrderByUser = (userId) => {
+const getOrderByUser = (userId) => {    // lấy ds đơn hàng theo user
   return new Promise(async (resolve, reject) => {
     try {
       const orders = await Order.find({
