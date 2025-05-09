@@ -19,7 +19,7 @@
 - **Drive:** [https://drive.google.com/drive/folders/1UR5-nwDWV7avxDCURRyuXK4VxV8XMZj9?usp=sharing]
 - **Github:** [https://github.com/UnCleFor/IE213.git]
 - **Link đến video demo:** Đang bổ sung  
-- **Link đến video báo cáo:** Đang bổ sung  
+- **Link đến video báo cáo:** [https://youtu.be/PA_lPm-GFro?si=6lx8dqPAeO3olr6b]
 - **Link deploy project:** [https://ie213.vercel.app/]
 
 ## Tổ chức folder
