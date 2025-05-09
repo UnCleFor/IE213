@@ -43,7 +43,7 @@
 | Frontend   |    `.env`     | `REACT_APP_API_URL=http://localhost:3001/api`        | Kết nối tới API local     |
 | Backend    |    `index.js` | `origin: 'http://localhost:3000'`                    | Cho phép CORS từ frontend |
 
-```markdown
+
 ### Cài đặt thủ công không dùng Docker
 
 1. **Clone repository**
@@ -91,8 +91,7 @@ npm start
 Sau khi khởi chạy:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:3001
-```
-```
+
 1. Cài đặt Docker
 Đảm bảo đã cài đặt Docker và Docker Compose
 
