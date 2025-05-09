@@ -89,16 +89,10 @@ REACT_APP_API_URL=http://localhost:3001/api
      npm start
      ```
      
-Sau khi khởi chạy:
-
-    - Frontend: http://localhost:3000
-
-    - Backend API: http://localhost:3001
-
 ### Triển khai với Docker
 
 1. Cài đặt Docker
-Đảm bảo đã cài đặt Docker và Docker Compose
+    Đảm bảo đã cài đặt Docker và Docker Compose
 
 2. Khởi chạy hệ thống
 ```bash
