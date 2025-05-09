@@ -92,9 +92,10 @@ REACT_APP_API_URL=http://localhost:3001/api
 ### Triển khai với Docker
 
 1. Cài đặt Docker
-    Đảm bảo đã cài đặt Docker và Docker Compose
 
-2. Khởi chạy hệ thống
+   Đảm bảo đã cài đặt Docker và Docker Compose
+
+3. Khởi chạy hệ thống
 ```bash
 docker-compose up --build
 ```
