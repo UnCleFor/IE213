@@ -23,6 +23,7 @@ const AdminUser = () => {
   const queryClient = useQueryClient();
   const user = useSelector((state) => state?.user);
 
+  // Các trạng thái cho UI
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rowSelected, setRowSelected] = useState('');
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
@@ -42,8 +43,8 @@ const AdminUser = () => {
     phone: '',
     avatar: '',
     isAdmin: false,
-    password: '', // Đảm bảo có password
-    confirmPassword: '', // Thêm confirmPassword vào state
+    password: '',
+    confirmPassword: '',
   });
 
   const [stateUserDetails, setStateUserDetails] = useState({
@@ -54,12 +55,11 @@ const AdminUser = () => {
     isAdmin: false, // Thêm
   });
 
-
+  // Các mutation dùng để gọi API thêm, cập nhật, xóa
   const mutation = useMutationHooks((data) => {
     const { name, email, phone, avatar, password, confirmPassword } = data;
     return UserService.signupUser({ name, email, phone, avatar, password, confirmPassword });
   });
-
 
   const mutationUpdate = useMutationHooks(({ id, token, ...rests }) => {
     return UserService.updateUser(id, rests, token);
@@ -73,21 +73,25 @@ const AdminUser = () => {
     return UserService.deleteManyUser(ids, token);
   });
 
+  // Trạng thái mutation
   const { data, isLoading, isSuccess, isError } = mutation;
   const { data: dataUpdated, isLoading: isLoadingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate;
   const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
   const { data: dataDeletedMany, isLoading: isLoadingDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeleteMany;
 
+  // API lấy toàn bộ user
   const getAllUsers = async () => {
     const res = await UserService.getAllUser(user.access_token);
     return res;
   };
 
+  // Truy vấn danh sách người dùng
   const { isLoading: isLoadingUser, data: users } = useQuery({
     queryKey: ['users', user.access_token], // queryKey thêm token để theo dõi thay đổi
     queryFn: () => UserService.getAllUser(user.access_token),
   });
 
+  // Lấy chi tiết người dùng theo ID
   const fetchGetDetailsUser = async (rowSelected) => {
     const res = await UserService.getDetailUser(rowSelected);
     if (res?.data) {
@@ -103,6 +107,7 @@ const AdminUser = () => {
     setIsLoadingUpdate(false);
   };
 
+  // Reset form và state khi hủy
   const handleCancel = () => {
     setIsModalOpen(false);
     setStateUser({
@@ -116,6 +121,7 @@ const AdminUser = () => {
     mutation.reset();
   };
 
+  // Thay đổi input form thêm user
   const handleOnchange = (e) => {
     setStateUser({
       ...stateUser,
@@ -123,6 +129,7 @@ const AdminUser = () => {
     });
   };
 
+  // Thay đổi input form chi tiết user
   const handleOnchangeDetails = (e) => {
     setStateUserDetails({
       ...stateUserDetails,
@@ -130,6 +137,7 @@ const AdminUser = () => {
     });
   };
 
+  // Chọn avatar khi tạo user
   const handleOnchangeAvatar = async ({ fileList }) => {
     const file = fileList[0];
     if (!file) return;
@@ -148,6 +156,7 @@ const AdminUser = () => {
     });
   };
 
+  // Chọn avatar khi cập nhật user
   const handleOnchangeAvatarDetails = async ({ fileList }) => {
     const file = fileList[0];
     if (!file.url && !file.preview) {
@@ -159,6 +168,7 @@ const AdminUser = () => {
     });
   };
 
+  // Xóa 1 người dùng
   const handleDeleteUser = () => {
     mutationDelete.mutate({
       id: rowSelected,
@@ -166,6 +176,7 @@ const AdminUser = () => {
     });
   };
 
+  // Xóa nhiều người dùng
   const handleDeleteManyUsers = (ids) => {
     setIsFinishDeletedMany(true)
     mutationDeleteMany.mutate({
@@ -174,16 +185,14 @@ const AdminUser = () => {
     })
   }
 
+  // Submit form tạo người dùng
   const onFinish = () => {
-
-    mutation.mutate({
-      ...stateUser,
-    });
+    mutation.mutate({ ...stateUser });
   };
 
 
+  // Submit cập nhật người dùng
   const onUpdateUser = () => {
-    console.log('onUpdateUser called'); // Đảm bảo sự kiện này được gọi
     setIsFinishUpdated(true)
     mutationUpdate.mutate({
       id: rowSelected,
@@ -192,6 +201,7 @@ const AdminUser = () => {
     });
   };
 
+  // Action sửa/xóa trên từng dòng
   const renderAction = (record) => (
     <div>
       <EditOutlined
@@ -213,17 +223,21 @@ const AdminUser = () => {
     </div>
   );
 
+  // Tìm kiếm theo cột
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
   };
+
+  // Reset bộ lọc tìm kiếm
   const handleReset = (clearFilters, confirm) => {
     clearFilters();          // Xóa bộ lọc hiện tại
     setSearchText('');       // Reset từ khóa tìm kiếm
     confirm();               // Kích hoạt lại lọc (với từ khóa rỗng)
   };
 
+  // Cấu hình tìm kiếm cho từng cột
   const getColumnSearchProps = dataIndex => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div style={{ padding: 8 }} onKeyDown={e => e.stopPropagation()}>
@@ -270,6 +284,7 @@ const AdminUser = () => {
     },
   });
 
+  // Định nghĩa cột cho bảng
   const columns = [
     {
       title: 'Name',
@@ -305,19 +320,22 @@ const AdminUser = () => {
     },
   ];
 
-
+  // Chuẩn hóa dữ liệu người dùng cho bảng
   const dataTable = users?.data?.map((user) => ({ ...user, key: user._id }));
 
+  // Đồng bộ state form khi mở modal
   useEffect(() => {
     if (isModalOpen) {
       formAdd.setFieldsValue(stateUser); // Đồng bộ state vào form mỗi khi mở lại
     }
   }, [isModalOpen]);
 
+  // Đồng bộ form cập nhật khi dữ liệu thay đổi
   useEffect(() => {
     formUpdate.setFieldsValue(stateUserDetails);
   }, [formUpdate, stateUserDetails]);
 
+  // Xử lý sau khi thêm user
   useEffect(() => {
     if (isSuccess && data?.status === 'OK') {
       message.success('Thêm người dùng thành công!');
@@ -328,6 +346,7 @@ const AdminUser = () => {
     }
   }, [isSuccess, isError]);
 
+  // Xử lý sau khi cập nhật user
   useEffect(() => {
     if (isSuccessUpdated && dataUpdated?.status === 'OK') {
       message.success('Cập nhật thành công!');
@@ -340,6 +359,7 @@ const AdminUser = () => {
     }
   }, [isSuccessUpdated, isErrorUpdated]);
 
+  // Xử lý sau khi xóa 1 user
   useEffect(() => {
     if (isSuccessDeleted && dataDeleted?.status === 'OK') {
       message.success('Xóa người dùng thành công!');
@@ -350,6 +370,7 @@ const AdminUser = () => {
     }
   }, [isSuccessDeleted, isErrorDeleted]);
 
+  // Xử lý sau khi xóa nhiều user
   useEffect(() => {
     if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
       message.success('Xóa các người dùng thành công!');
@@ -384,6 +405,8 @@ const AdminUser = () => {
         </Button>
       </div>
       <div style={{ marginTop: '20px' }}>
+
+        {/* Bảng danh sách người dùng */}
         <TableComponent
           deleteAll={handleDeleteManyUsers}
           forceRender
@@ -396,6 +419,8 @@ const AdminUser = () => {
           exportFileName="users_list"
         />
       </div>
+
+      {/* Modal thêm người dùng */}
       <Modal forceRender title="Tạo người dùng mới" open={isModalOpen} onCancel={handleCancel} footer={null}>
         <Loading isLoading={isLoading}>
           <Form labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} form={formAdd} onFinish={onFinish}>
@@ -487,10 +512,10 @@ const AdminUser = () => {
               </Button>
             </Form.Item>
           </Form>
-
         </Loading>
       </Modal>
 
+      {/* Drawer cập nhật người dùng */}
       <DrawerComponent
         title="Chi tiết người dùng"
         isOpen={isOpenDrawer}
@@ -498,8 +523,6 @@ const AdminUser = () => {
           setIsOpenDrawer(false);
           mutationUpdate.reset();  // Reset mutation khi đóng drawer
         }}
-
-        
       >
         <Loading isLoading={isLoadingUpdate || isFinishUpdated}>
           <Form
@@ -557,8 +580,6 @@ const AdminUser = () => {
               <Button
                 type="primary"
                 onClick={() => {
-                  // Gọi hàm cập nhật thủ công
-                  //console.log('Cập nhật người dùng');
                   onUpdateUser();
                 }}
               >
@@ -569,7 +590,7 @@ const AdminUser = () => {
         </Loading>
       </DrawerComponent>
 
-
+      {/* Modal xác nhận xóa */}
       <ModalComponent
         title="Xóa người dùng"
         open={isModalOpenDelete}

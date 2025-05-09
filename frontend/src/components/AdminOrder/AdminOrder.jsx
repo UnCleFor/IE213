@@ -1,32 +1,31 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { WrapperHeader } from './style'
-import { Form, Button, Modal, Switch, Input, Space, Divider, Table, Select, Tabs } from 'antd';
+import { Form, Button, Input, Space, Divider, Select, Tabs } from 'antd';
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
 import DrawerComponent from '../DrawerComponent/DrawerComponent'
 import Loading from '../LoadingComponent/Loading'
-import { WrapperUploadFile } from '../AdminProduct/style'
 import ModalComponent from '../ModalComponent/ModalComponent'
-import { getBase64 } from '../../utils'
 import * as message from '../Message/Message';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import * as OrderService from '../../services/OrderService';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import * as UserService from '../../services/UserService';
 import OrderReports from '../OrderReports/OrderReports';
 import ProductSalesChart from '../ProductSalesChart/ProductSalesChart';
 import PerformanceChart from '../PerformanceChart/PerformanceChart';
 
 const AdminOrder = () => {
-  // Tách thành 2 form riêng biệt
+  // Khai báo hai form cho thêm và cập nhật đơn hàng
   const [formAdd] = Form.useForm();
   const [formUpdate] = Form.useForm();
 
   const queryClient = useQueryClient();
   const user = useSelector((state) => state?.user);
 
+  // Các biến trạng thái quản lý modal, drawer, loading, v.v.
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rowSelected, setRowSelected] = useState('');
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
@@ -39,7 +38,7 @@ const AdminOrder = () => {
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
 
-
+  // Trạng thái lưu thông tin đơn hàng
   const [stateOrder, setStateOrder] = useState({
     _id: '',
     user: '',
@@ -79,27 +78,29 @@ const AdminOrder = () => {
     state: '',
   });
 
+  // Khai báo mutation cho cập nhật, xóa, xóa nhiều đơn hàng
   const mutationUpdate = useMutationHooks(({ id, token, ...rests }) => {
     return OrderService.updatedOrder(id, rests, token);
   });
-
   const mutationDelete = useMutationHooks(({ id, token }) => {
     return OrderService.deleteOrder(id, token);
   });
-
   const mutationDeleteMany = useMutationHooks(({ token, ...ids }) => {
     return OrderService.deleteManyOrder(ids, token);
   });
 
+  // Trạng thái phản hồi từ mutation
   const { data: dataUpdated, isLoading: isLoadingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate;
   const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
   const { data: dataDeletedMany, isLoading: isLoadingDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeleteMany;
 
+  // Query lấy danh sách đơn hàng
   const { isLoading: isLoadingOrder, data: orders } = useQuery({
     queryKey: ['orders', user.access_token],
     queryFn: () => OrderService.getAllOrders(user.access_token),
   });
 
+  // Hàm lấy chi tiết đơn hàng và cập nhật vào drawer
   const fetchGetDetailsOrder = async (rowSelected) => {
     setIsLoadingUpdate(true);
     setIsOpenDrawer(true);
@@ -128,8 +129,8 @@ const AdminOrder = () => {
     }
     setIsLoadingUpdate(false);
   };
-  console.log('orderItems', stateOrderDetails?.orderItems)
 
+  // Hàm xử lý đóng modal và reset form cập nhật
   const handleCancel = () => {
     setIsModalOpen(false);
     setStateOrder({
@@ -154,6 +155,7 @@ const AdminOrder = () => {
     formUpdate.resetFields();
   };
 
+  // Hàm xử lý khi thay đổi input trong drawer chi tiết đơn hàng
   const handleOnchangeDetails = (e) => {
     setStateOrderDetails({
       ...stateOrderDetails,
@@ -161,6 +163,7 @@ const AdminOrder = () => {
     });
   };
 
+  // Hàm xóa một đơn hàng
   const handleDeleteOrder = () => {
     mutationDelete.mutate({
       id: rowSelected,
@@ -168,6 +171,7 @@ const AdminOrder = () => {
     });
   };
 
+  // Hàm xóa nhiều đơn hàng
   const handleDeleteManyOrders = (ids) => {
     setIsFinishDeletedMany(true)
     mutationDeleteMany.mutate({
@@ -176,6 +180,7 @@ const AdminOrder = () => {
     })
   }
 
+  // Hàm lấy email người dùng theo userId với cache
   const handleGetUserEmail = async (id, access_token) => {
     try {
       const res = await UserService.getUserEmail(id, access_token);
@@ -188,13 +193,12 @@ const AdminOrder = () => {
       return "Lỗi tải email";
     }
   };
-  // Tạo cache ở component cha
+  // Cache cho email theo userId
   const emailCache = useRef(new Map());
 
-  // Component EmailCell với cache
+  // Component hiển thị email, sử dụng cache và gọi API khi cần
   const EmailCell = ({ userId, token }) => {
     const [email, setEmail] = useState(emailCache.current.get(userId) || "Loading...");
-
     useEffect(() => {
       if (!emailCache.current.has(userId)) {
         handleGetUserEmail(userId, token).then(email => {
@@ -203,10 +207,10 @@ const AdminOrder = () => {
         });
       }
     }, [userId, token]);
-
     return <span>{email}</span>;
   };
 
+  // Hàm cập nhật đơn hàng
   const onUpdateOrder = () => {
     setIsFinishUpdated(true)
     mutationUpdate.mutate({
@@ -216,6 +220,7 @@ const AdminOrder = () => {
     });
   };
 
+  // Hàm render nút chỉnh sửa và xóa trên mỗi dòng bảng
   const renderAction = (record) => (
     <div>
       <EditOutlined
@@ -237,6 +242,7 @@ const AdminOrder = () => {
     </div>
   );
 
+  // Hàm xử lý tìm kiếm trong bảng
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -248,6 +254,7 @@ const AdminOrder = () => {
     confirm();               // Kích hoạt lại lọc (với từ khóa rỗng)
   };
 
+  // Hàm cấu hình search theo email người dùng (có cache)
   const getColumnSearchProps = dataIndex => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div style={{ padding: 8 }} onKeyDown={e => e.stopPropagation()}>
@@ -331,12 +338,13 @@ const AdminOrder = () => {
     },
   });
 
+  // Cấu hình các cột cho bảng hiển thị đơn hàng
   const columns = [
     {
       title: 'Ordered Account',
       dataIndex: 'user',
       render: (id) => <EmailCell userId={id} token={user?.access_token} />,
-      ...getColumnEmailSearchProps('user'), // Sử dụng hàm search mới
+      ...getColumnEmailSearchProps('user'),
       sorter: (a, b) => {
         const emailA = emailCache.current.get(a.user) || '';
         const emailB = emailCache.current.get(b.user) || '';
@@ -352,14 +360,9 @@ const AdminOrder = () => {
     {
       title: 'Total Price',
       dataIndex: 'totalPrice',
-      render: (price) => `${price.toLocaleString()} VND`, // Format price
+      render: (price) => `${price.toLocaleString()} VND`,
       sorter: (a, b) => a.totalPrice - b.totalPrice,
     },
-    // {
-    //   title: 'Discount',
-    //   dataIndex: 'totalDiscount',
-    //   render: (discount) => `${discount.toLocaleString()} VND`, // Format discount
-    // },
     {
       title: 'Payment Method',
       dataIndex: 'paymentMethod',
@@ -406,7 +409,6 @@ const AdminOrder = () => {
       dataIndex: 'createdAt',
       render: (date) => new Date(date).toLocaleDateString(), // Format date
       sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
-      // defaultSortOrder: 'descend',
     },
     {
       title: 'Actions',
@@ -415,28 +417,13 @@ const AdminOrder = () => {
     },
   ];
 
-
+  // Map dữ liệu đơn hàng để hiển thị trong bảng
   const dataTable = orders?.data?.map((order) => ({ ...order, key: order._id }));
 
-  // useEffect(() => {
-  //   if (isModalOpen) {
-  //     formAdd.setFieldsValue(stateUser); // Đồng bộ state vào form mỗi khi mở lại
-  //   }
-  // }, [isModalOpen]);
-
+  // Cập nhật lại dữ liệu vào form khi drawer mở
   useEffect(() => {
     formUpdate.setFieldsValue(stateOrderDetails);
   }, [formUpdate, stateOrderDetails]);
-
-  // useEffect(() => {
-  //   if (isSuccess && data?.status === 'OK') {
-  //     message.success('Thêm người dùng thành công!');
-  //     handleCancel();
-  //     queryClient.invalidateQueries(['users']);
-  //   } else if (data?.status === 'ERR') {
-  //     message.error('Thêm người dùng thất bại!');
-  //   }
-  // }, [isSuccess, isError]);
 
   useEffect(() => {
     if (isSuccessUpdated && dataUpdated?.status === 'OK') {
@@ -470,6 +457,7 @@ const AdminOrder = () => {
     }
   }, [isSuccessDeletedMany, isErrorDeletedMany]);
 
+  // Tạo danh sách tab hiển thị trong giao diện quản lý đơn hàng
   const items = [
     {
       key: '1',
@@ -493,24 +481,44 @@ const AdminOrder = () => {
     {
       key: '2',
       label: 'Báo cáo thống kê tổng quát',
-      children: <OrderReports orders={orders} access_token={user?.access_token} isLoading={isLoadingOrder || isFinishDeletedMany}/>,
+      children: (
+        <OrderReports
+          orders={orders}
+          access_token={user?.access_token}
+          isLoading={isLoadingOrder || isFinishDeletedMany}
+        />
+      ),
     },
     {
       key: '3',
       label: 'Top sản phẩm bán chạy',
-      children: <ProductSalesChart orders={orders} isLoading={isLoadingOrder || isFinishDeletedMany}/>,
+      children: (
+        <ProductSalesChart
+          orders={orders}
+          isLoading={isLoadingOrder || isFinishDeletedMany}
+        />
+      ),
     },
     {
       key: '4',
       label: 'Hiệu suất bán hàng theo thời gian',
-      children: <PerformanceChart orders={orders} isLoading={isLoadingOrder || isFinishDeletedMany} />,
+      children: (
+        <PerformanceChart
+          orders={orders}
+          isLoading={isLoadingOrder || isFinishDeletedMany}
+        />
+      ),
     },
-  
   ];
+
   return (
     <div>
       <WrapperHeader>Quản lý đơn hàng</WrapperHeader>
+
+      {/* Tabs chứa 4 mục: danh sách, báo cáo, top bán chạy, hiệu suất */}
       <Tabs defaultActiveKey="1" items={items} />
+
+      {/* Drawer hiển thị chi tiết đơn hàng để cập nhật */}
       <DrawerComponent
         title="Chi tiết đơn hàng"
         isOpen={isOpenDrawer}
@@ -526,7 +534,7 @@ const AdminOrder = () => {
             form={formUpdate}
             onFinish={onUpdateOrder}
           >
-            {/* Order Information */}
+            {/* Thông tin đơn hàng */}
             <Form.Item label="Mã đơn hàng">
               <Input value={stateOrderDetails._id} readOnly />
             </Form.Item>
@@ -547,6 +555,7 @@ const AdminOrder = () => {
               <Input value={stateOrderDetails.paymentMethod} readOnly />
             </Form.Item>
 
+            {/* Trạng thái thanh toán */}
             <Form.Item
               label={<span style={{ fontWeight: 'bold', color: '#1890ff' }}>Trạng thái thanh toán</span>}
               name="isPaid"
@@ -554,7 +563,9 @@ const AdminOrder = () => {
             >
               <Select
                 value={stateOrderDetails.isPaid}
-                onChange={(value) => handleOnchangeDetails({ target: { name: 'isPaid', value } })}
+                onChange={(value) =>
+                  handleOnchangeDetails({ target: { name: 'isPaid', value } })
+                }
                 options={[
                   { value: false, label: 'Chưa thanh toán' },
                   { value: true, label: 'Đã thanh toán' }
@@ -562,6 +573,7 @@ const AdminOrder = () => {
               />
             </Form.Item>
 
+            {/* Trạng thái giao hàng */}
             <Form.Item
               label={<span style={{ fontWeight: 'bold', color: '#1890ff' }}>Trạng thái giao hàng</span>}
               name="isDelivered"
@@ -569,7 +581,9 @@ const AdminOrder = () => {
             >
               <Select
                 value={stateOrderDetails.isDelivered}
-                onChange={(value) => handleOnchangeDetails({ target: { name: 'isDelivered', value } })}
+                onChange={(value) =>
+                  handleOnchangeDetails({ target: { name: 'isDelivered', value } })
+                }
                 options={[
                   { value: false, label: 'Đang xử lý' },
                   { value: true, label: 'Đã giao' }
@@ -577,14 +591,17 @@ const AdminOrder = () => {
               />
             </Form.Item>
 
-            <Form.Item 
+            {/* Trạng thái đơn hàng tổng thể */}
+            <Form.Item
               label={<span style={{ fontWeight: 'bold', color: '#1890ff' }}>Trạng thái đơn hàng</span>}
               name="state"
               rules={[{ required: true, message: 'Vui lòng chọn trạng thái đơn hàng' }]}
             >
               <Select
                 value={stateOrderDetails.state}
-                onChange={(value) => handleOnchangeDetails({ target: { name: 'state', value } })}
+                onChange={(value) =>
+                  handleOnchangeDetails({ target: { name: 'state', value } })
+                }
                 options={[
                   { value: 'Đã đặt', label: 'Đã đặt' },
                   { value: 'Đã xác nhận', label: 'Đã xác nhận' },
@@ -594,13 +611,21 @@ const AdminOrder = () => {
                 ]}
               />
             </Form.Item>
-            {dataUpdated?.status === 'ERR' && <span style={{ color: 'red' }}>{dataUpdated?.message}</span>}
-            <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
-              <Button type="primary" htmlType="submit">Áp dụng</Button>
-            </Form.Item>
-            {/* Shipping Address */}
-            <Divider orientation="left">Thông tin giao hàng</Divider>
 
+            {/* Hiển thị lỗi nếu cập nhật thất bại */}
+            {dataUpdated?.status === 'ERR' && (
+              <span style={{ color: 'red' }}>{dataUpdated?.message}</span>
+            )}
+
+            {/* Nút xác nhận cập nhật */}
+            <Form.Item wrapperCol={{ offset: 18, span: 6 }}>
+              <Button type="primary" htmlType="submit">
+                Áp dụng
+              </Button>
+            </Form.Item>
+
+            {/* Thông tin người nhận */}
+            <Divider orientation="left">Thông tin giao hàng</Divider>
             <Form.Item label="Họ tên người nhận">
               <Input value={stateOrderDetails.shippingAddress?.fullName} readOnly />
             </Form.Item>
@@ -613,9 +638,8 @@ const AdminOrder = () => {
               <Input value={stateOrderDetails.shippingAddress?.phone} readOnly />
             </Form.Item>
 
-            {/* Order Items */}
+            {/* Chi tiết sản phẩm trong đơn */}
             <Divider orientation="left">Chi tiết sản phẩm</Divider>
-
             <TableComponent
               data={stateOrderDetails.orderItems}
               showDeleteAll={false}
@@ -628,13 +652,13 @@ const AdminOrder = () => {
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <img
                         src={record.image}
+                        alt={text}
                         style={{
                           width: 50,
                           height: 50,
                           marginRight: 10,
                           objectFit: 'cover'
                         }}
-                        alt={text}
                         onError={(e) => {
                           e.target.src = '/placeholder-image.png'; // Fallback image
                           e.target.onerror = null;
@@ -642,7 +666,7 @@ const AdminOrder = () => {
                       />
                       <span>{text}</span>
                     </div>
-                  )
+                  ),
                 },
                 {
                   title: 'Số lượng',
@@ -656,7 +680,8 @@ const AdminOrder = () => {
                   dataIndex: 'price',
                   key: 'price',
                   align: 'right',
-                  render: (price) => `${price?.toLocaleString('vi-VN')} ₫`
+                  render: (price) =>
+                    `${price?.toLocaleString('vi-VN')} ₫`,
                 },
               ]}
               pagination={false}
@@ -665,6 +690,8 @@ const AdminOrder = () => {
           </Form>
         </Loading>
       </DrawerComponent>
+
+      {/* Modal xác nhận xóa đơn hàng */}
       <ModalComponent
         title="Xóa đơn hàng"
         open={isModalOpenDelete}
@@ -674,7 +701,7 @@ const AdminOrder = () => {
         <Loading isLoading={isLoadingDeleted}>
           <div>Bạn có chắc chắn muốn xóa đơn hàng này không?</div>
         </Loading>
-      </ModalComponent>  
+      </ModalComponent>
     </div>
   );
 };

@@ -1,54 +1,50 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { WrapperHeader } from './style'
-import { Form, Button, Modal, Switch, Input, Space, Tag, Tooltip } from 'antd';
+import { Button, Modal, Space, Tag, Tooltip } from 'antd';
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
 import DrawerComponent from '../DrawerComponent/DrawerComponent'
 import Loading from '../LoadingComponent/Loading'
-import { WrapperUploadFile } from '../AdminProduct/style'
-import ModalComponent from '../ModalComponent/ModalComponent'
-import { getBase64 } from '../../utils'
 import * as message from '../Message/Message';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useMutationHooks } from '../../hooks/useMutationHook'
 import * as UserService from '../../services/UserService';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
-
+import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import * as LoginHistoryService from '../../services/LoginHistoryService';
+
 const AdminLogin = () => {
   // Tách thành 2 form riêng biệt
-
   const queryClient = useQueryClient();
   const user = useSelector((state) => state?.user);
 
-
-
+  // Quản lý tìm kiếm trong bảng
   const [isFinishDeletedMany, setIsFinishDeletedMany] = useState(false);
-
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
+
+  // Trạng thái Drawer lịch sử đăng nhập
   const [isLoginHistoryOpen, setIsLoginHistoryOpen] = useState(false);
   const [loginHistory, setLoginHistory] = useState([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
+  // Row được chọn để thực hiện hành động
   const [rowSelected, setRowSelected] = useState('');
 
-const { isLoading: isLoadingUser, data: users } = useQuery({
-  queryKey: ['users', user.access_token],
-  queryFn: () => UserService.getAllUser(user.access_token),
-  refetchInterval: 5000, // Tự động refetch mỗi 5 giây
-  refetchIntervalInBackground: true, // Tiếp tục refetch ngay cả khi tab không active
-});
+  // Lấy dữ liệu người dùng
+  const { isLoading: isLoadingUser, data: users } = useQuery({
+    queryKey: ['users', user.access_token],
+    queryFn: () => UserService.getAllUser(user.access_token),
+    refetchInterval: 5000, // Tự động refetch mỗi 5 giây
+    refetchIntervalInBackground: true, // Tiếp tục refetch ngay cả khi tab không active
+  });
 
-
+  // Hàm gọi API lấy lịch sử đăng nhập người dùng
   const fetchLoginHistory = async (userId) => {
     setIsLoadingHistory(true);
     try {
       const res = await LoginHistoryService.getLoginHistory(userId, user?.access_token);
       setLoginHistory(res.data);
-      console.log('login', loginHistory)
     } catch (error) {
       console.error('Error fetching login history:', error);
     } finally {
@@ -56,10 +52,13 @@ const { isLoading: isLoadingUser, data: users } = useQuery({
     }
   };
 
+  // Mở drawer hiển thị lịch sử đăng nhập
   const handleViewLoginHistory = (userId) => {
     fetchLoginHistory(userId);
     setIsLoginHistoryOpen(true);
   };
+
+  // Chặn hoặc bỏ chặn người dùng
   const handleToggleBlock = async (record) => {
     try {
       Modal.confirm({
@@ -78,7 +77,8 @@ const { isLoading: isLoadingUser, data: users } = useQuery({
       message.error('Có lỗi xảy ra khi cập nhật trạng thái người dùng');
     }
   };
-  
+
+  // Buộc người dùng đăng xuất
   const handleForceLogout = async (userId) => {
     try {
       Modal.confirm({
@@ -97,9 +97,10 @@ const { isLoading: isLoadingUser, data: users } = useQuery({
       message.error('Có lỗi xảy ra khi buộc đăng xuất');
     }
   };
+
+  // Các action hiển thị trên mỗi dòng bảng
   const renderAction = (record) => {
     const isAdmin = record.isAdmin;
-  
     return (
       <div style={{ display: 'flex', gap: '10px' }}>
         <Tooltip title="Xem lịch sử đăng nhập">
@@ -111,7 +112,7 @@ const { isLoading: isLoadingUser, data: users } = useQuery({
             style={{ color: 'blue', fontSize: '22px', cursor: 'pointer' }}
           />
         </Tooltip>
-        
+
         {!isAdmin && (
           <>
             <Tooltip title={record.isBlocked ? 'Bỏ chặn người dùng' : 'Chặn người dùng'}>
@@ -127,7 +128,7 @@ const { isLoading: isLoadingUser, data: users } = useQuery({
                 {record.isBlocked ? 'Bỏ chặn' : 'Chặn'}
               </Button>
             </Tooltip>
-            
+
             {record.isLoggedIn && (
               <Tooltip title="Buộc đăng xuất">
                 <Button
@@ -149,17 +150,21 @@ const { isLoading: isLoadingUser, data: users } = useQuery({
     );
   };
 
+  // Hàm xử lý tìm kiếm: Xác nhận bộ lọc và lưu trạng thái tìm kiếm
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
   };
+
+  // Hàm đặt lại tìm kiếm: Xóa bộ lọc và reset lại từ khóa
   const handleReset = (clearFilters, confirm) => {
-    clearFilters();          // Xóa bộ lọc hiện tại
-    setSearchText('');       // Reset từ khóa tìm kiếm
-    confirm();               // Kích hoạt lại lọc (với từ khóa rỗng)
+    clearFilters();
+    setSearchText('');
+    confirm();
   };
 
+  // Hàm tạo thuộc tính lọc theo cột
   const getColumnSearchProps = dataIndex => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div style={{ padding: 8 }} onKeyDown={e => e.stopPropagation()}>
@@ -205,7 +210,8 @@ const { isLoading: isLoadingUser, data: users } = useQuery({
       },
     },
   });
-  
+
+  // Cấu hình cột cho bảng dữ liệu
   const columns = [
     {
       title: 'Name',
@@ -253,20 +259,19 @@ const { isLoading: isLoadingUser, data: users } = useQuery({
       }
     },
     {
-  title: 'Bị chặn',
-  dataIndex: 'isBlocked',
-  render: (isBlocked) => (
-    <Tag color={isBlocked ? 'red' : 'green'}>
-      {isBlocked ? 'Bị chặn' : 'Hoạt động'}
-    </Tag>
-  ),
-  filters: [
-    { text: 'Hoạt động', value: false },
-    { text: 'Bị chặn', value: true },
-  ],
-  onFilter: (value, record) => record.isBlocked === value,
-},
-
+      title: 'Bị chặn',
+      dataIndex: 'isBlocked',
+      render: (isBlocked) => (
+        <Tag color={isBlocked ? 'red' : 'green'}>
+          {isBlocked ? 'Bị chặn' : 'Hoạt động'}
+        </Tag>
+      ),
+      filters: [
+        { text: 'Hoạt động', value: false },
+        { text: 'Bị chặn', value: true },
+      ],
+      onFilter: (value, record) => record.isBlocked === value,
+    },
     {
       title: 'Hành động',
       dataIndex: 'action',
@@ -274,14 +279,19 @@ const { isLoading: isLoadingUser, data: users } = useQuery({
     },
   ];
 
+  // Dữ liệu bảng người dùng
   const dataTable = users?.data?.map((user) => ({ ...user, key: user._id }));
+
+  // Thống kê số người dùng hoạt động / không hoạt động
   const activeUsersCount = users?.data?.filter(user => user.isLoggedIn).length || 0;
   const inactiveUsersCount = users?.data?.filter(user => !user.isLoggedIn).length || 0;
 
-
+  // Giao diện chính
   return (
     <div>
       <WrapperHeader>Quản lý truy cập</WrapperHeader>
+
+      {/* Hiển thị số lượng người dùng đang hoạt động / không hoạt động */}
       <div style={{ display: 'flex', gap: '20px', marginBottom: '16px' }}>
         <Tag color="green" style={{ fontSize: '16px', padding: '6px 12px' }}>
           🟢 Đang truy cập: {activeUsersCount}
@@ -291,9 +301,9 @@ const { isLoading: isLoadingUser, data: users } = useQuery({
         </Tag>
       </div>
 
+      {/* Bảng danh sách người dùng */}
       <div style={{ marginTop: '20px' }}>
         <TableComponent
-
           forceRender
           columns={columns}
           isLoading={isLoadingUser || isFinishDeletedMany}
@@ -304,9 +314,10 @@ const { isLoading: isLoadingUser, data: users } = useQuery({
           exportFileName="users_list"
         />
       </div>
+
+      {/* Drawer hiển thị lịch sử đăng nhập */}
       <DrawerComponent
         title="Lịch sử đăng nhập"
-
         open={isLoginHistoryOpen}
         onClose={() => setIsLoginHistoryOpen(false)}
       >

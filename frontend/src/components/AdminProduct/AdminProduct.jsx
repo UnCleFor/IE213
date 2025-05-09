@@ -4,7 +4,6 @@ import { useMutationHooks } from "../../hooks/useMutationHook";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Form, Button, Modal, Space, Select, Input } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
-
 import { WrapperHeader, WrapperUploadFile } from './style';
 import TableComponent from '../TableComponent/TableComponent';
 import InputComponent from '../InputComponent/InputComponent';
@@ -16,12 +15,14 @@ import { getBase64 } from '../../utils';
 import ModalComponent from '../ModalComponent/ModalComponent';
 import numeral from 'numeral';
 const AdminProduct = () => {
+  // Khai báo hai form cho thêm và cập nhật đơn hàng
   const [formAdd] = Form.useForm();
   const [formUpdate] = Form.useForm();
 
   const queryClient = useQueryClient();
   const user = useSelector((state) => state?.user);
 
+  // Các biến trạng thái quản lý modal, drawer, loading, v.v.
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rowSelected, setRowSelected] = useState('');
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
@@ -35,6 +36,7 @@ const AdminProduct = () => {
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
 
+  // Trạng thái lưu thông tin đơn hàng
   const [stateProduct, setStateProduct] = useState({
     name: '',
     image: '',
@@ -76,8 +78,11 @@ const AdminProduct = () => {
       height: ''
     }
   });
+
+  // Trạng thái lưu phòng được chọn trong drawer chi tiết sản phẩm
   const [selectedRoomDetails, setSelectedRoomDetails] = useState(stateProductDetails?.room || '');
 
+  // Khai báo mutation cho cập nhật, xóa, xóa nhiều đơn hàng
   const mutation = useMutationHooks((data) => {
     const { name, image, images, type, price, countInStock, description, room, brand, origin, discount, colors, size } = data;
     return ProductService.createProduct({ name, image, images, type, price, countInStock, description, room, brand, origin, discount, colors, size });
@@ -95,26 +100,28 @@ const AdminProduct = () => {
     return ProductService.deleteManyProduct(ids, token);
   });
 
-  console.log('mutationDeleteMany', mutationDeleteMany)
-
+  // Trạng thái phản hồi từ mutation
   const { data, isLoading, isSuccess, isError } = mutation;
   const { data: dataUpdated, isLoading: isLoadingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate;
   const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
   const { data: dataDeletedMany, isLoading: isLoadingDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeleteMany;
+
+  // Hàm lấy toàn bộ sản phẩm
   const getAllProducts = async () => {
     const res = await ProductService.getAllProductAdmin();
     return res;
   };
 
+  // Query lấy danh sách đơn hàng
   const { isLoading: isLoadingProduct, data: products } = useQuery({
     queryKey: ['products'],
     queryFn: getAllProducts,
   });
 
+  // Hàm lấy chi tiết đơn hàng và cập nhật vào drawer
   const fetchGetDetailsProduct = async (rowSelected) => {
     setIsLoadingUpdate(true);
     setIsOpenDrawer(true);
-
     const res = await ProductService.getDetailsProduct(rowSelected);
     if (res?.data) {
       setStateProductDetails({
@@ -137,11 +144,11 @@ const AdminProduct = () => {
           height: res?.data?.size?.height || ''
         }
       });
-
     }
     setIsLoadingUpdate(false);
   };
 
+  // Hàm xử lý khi người dùng yêu cầu xem chi tiết sản phẩm được chọn
   const handleDetailsProduct = () => {
     if (rowSelected) {
       setIsLoadingUpdate(true);
@@ -149,12 +156,9 @@ const AdminProduct = () => {
     }
   };
 
-
-
+  // Hàm xử lý đóng modal và reset form cập nhật
   const handleCancel = () => {
-
     setIsModalOpen(false);
-
     setStateProduct({
       name: '',
       image: '',
@@ -180,40 +184,44 @@ const AdminProduct = () => {
     mutation.reset();
   };
 
+  // Hàm xử lý khi người dùng thay đổi giá trị trong form nhập liệu
   const handleOnchange = (e) => {
     const { name, value } = e.target;
 
+    // Nếu thay đổi là liên quan đến kích thước sản phẩm (chiều dài, rộng, cao)
     if (name === 'length' || name === 'width' || name === 'height') {
       const newSize = {
         ...(stateProduct.size || {}),
         [name]: value
       };
 
-      // Cập nhật cả state và form
+      // Cập nhật state lưu thông tin sản phẩm
       setStateProduct(prev => ({
         ...prev,
         size: newSize
       }));
 
+      // Đồng bộ giá trị vào form Ant Design
       formAdd.setFieldsValue({
         size: newSize
       });
+
     } else {
       setStateProduct(prev => ({
         ...prev,
         [name]: value
       }));
+
+      // Đồng bộ với form Ant Design
       formAdd.setFieldsValue({
         [name]: value
       });
     }
   };
 
-
-
+  // Hàm xử lý khi thay đổi input trong drawer chi tiết đơn hàng
   const handleOnchangeDetails = (e) => {
     const { name, value } = e.target;
-
     // Xử lý cho các trường liên quan đến size nếu cần (ví dụ: length, width, height)
     if (name === 'length' || name === 'width' || name === 'height') {
       setStateProductDetails((prevState) => ({
@@ -231,7 +239,7 @@ const AdminProduct = () => {
     }
   };
 
-
+  // Hàm xử lý sự kiện khi người dùng chọn ảnh đại diện (avatar)
   const handleOnchangeAvatar = async ({ fileList }) => {
     const file = fileList?.[0];
     if (!file) return;
@@ -251,6 +259,7 @@ const AdminProduct = () => {
     });
   };
 
+  // Xử lý khi người dùng upload nhiều ảnh sản phẩm mới
   const handleOnchangeImages = async ({ fileList }) => {
     const newImages = await Promise.all(fileList.map(file => getBase64(file.originFileObj)));
     setStateProduct({
@@ -258,6 +267,8 @@ const AdminProduct = () => {
       images: newImages
     });
   };
+
+  // Xử lý khi người dùng upload ảnh cho sản phẩm đã có (cập nhật chi tiết sản phẩm)
   const handleOnchangeImagesDetails = async ({ fileList }) => {
     const newImages = await Promise.all(
       fileList.map(file => {
@@ -267,13 +278,15 @@ const AdminProduct = () => {
         return file.url || file.thumbUrl; // ảnh cũ đã có
       })
     );
+
+    // Cập nhật state chi tiết sản phẩm với danh sách ảnh mới
     setStateProductDetails(prev => ({
       ...prev,
       images: newImages
     }));
   };
 
-
+  // Xử lý khi người dùng thay ảnh đại diện (avatar) của sản phẩm đã có
   const handleOnchangeAvatarDetails = async ({ fileList }) => {
     const file = fileList[0];
     if (!file.url && !file.preview) {
@@ -285,14 +298,17 @@ const AdminProduct = () => {
     });
   };
 
+  // Đóng modal xác nhận xoá sản phẩm
   const handleCancelDelete = () => {
     setIsModalOpenDelete(false)
   }
 
+  // Submit form để tạo sản phẩm mới
   const onFinish = () => {
     mutation.mutate(stateProduct);
   };
 
+  // Submit để cập nhật sản phẩm đã chọn
   const onUpdateProduct = () => {
     setIsFinishUpdated(true);
     mutationUpdate.mutate({
@@ -302,14 +318,15 @@ const AdminProduct = () => {
     });
   };
 
+  // Hàm xóa một đơn hàng
   const handleDeleteProduct = () => {
     mutationDelete.mutate({
       id: rowSelected,
       token: user.access_token,
     });
-    // Đóng modal sau khi xóa thành công
-
   };
+
+  // Hàm xóa nhiều đơn hàng
   const handleDeleteManyProducts = (ids) => {
     setIsFinishDeletedMany(true)
     mutationDeleteMany.mutate({
@@ -318,6 +335,7 @@ const AdminProduct = () => {
     })
   }
 
+  // Hàm render nút chỉnh sửa và xóa trên mỗi dòng bảng
   const renderAction = (record) => (
     <div>
       <EditOutlined
@@ -327,7 +345,6 @@ const AdminProduct = () => {
           setRowSelected(record._id);
           fetchGetDetailsProduct(record._id); // Gọi fetch chi tiết ở đây
         }}
-
         style={{ color: 'black', fontSize: '30px', paddingLeft: '10px', cursor: 'pointer' }}
       />
       <DeleteOutlined
@@ -341,17 +358,21 @@ const AdminProduct = () => {
     </div>
   );
 
+  // Hàm xử lý tìm kiếm trong bảng
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
   };
+
+  // Hàm xử lý khi người dùng nhấn "Reset" trong ô tìm kiếm của cột
   const handleReset = (clearFilters, confirm) => {
     clearFilters();          // Xóa bộ lọc hiện tại
     setSearchText('');       // Reset từ khóa tìm kiếm
     confirm();               // Kích hoạt lại lọc (với từ khóa rỗng)
   };
 
+  // Hàm cấu hình search cho từng cột cụ thể
   const getColumnSearchProps = dataIndex => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div style={{ padding: 8 }} onKeyDown={e => e.stopPropagation()}>
@@ -397,6 +418,8 @@ const AdminProduct = () => {
       },
     },
   });
+
+  // Danh sách các loại sản phẩm được phân loại theo từng phòng trong nhà
   const productTypesByRoom = {
     'Phòng khách': ['Sofa', 'Bàn trà', 'Kệ tivi', 'Ghế đơn', 'Tủ trang trí'],
     'Phòng ngủ': ['Giường', 'Tủ quần áo', 'Tab đầu giường', 'Bàn trang điểm', 'Chăn ga gối'],
@@ -404,17 +427,22 @@ const AdminProduct = () => {
     'Phòng làm việc': ['Bàn làm việc', 'Ghế làm việc', 'Kệ sách', 'Tủ hồ sơ', 'Đèn bàn'],
     'Trang trí nhà cửa': ['Tranh treo tường', 'Đèn trang trí', 'Thảm', 'Cây giả', 'Đồng hồ trang trí']
   };
+
+  // Danh sách tất cả các loại sản phẩm có thể có trong hệ thống (dùng cho dropdown, lọc,...)
   const productTypes = [
     "Sofa", "Bàn trà", "Kệ tivi", "Ghế đơn", "Tủ trang trí", "Giường", "Tủ quần áo",
     "Tab đầu giường", "Bàn trang điểm", "Chăn ga gối", "Bàn ăn", "Ghế ăn", "Tủ bếp",
     "Tủ rượu", "Phụ kiện bàn ăn", "Bàn làm việc", "Ghế làm việc", "Kệ sách", "Tủ hồ sơ",
     "Đèn bàn", "Tranh treo tường", "Đèn trang trí", "Thảm", "Cây giả", "Đồng hồ trang trí"
   ];
+
+  // Trạng thái bộ lọc hiện tại (dùng để lọc sản phẩm theo phòng và loại)
   const [filters, setFilters] = useState({
     room: undefined,
     type: undefined,
   });
 
+  // Cập nhật bộ lọc khi người dùng thay đổi trên bảng
   const handleTableChange = (pagination, currentFilters) => {
     setFilters({
       room: currentFilters.room || undefined,
@@ -436,6 +464,7 @@ const AdminProduct = () => {
     return Array.from(types);
   };
 
+  // Cấu hình các cột cho bảng hiển thị đơn hàng
   const columns = [
     {
       title: 'Name',
@@ -513,23 +542,25 @@ const AdminProduct = () => {
     },
   ];
 
-
-
+  // Map dữ liệu đơn hàng để hiển thị trong bảng
   const dataTable = products?.data?.length && products?.data?.map((product) => ({
     ...product,
     key: product._id
   }));
 
+  // Cập nhật lại dữ liệu vào form khi drawer mở
   useEffect(() => {
     if (isModalOpen) {
       formAdd.setFieldsValue(stateProduct); // Đồng bộ state vào form mỗi khi mở lại
     }
   }, [isModalOpen]);
 
+  // Cập nhật giá trị của form khi stateProductDetails thay đổi
   useEffect(() => {
     formUpdate.setFieldsValue(stateProductDetails);
   }, [formUpdate, stateProductDetails]);
 
+  // Xử lý khi thêm sản phẩm thành công/thất bại
   useEffect(() => {
     if (isSuccess && data?.status === 'OK') {
       message.success('Thêm sản phẩm thành công!');
@@ -540,6 +571,7 @@ const AdminProduct = () => {
     }
   }, [isSuccess, isError]);
 
+  // Xử lý khi cập nhật sản phẩm thành công/thất bại
   useEffect(() => {
     if (isSuccessUpdated && dataUpdated?.status === 'OK') {
       message.success('Cập nhật thành công!');
@@ -552,6 +584,7 @@ const AdminProduct = () => {
     }
   }, [isSuccessUpdated, isErrorUpdated]);
 
+  // Xử lý khi xóa sản phẩm thành công/thất bại
   useEffect(() => {
     if (isSuccessDeleted && dataDeleted?.status === 'OK') {
       message.success('Xóa sản phẩm thành công!');
@@ -562,6 +595,7 @@ const AdminProduct = () => {
     }
   }, [isSuccessDeleted, isErrorDeleted]);
 
+  // Xử lý khi xóa nhiều sản phẩm thành công/thất bại
   useEffect(() => {
     if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
       message.success('Xóa các sản phẩm thành công!');
@@ -606,7 +640,6 @@ const AdminProduct = () => {
           onRow={(record) => ({
             onClick: () => setRowSelected(record._id)
           })}
-          // phân trang tượng trưng
           onChange={handleTableChange}
           exportFileName="products_list"
         />
@@ -627,9 +660,9 @@ const AdminProduct = () => {
                 width: stateProduct.size?.width || '',
                 height: stateProduct.size?.height || ''
               },
-
             }}
           >
+            {/* Các trường nhập liệu cho sản phẩm */}
             {['name', 'price', 'countInStock', 'description', 'brand', 'origin', 'discount'].map((field) => (
               <Form.Item
                 key={field}
@@ -645,6 +678,7 @@ const AdminProduct = () => {
               </Form.Item>
             ))}
 
+            {/* Các trường phòng và loại sản phẩm */}
             <Form.Item
               label="Room"
               name="room"
@@ -685,6 +719,7 @@ const AdminProduct = () => {
                 ))}
               </Select>
             </Form.Item>
+
             {/* Cập nhật màu sắc */}
             <Form.Item
               label="Colors"
@@ -748,8 +783,6 @@ const AdminProduct = () => {
               </Input.Group>
             </Form.Item>
 
-
-
             {/* Cập nhật ảnh */}
             <Form.Item
               label="Avatar"
@@ -778,7 +811,6 @@ const AdminProduct = () => {
                   />
                 )}
               </div>
-
             </Form.Item>
 
             {/* Thêm ảnh phụ */}
@@ -813,7 +845,6 @@ const AdminProduct = () => {
               <Button type="primary" htmlType="submit">Xác nhận</Button>
             </Form.Item>
           </Form>
-
         </Loading>
       </Modal>
 
@@ -825,7 +856,6 @@ const AdminProduct = () => {
           setIsOpenDrawer(false);
           mutationUpdate.reset();  // Reset mutation khi đóng drawer
         }}
-       
       >
         <Loading isLoading={isLoadingUpdate || isFinishUpdated}>
           <Form
@@ -971,8 +1001,6 @@ const AdminProduct = () => {
               </Input.Group>
             </Form.Item>
 
-
-
             {/* Ảnh chính */}
             <Form.Item
               label="Avatar"
@@ -1039,7 +1067,6 @@ const AdminProduct = () => {
         </Loading>
       </DrawerComponent>
 
-
       {/* Modal xoá sản phẩm */}
       <ModalComponent
         title="Xóa sản phẩm"
@@ -1051,8 +1078,6 @@ const AdminProduct = () => {
           <div>Bạn có muốn xóa sản phẩm này không ?</div>
         </Loading>
       </ModalComponent>
-
-
     </div>
   );
 };
