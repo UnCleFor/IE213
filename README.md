@@ -22,17 +22,19 @@
 - **Link đến video báo cáo:** Đang bổ sung  
 - **Link deploy project:** [https://ie213.vercel.app/]
 
-## Tổ chức folder
-📦 repository
-├── 📂 backend/ (Node.js + Express API)
-├── 📂 docs/ (tài liệu báo cáo, hướng dẫn sử dụng, Documentation API)
-├── 📂 frontend/ (React.js UI)
-├── 📂 tests/ (các bài kiểm thử tự động)
-├── 📄 .gitignore (bỏ qua file không cần thiết)
-├── 📄 docker-compose.yml (triển khai Docker)
-├── 📄 package.json (dependencies)
-└── 📄 README.md (tài nguyên cuối kì, hướng dẫn cài đặt và sử dụng hệ thống)
 
+```markdown
+## Tổ chức folder
+
+    📦 repository
+    ├── 📂 backend/            # Node.js + Express API
+    ├── 📂 docs/               # Tài liệu báo cáo, hướng dẫn sử dụng, Documentation API
+    ├── 📂 frontend/           # React.js UI
+    ├── 📂 tests/              # Các bài kiểm thử tự động
+    ├── 📄 .gitignore          # Bỏ qua file không cần thiết
+    ├── 📄 docker-compose.yml  # Triển khai Docker
+    ├── 📄 package.json        # Dependencies
+    └── 📄 README.md           # Tài nguyên cuối kì, hướng dẫn cài đặt và sử dụng hệ thống
 ## Hướng dẫn cài đặt và sử dụng hệ thống trên local
 
 ### Cấu hình quan trọng cho Local
