@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Typography, Select, InputNumber, Pagination, Slider, Breadcrumb } from 'antd';
+import { Row, Col, Typography, Select, Pagination, Slider } from 'antd';
 import axios from 'axios';
+import { useLocation, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
 import CardComponent from '../../components/CardComponent/CardComponent';
 import ContainerComponent from '../../components/ContainerComponent/ContainerComponent';
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
-import { useLocation, useParams } from 'react-router-dom';
-import * as ProductService from '../../services/ProductService'
-import LoadingComponent from '../../components/LoadingComponent/Loading'
-import { current } from '@reduxjs/toolkit';
-import { useSelector } from 'react-redux';
-import { useDebounce } from '../../hooks/useDebounce';
 import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
-import BreadCrumbForType from "../../components/BreadCrumbForType/BreadCrumbForType";
+import LoadingComponent from '../../components/LoadingComponent/Loading'
+import * as ProductService from '../../services/ProductService'
+import { useDebounce } from '../../hooks/useDebounce';
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -20,34 +19,20 @@ const TypeProduct = () => {
   const searchProduct = useSelector((state) => state?.product?.search)
   const searchDebounce = useDebounce(searchProduct, 500)
   const [products, setProducts] = useState([]);
-  const { state } = useLocation()
-  console.log('Received state:', state);
-  const {  parentLabel, key, keyPath } = state || {}
-  console.log('parentLabel:', parentLabel); // In giá trị của parentLabel
-  console.log('keyPath:', keyPath);
   const [loading, setLoading] = useState(false)
+  const [colorsAvailable, setColorsAvailable] = useState('');
+  const [colorOptions, setColorOptions] = useState([]);
+  const [minPrice, setMinPrice] = useState(null);
+  const [maxPrice, setMaxPrice] = useState(null);
+  const [sortBy, setSortBy] = useState(null);
+
   const user = useSelector((state) => state.user)
   const { type } = useParams(); 
   const location = useLocation();
+  const { state } = useLocation();
+  const {  parentLabel, key, keyPath } = state || {};
   const filterBy = location.state?.filterBy || 'type';
   const label = location.state?.label || type; // Fallback nếu không có state
-  //console.log('state nè (label)', state?.label)
-  // const fetchProducts = async () => {
-  //   try {
-  //     let url = `${process.env.REACT_APP_API_URL}/product/get-all`;
-  //     if (type) {
-  //       url += `?filter=type&filter=${type}`;
-  //     }
-  //     const res = await axios.get(url);
-  //     setProducts(res.data.data);
-  //   } catch (error) {
-  //     console.error('Lỗi khi lấy danh sách sản phẩm:', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchProducts();
-  // }, [type]);
 
   const [panigate, setPanigate] = useState({
     page: 0,
@@ -55,6 +40,22 @@ const TypeProduct = () => {
     total: 1,
   })
 
+  // Lấy danh sách màu sắc từ server
+  useEffect(() => {
+    const fetchColors = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/colors`);
+        const colorsArray = res.data?.data?.data || [];
+        setColorOptions(colorsArray);
+      } catch (err) {
+        console.error('Lỗi API:', err);
+        setColorOptions([]);
+      }
+    };
+    fetchColors();
+  }, []);
+
+  // Lấy danh sách sản phẩm theo loại (type)
   const fetchProductType = async (filterBy, label, page, limit) => {
     setLoading(true);
     try {
@@ -68,64 +69,14 @@ const TypeProduct = () => {
     }
   };
 
+  // Gọi hàm lấy sản phẩm khi thay đổi URL params hoặc phân trang
   useEffect(() => {
     if (type) { // Sử dụng type từ URL params thay vì chỉ phụ thuộc vào state
       fetchProductType(filterBy, label, panigate.page, panigate.limit);
     }
   }, [type, filterBy, label, panigate.page, panigate.limit]);
 
-  const onChange = (current, pageSize) => {
-    setPanigate({ ...panigate, page: current - 1, limit: [pageSize] })
-  }
-
-  console.log('filter nè:', filterBy)
-
-  const [colorsAvailable, setColorsAvailable] = useState('');
-  const [colorOptions, setColorOptions] = useState([]);
-  const [category, setCategory] = useState(null);
-  const [minPrice, setMinPrice] = useState(null);
-  const [maxPrice, setMaxPrice] = useState(null);
-  const [sortBy, setSortBy] = useState(null);
-
-  // useEffect(() => {
-  //   const fetchColors = async () => {
-  //     try {
-  //       const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/colors`);
-        
-  //       console.log('API Response:', res.data);
-  //       const colors = Array.isArray(res.data?.data) ? res.data.data : [];
-  //       setColorOptions(colors);
-        
-  //     } catch (err) {
-  //       console.error('Lỗi lấy màu sắc:', err);
-  //       setColorOptions([]);
-  //     }
-  //   };
-  
-  //   fetchColors();
-  // }, []);
-
-  useEffect(() => {
-    const fetchColors = async () => {
-      try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/colors`);
-  
-        const colorsArray = res.data?.data?.data || [];
-        setColorOptions(colorsArray);
-  
-      } catch (err) {
-        console.error('Lỗi API:', err);
-        setColorOptions([]);
-      }
-    };
-  
-    fetchColors();
-  }, []);
-
-  useEffect(() => {
-    console.log('Color Options:', colorOptions);
-  }, [colorOptions]);
-
+  // Hàm xử lý khi bấm nút "Lọc"
   const handleFilter = async () => {
     try {
       setLoading(true);
@@ -142,8 +93,13 @@ const TypeProduct = () => {
       console.error("Lỗi khi lọc ở typeproduct:", err);
     }
   };
-   
 
+  // Hàm xử lý thay đổi trang
+  const onChange = (current, pageSize) => {
+    setPanigate({ ...panigate, page: current - 1, limit: [pageSize] })
+  }
+
+  // Cấu trúc breadcrumb
   const breadcrumbs = [
     { name: 'Trang chủ', link: '/' },
     ...(parentLabel
@@ -152,16 +108,13 @@ const TypeProduct = () => {
     ...(label ? [{ name: label, isCurrent: true }] : []),
   ];
   
-  console.log('breadcrumbs:', breadcrumbs);  // In ra breadcrumbs để kiểm tra kết quả
-
-  
   return (
     <ContainerComponent>
       <div style={{ padding: "16px 0" }}>
       <BreadcrumbComponent breadcrumbs={breadcrumbs} />
         <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>{label}</Title>
 
-        {/* Bộ lọc + sắp xếp */}
+        {/* Bộ lọc sản phẩm */}
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }} justify="start">
           <Col xs={24} sm={12} md={6}>
             <Select
@@ -212,15 +165,10 @@ const TypeProduct = () => {
           </Col>
 
           <Col xs={24} sm={6} md={4}>
-            {/* <Button type="primary" style={{ width: '100%' }} onClick={handleFilter}>
-              Lọc
-            </Button> */}
             <ButtonComponent
-              //onClick={handleUpdate}
               size="middle"
               styleButton={{
                 backgroundColor: 'brown',
-                //padding: '12px 28px',
                 borderRadius: '8px',
                 border: 'none',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)',

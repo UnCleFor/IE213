@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-// 1. Đầu tiên khai báo hàm loadState
+// Lấy dữ liệu user từ localStorage nếu có, nếu không trả về state mặc định
 const loadState = () => {
   try {
     const serializedState = localStorage.getItem('userState');
@@ -19,6 +19,7 @@ const loadState = () => {
     }
     return JSON.parse(serializedState);
   } catch (e) {
+    // Nếu có lỗi, trả về state mặc định
     return {
       name: '',
       email: '',
@@ -33,10 +34,10 @@ const loadState = () => {
   }
 };
 
-// 2. Sau đó mới khởi tạo initialState bằng cách gọi loadState
+// Khởi tạo trạng thái ban đầu từ localStorage
 const initialState = loadState();
 
-// 3. Tiếp theo khai báo hàm saveState
+// Lưu user state vào localStorage
 const saveState = (state) => {
   try {
     const serializedState = JSON.stringify(state);
@@ -46,10 +47,12 @@ const saveState = (state) => {
   }
 };
 
+// Tạo Redux slice cho user
 export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    // Cập nhật thông tin người dùng và lưu vào localStorage
     updateUser: (state, action) => {
       const { name = '', email = '', phone = '', address = '', avatar = '', access_token = '', _id = '', isAdmin = false, refreshToken = '' } = action.payload;
       state.name = name || email;
@@ -61,8 +64,11 @@ export const userSlice = createSlice({
       state.access_token = access_token;
       state.isAdmin = isAdmin;
       state.refreshToken = refreshToken;
-      saveState(state); // Lưu state sau khi cập nhật
+
+      saveState(state); // Lưu trạng thái vào localStorage
     },
+
+    // Đăng xuất hoặc reset toàn bộ thông tin user
     resetUser: (state) => {
       state.name = '';
       state.email = '';
@@ -73,10 +79,14 @@ export const userSlice = createSlice({
       state.isAdmin = false;
       state.avatar = '';
       state.refreshToken = '';
-      localStorage.removeItem('userState'); // Xóa khỏi localStorage khi reset
+
+      // Xóa localStorage khi reset user
+      localStorage.removeItem('userState');
     },
   },
 });
 
+// Export actions để sử dụng trong component
 export const { updateUser, resetUser } = userSlice.actions;
+
 export default userSlice.reducer;

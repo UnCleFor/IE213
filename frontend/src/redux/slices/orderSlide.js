@@ -1,55 +1,61 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+// Trạng thái ban đầu của đơn hàng
 const initialState = {
-    orderItems: [],
-    orderItemsSelected: [],
-    shippingAddress: {},
-    paymentMethod: '',
-    itemsPrice: 0,
-    shippingPrice: 0,
-    taxPrice: 0,
-    totalPrice: 0,
+    orderItems: [], // Danh sách sản phẩm trong giỏ hàng
+    orderItemsSelected: [], // Danh sách sản phẩm được chọn để thanh toá
+    shippingAddress: {}, // Địa chỉ giao hàng
+    paymentMethod: '', // Phương thức thanh toán
+    itemsPrice: 0, // Tổng giá sản phẩm
+    shippingPrice: 0, // Phí vận chuyển
+    taxPrice: 0, // Thuế
+    totalPrice: 0, // Tổng giá trị đơn hàng
 
-    // tham chiếu đến bảng user
-    user: '',
-    isPaid: false,
-    paidAt: '',
-    isDelivered: false,
-    deliveredAt: '',
-    isErrorOrder: false,
-    isSucessOrder: false,
-    isBuyNow: false // Thêm trạng thái mua ngay
+    user: '', // Người mua hàng (liên kết với bảng user)
+    isPaid: false, // Đã thanh toán hay chưa
+    paidAt: '', // Thời gian thanh toán
+    isDelivered: false,  // Đã giao hàng hay chưa
+    deliveredAt: '', // Thời gian giao hàng
+
+    isErrorOrder: false, // Trạng thái lỗi khi đặt hàng
+    isSucessOrder: false, // Trạng thái đặt hàng thành công
+    isBuyNow: false  // Trạng thái "Mua ngay"
 }
 
+// Tạo slice cho đơn hàng
 export const orderSlide = createSlice({
     name: 'order',
     initialState,
     reducers: {
+        // Thêm sản phẩm vào giỏ hàng
         addOrderProduct: (state, action) => {
             const { orderItem } = action.payload
             const itemOrder = state?.orderItems?.find((item) => item?.product === orderItem.product)
             console.log('itemOrder', itemOrder)
+
             if (itemOrder) {
                 itemOrder.amount += orderItem?.amount
             } else {
                 state.orderItems.push(orderItem)
             }
-            state.isBuyNow = false // Đánh dấu không phải mua ngay
+
+            state.isBuyNow = false // Không phải trạng thái "Mua ngay"
         },
-        // Thêm reducer mới cho chức năng mua ngay
+
+        // Mua ngay 1 sản phẩm
         buyNowProduct: (state, action) => {
             const { orderItem } = action.payload
-            // Xóa tất cả sản phẩm hiện có trong giỏ hàng
-            state.orderItems = [orderItem]
-            // Chọn sản phẩm này để thanh toán ngay
-            state.orderItemsSelected = [orderItem]
-            // Đánh dấu là mua ngay
-            state.isBuyNow = true
+            state.orderItems = [orderItem] // Chỉ chứa sản phẩm này
+            state.orderItemsSelected = [orderItem]  // Được chọn để thanh toán luôn
+            state.isBuyNow = true // Đánh dấu là mua ngay
         },
+
+        // Tăng số lượng sản phẩm
         increaseAmount: (state, action) => {
             const { idProduct } = action.payload
             const itemOrder = state?.orderItems?.find((item) => item?.product === idProduct)
             const itemOrderSelected = state?.orderItemsSelected?.find((item) => item?.product === idProduct)
+
             if (itemOrder) {
                 itemOrder.amount++;
             }
@@ -57,10 +63,13 @@ export const orderSlide = createSlice({
                 itemOrderSelected.amount++;
             }
         },
+
+        // Giảm số lượng sản phẩm
         decreaseAmount: (state, action) => {
             const { idProduct } = action.payload
             const itemOrder = state?.orderItems?.find((item) => item?.product === idProduct)
             const itemOrderSelected = state?.orderItemsSelected?.find((item) => item?.product === idProduct)
+
             if (itemOrder && itemOrder.amount > 1) {
                 itemOrder.amount--;
             }
@@ -68,47 +77,54 @@ export const orderSlide = createSlice({
                 itemOrderSelected.amount--;
             }
         },
+
+        // Xóa 1 sản phẩm khỏi giỏ hàng
         removeOrderProduct: (state, action) => {
             const { idProduct } = action.payload
-
             const itemOrder = state?.orderItems?.filter((item) => item?.product !== idProduct)
             const itemOrderSelected = state?.orderItemsSelected?.filter((item) => item?.product !== idProduct)
             state.orderItems = itemOrder
             state.orderItemsSelected = itemOrderSelected
         },
+
+        // Xóa nhiều sản phẩm khỏi giỏ hàng (dựa vào danh sách được chọn)
         removeAllOrderProduct: (state, action) => {
             const { listChecked } = action.payload
-
             const itemOrders = state?.orderItems?.filter((item) => !listChecked.includes(item.product))
             const itemOrdersSelected = state?.orderItems?.filter((item) => !listChecked.includes(item.product))
-
             state.orderItems = itemOrders
             state.orderItemsSelected = itemOrdersSelected
         },
+
+        // Cập nhật danh sách sản phẩm được chọn để thanh toán
         selectedOrder: (state, action) => {
             const { listChecked } = action.payload
             const orderSelected = []
+
             state.orderItems.forEach((order) => {
                 if (listChecked.includes(order.product)) {
                     orderSelected.push(order)
                 }
             })
+
             state.orderItemsSelected = orderSelected
         },
+
+        // Reset toàn bộ trạng thái đơn hàng
         resetOrder: () => initialState,
     }
 })
 
-// Action creators are generated for each case reducer function
-export const { 
-    addOrderProduct, 
+// Export các action ra để dùng ở các componen
+export const {
+    addOrderProduct,
     buyNowProduct, // Thêm action buyNowProduct vào exports
-    increaseAmount, 
-    decreaseAmount, 
-    removeOrderProduct, 
-    removeAllOrderProduct, 
-    selectedOrder, 
-    resetOrder 
+    increaseAmount,
+    decreaseAmount,
+    removeOrderProduct,
+    removeAllOrderProduct,
+    selectedOrder,
+    resetOrder
 } = orderSlide.actions
 
 export default orderSlide.reducer

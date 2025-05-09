@@ -1,5 +1,14 @@
 import axios from "axios"
+
+// Tạo một instance axios để sử dụng với JWT
 export const axiosJWT = axios.create()
+
+/**
+ * Lấy tất cả sản phẩm theo từ khóa tìm kiếm và giới hạn số lượng
+ * @param {string} search - Từ khóa tìm kiếm (nếu có)
+ * @param {number} limit - Số lượng sản phẩm muốn lấy
+ * @returns {Promise<Object>} - Danh sách sản phẩm
+ */
 export const getAllProduct = async (search, limit) => {
   let res = {}
   if (search.length > 0) {
@@ -10,32 +19,22 @@ export const getAllProduct = async (search, limit) => {
   return res.data
 }
 
-// gán cơ bản search = 0 và ko gắn limit vào url để khi gọi getAllProduct() ko tham số bên admin thì nó lấy ra đc
-// export const getAllProduct = async (search = 0 , limit) => {
-//   let res = {}
-//   if (search.length > 0) {
-//     res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all?filter=name&filter=${search}?limit=${limit}`)
-//   } else {
-//     res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`)
-//   }
-//   return res.data
-// }
-
+/**
+ * Lấy tất cả sản phẩm (chức năng cho admin)
+ * @returns {Promise<Object>} - Danh sách sản phẩm
+ */
 export const getAllProductAdmin = async () => {
   const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`)
   return res.data
 }
 
-
-
-// export const createProduct = async (data) => {
-//     const res = await axios.post(`${process.env.REACT_APP_API_URL}/product/create`, data)
-//     return res.data
-// }
-
+/**
+ * Tạo sản phẩm mới
+ * @param {Object} data - Dữ liệu sản phẩm
+ * @returns {Promise<Object>} - Kết quả tạo sản phẩm
+ */
 export const createProduct = async (data) => {
   const token = localStorage.getItem('access_token');
-  console.log("Token gửi đi:", token);
   const res = await axios.post(
     `${process.env.REACT_APP_API_URL}/product/create`,
     data,
@@ -48,10 +47,24 @@ export const createProduct = async (data) => {
   );
   return res.data;
 }
+
+/**
+ * Lấy chi tiết sản phẩm theo ID
+ * @param {string} id - ID sản phẩm
+ * @returns {Promise<Object>} - Thông tin chi tiết sản phẩm
+ */
 export const getDetailsProduct = async (id) => {
   const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-details/${id}`)
   return res.data
 }
+
+/**
+ * Cập nhật sản phẩm
+ * @param {string} id - ID sản phẩm
+ * @param {Object} data - Dữ liệu cập nhật
+ * @param {string} access_token - Token xác thực
+ * @returns {Promise<Object>}
+ */
 export const updateProduct = async (id, data, access_token) => {
   const res = await axiosJWT.put(
     `${process.env.REACT_APP_API_URL}/product/update/${id}`,
@@ -64,6 +77,13 @@ export const updateProduct = async (id, data, access_token) => {
   );
   return res.data;
 };
+
+/**
+ * Xóa sản phẩm theo ID
+ * @param {string} id - ID sản phẩm
+ * @param {string} access_token - Token xác thực
+ * @returns {Promise<Object>}
+ */
 export const deleteProduct = async (id, access_token) => {
   const res = await axiosJWT.delete(
     `${process.env.REACT_APP_API_URL}/product/delete/${id}`,
@@ -76,6 +96,14 @@ export const deleteProduct = async (id, access_token) => {
   return res.data;
 };
 
+/**
+ * Lấy danh sách sản phẩm theo loại, nhãn, phân trang
+ * @param {string} filterBy - Loại bộ lọc (ví dụ: "category")
+ * @param {string} label - Giá trị cần lọc
+ * @param {number} page - Trang hiện tại
+ * @param {number} limit - Số sản phẩm mỗi trang
+ * @returns {Promise<Object>}
+ */
 export const getProductType = async (filterBy, label, page, limit) => {
   if (filterBy) {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all?filter=${filterBy}&label=${label}&limit=${limit}&page=${page}`)
@@ -83,6 +111,12 @@ export const getProductType = async (filterBy, label, page, limit) => {
   }
 };
 
+/**
+ * Xóa nhiều sản phẩm cùng lúc
+ * @param {Array<string>} data - Danh sách ID sản phẩm cần xóa
+ * @param {string} access_token - Token xác thực
+ * @returns {Promise<Object>}
+ */
 export const deleteManyProduct = async (data, access_token) => {
   const res = await axiosJWT.post(
     `${process.env.REACT_APP_API_URL}/product/delete-many`,
@@ -96,6 +130,11 @@ export const deleteManyProduct = async (data, access_token) => {
   return res.data;
 };
 
+/**
+ * Tìm sản phẩm theo từ khóa
+ * @param {string} keyword - Từ khóa tìm kiếm
+ * @returns {Promise<Object>}
+ */
 export const fetchProductsByName = async (keyword) => {
   const res = await axios.get(
     `${process.env.REACT_APP_API_URL}/product/search?keyword=${keyword}`
@@ -103,31 +142,17 @@ export const fetchProductsByName = async (keyword) => {
   return res.data;
 };
 
-// export const filterProducts = async (filters) => {
-//   try {
-//     const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/filter`, {
-//       params: {
-//         colors: filters.colors?.join(','),
-//         minPrice: filters.minPrice,
-//         maxPrice: filters.maxPrice,
-//         sortBy: filters.sortBy,
-//         type: filters.type
-//       }
-//     });
-//     return res.data.data;
-//   } catch (error) {
-//     console.error("Lỗi khi lọc sản phẩm:", error);
-//     throw error;
-//   }
-// };
-
+/**
+ * Lọc sản phẩm theo nhiều điều kiện: màu sắc, loại, phòng, giá, sắp xếp
+ * @param {Object} filters - Các điều kiện lọc
+ * @returns {Promise<Array>} - Danh sách sản phẩm phù hợp
+ */
 export const filterProducts = async (filters = {}) => {
   try {
-    // Chuẩn bị params
     const params = {
-      ...(filters.colors && { colors: filters.colors }), // Đã được xử lý từ component
+      ...(filters.colors && { colors: filters.colors }),
       ...(filters.type && { type: filters.type }),
-      ...(filters.room && { room: filters.room }),      
+      ...(filters.room && { room: filters.room }),
       ...(filters.minPrice && { minPrice: filters.minPrice }),
       ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
       ...(filters.sortBy && { sortBy: filters.sortBy })
@@ -135,7 +160,6 @@ export const filterProducts = async (filters = {}) => {
 
     console.log('[FRONTEND] Params gửi đi:', params);
 
-    // Gọi API với params đầy đủ
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/filter`, {
       params
     });
@@ -155,10 +179,19 @@ export const filterProducts = async (filters = {}) => {
   }
 };
 
+/**
+ * Lấy danh sách sản phẩm đang giảm giá
+ * @returns {Promise<Object>}
+ */
 export const getDiscountedProducts = async () => {
   const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-discounted`)
   return res.data
 }
+
+/**
+ * Lấy danh sách sản phẩm mới nhất
+ * @returns {Promise<Object>}
+ */
 export const getNewestProducts = async () => {
   const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-newest`)
   return res.data

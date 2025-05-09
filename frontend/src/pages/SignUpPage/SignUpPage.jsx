@@ -1,39 +1,57 @@
 import React, { useEffect } from "react"
-import { Row, Col } from "antd";
-import { WrapperContainerLeft, WrapperContainerRight, WrapperTextLight } from "./style"
+import { Row, Col, Image } from "antd";
+import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons'
+import { useNavigate } from "react-router-dom"
+import { useState } from 'react'
+
+import { WrapperTextLight } from "./style"
 import InputForm from "../../components/InputForm/InputForm"
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent"
-import logo from '../../assets/images/beautihome.png'
-import { Image } from 'antd'
-import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons'
-import { useState } from 'react'
-import { useNavigate } from "react-router-dom"
-import * as UserService from '../../services/UserService'
-import { useMutationHooks } from "../../hooks/useMutationHook";
 import Loading from "../../components/LoadingComponent/Loading"
 import * as message from '../../components/Message/Message';
+import * as UserService from '../../services/UserService'
+import { useMutationHooks } from "../../hooks/useMutationHook";
+import logo from '../../assets/images/beautihome.png'
 
 const SignUpPage = () => {
     const navigate = useNavigate()
-    const [isShowPassword, setIsShowPassword] = useState(false)
-    const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
+
+    // State cho các trường form
     const [name, setName] = useState('')
     const [phone, setPhone] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
 
+    // Hiện/ẩn mật khẩu
+    const [isShowPassword, setIsShowPassword] = useState(false)
+    const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
 
-    // Hàm dùng chung để cập nhật state
-    const handleOnchange = (setter) => (value) => setter(value)
-
-    const mutation = useMutationHooks(
-        data => UserService.signupUser(data)
-    )
-
+    // Mutation xử lý đăng ký người dùng
+    const mutation = useMutationHooks(data => UserService.signupUser(data))
     const { data, isSuccess, isError } = mutation;
 
-    // lỗi ko in ra được thông báo, nhưng chuyển trang đc
+    // Hàm xử lý thay đổi input (dùng chung)
+    const handleOnchange = (setter) => (value) => setter(value)
+
+    // Điều hướng đến trang đăng nhập
+    const handleNavigateSignIn = () => {
+        navigate('/sign_in')
+    }
+
+    // Gửi form đăng ký
+    const handleSignUp = () => {
+        mutation.mutate({ name, phone, email, password, confirmPassword })
+
+    }
+
+    // Nhấn logo để trở về trang chủ
+    const handleLogoClick = () => {
+        navigate('/');
+    };
+
+
+    // Xử lý phản hồi khi mutation thành công/thất bại
     useEffect(() => {
         if (isSuccess && data?.status !== 'ERR') {
             message.success({
@@ -48,18 +66,6 @@ const SignUpPage = () => {
     }, [isSuccess, isError])
 
     const isLoading = mutation.isPending
-
-    const handleNavigateSignIn = () => {
-        navigate('/sign_in')
-    }
-    const handleSignUp = () => {
-        mutation.mutate({ name, phone, email, password, confirmPassword })
-
-    }
-
-    const handleLogoClick = () => {
-        navigate('/');
-    };
 
     return (
         <div
@@ -82,7 +88,7 @@ const SignUpPage = () => {
                     overflow: 'hidden',
                 }}
             >
-                {/* Logo bên trái */}
+                {/* Cột Logo bên trái */}
                 <Col
                     xs={24}
                     md={9}
@@ -103,10 +109,12 @@ const SignUpPage = () => {
                         style={{ pointerEvents: 'none' }} // Prevent double clicks
                     />
                 </Col>
-                {/* Form đăng ký */}
+
+                {/* Cột form đăng ký bên phải */}
                 <Col xs={24} md={15} style={{ padding: '20px' }}>
                     <p style={{ textAlign: 'center', fontSize: '20px' }}>ĐĂNG KÝ</p>
 
+                    {/* Họ và tên */}
                     <InputForm
                         style={{ marginBottom: '10px' }}
                         placeholder="Họ và tên*"
@@ -114,6 +122,7 @@ const SignUpPage = () => {
                         onChange={handleOnchange(setName)}
                     />
 
+                    {/* Số điện thoại */}
                     <InputForm
                         style={{ marginBottom: '10px' }}
                         placeholder="Số điện thoại"
@@ -121,6 +130,7 @@ const SignUpPage = () => {
                         onChange={handleOnchange(setPhone)}
                     />
 
+                    {/* Email */}
                     <InputForm
                         style={{ marginBottom: '10px' }}
                         placeholder="Email*"
@@ -180,9 +190,10 @@ const SignUpPage = () => {
                         />
                     </div>
 
-                    {/* Hiển thị lỗi nếu có */}
+                    {/* Hiển thị lỗi từ server nếu có */}
                     {data?.status === 'ERR' && <span style={{ color: 'red' }}>{data?.message}</span>}
 
+                    {/* Nút đăng ký */}
                     <Loading isLoading={isLoading}>
                         <ButtonComponent
                             disabled={
@@ -204,6 +215,7 @@ const SignUpPage = () => {
                         />
                     </Loading>
 
+                    {/* Liên kết đến trang đăng nhập */}
                     <p>
                         Bạn đã có tài khoản?{' '}
                         <WrapperTextLight onClick={handleNavigateSignIn}>
@@ -215,4 +227,5 @@ const SignUpPage = () => {
         </div>
     )
 }
+
 export default SignUpPage

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Image } from "antd";
 import { EyeFilled, EyeInvisibleFilled } from "@ant-design/icons";
-import { WrapperContainerLeft, WrapperContainerRight, WrapperTextLight } from "./style";
+import { WrapperTextLight } from "./style";
 import InputForm from "../../components/InputForm/InputForm";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import logo from "../../assets/images/beautihome.png";
@@ -13,36 +13,41 @@ import * as message from '../../components/Message/Message';
 import { jwtDecode } from "jwt-decode";
 import { useDispatch } from 'react-redux'
 import { updateUser } from "../../redux/slices/userSlide";
+
 const SignInPage = () => {
+    // State hiển thị mật khẩu
     const [isShowPassword, setIsShowPassword] = useState(false);
+
+    // Lấy thông tin điều hướng trước đó (nếu có)
     const location = useLocation()
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    //    const mutation = useMutationHooks(
-    //        data => UserService.loginUser(data)
-    //  )
-    //    const {data, isLoading} = mutation
+    // State cho form
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
 
-    const mutation = useMutationHooks(
-        data => UserService.loginUser(data)
-    )
+    // Gọi API đăng nhập qua custom hook
+    const mutation = useMutationHooks(data => UserService.loginUser(data))
     const { data, isSuccess, isError } = mutation
+    const isLoading = mutation.isPending
+
+    // Hàm xử lý khi đăng nhập thành công
     useEffect(() => {
-        console.log('location', location)
         if (isSuccess && data?.status !== 'ERR') {
+            // Điều hướng: nếu có vị trí trước đó => quay lại, ngược lại về home
             if (location?.state) {
                 navigate(location?.state)
             } else {
                 navigate('/')
             }
+
+            // Lưu access token vào localStorage
             localStorage.setItem('access_token', data?.access_token)
 
+            // Decode token để lấy userId
             if (data?.access_token) {
                 const decoded = jwtDecode(data?.access_token)
-                console.log('decoded', decoded)
                 if (decoded?.id) {
                     handleGetDetailUser(decoded?.id, data?.access_token)
                 }
@@ -50,16 +55,13 @@ const SignInPage = () => {
         }
     }, [isSuccess])
 
+    // Hàm lấy thông tin chi tiết người dùng sau đăng nhập
     const handleGetDetailUser = async (id, token) => {
         const res = await UserService.getDetailUser(id, token)
         dispatch(updateUser({ ...res?.data, access_token: token }))
-        //console.log('res',res)
     }
 
-    const isLoading = mutation.isPending
-
-    console.log('mutation', mutation)
-
+    // Thông báo sau khi mutation hoàn tất
     useEffect(() => {
         if (isSuccess && data?.status === 'OK') {
             message.success('Đăng nhập thành công!');
@@ -68,19 +70,26 @@ const SignInPage = () => {
         }
     }, [isSuccess, isError]);
 
+    // Chuyển hướng đến trang đăng ký
     const handleNavigateSignUp = () => {
         navigate('/sign_up')
     }
-    const handleOnchange = (setter) => (value) => setter(value)
 
-    const handleSignIn = () => {
-        mutation.mutate({ email, password })
-        console.log('sign_in', email, password)
-    }
+    // Chuyển hướng đến trang quên mật khẩu
     const handleForgotPass = () => {
         navigate('/forgot-password')
     }
 
+    // Cập nhật giá trị email/password từ input
+    const handleOnchange = (setter) => (value) => setter(value)
+
+    // Gửi thông tin đăng nhập
+    const handleSignIn = () => {
+        mutation.mutate({ email, password })
+        console.log('sign_in', email, password)
+    }
+
+    // Bấm logo quay về trang chủ
     const handleLogoClick = () => {
         navigate('/');
     };
@@ -104,7 +113,7 @@ const SignInPage = () => {
                     overflow: 'hidden'
                 }}
             >
-                {/* logo */}
+                {/* Cột bên trái: Logo */}
                 <Col xs={24} md={9} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
                     <div
                         onClick={handleLogoClick}
@@ -120,14 +129,14 @@ const SignInPage = () => {
                     </div>
                 </Col>
 
-                {/* nhập liệu */}
+                {/* Cột bên phải: Form đăng nhập */}
                 <Col xs={24} md={15} style={{ padding: '20px' }}>
                     <p style={{ textAlign: 'center', fontSize: '20px' }}>ĐĂNG NHẬP</p>
 
                     {/* Input Email */}
                     <InputForm style={{ marginBottom: '10px' }} placeholder="Email*" value={email} onChange={handleOnchange(setEmail)} />
 
-                    {/* Input Mật khẩu + Icon hiển thị mật khẩu */}
+                    {/* Input Mật khẩu kèm Icon hiển thị mật khẩu */}
                     <div style={{ position: 'relative', marginBottom: '10px' }}>
                         <span
                             onClick={() => setIsShowPassword(!isShowPassword)}
@@ -139,7 +148,7 @@ const SignInPage = () => {
                                 cursor: 'pointer',
                                 fontSize: '18px',
                                 color: '#666',
-                                zIndex: 2, // ✅ thêm zIndex để icon nổi lên trên
+                                zIndex: 2, // thêm zIndex để icon nổi lên trên
                             }}
                         >
                             {isShowPassword ? <EyeFilled /> : <EyeInvisibleFilled />}
@@ -152,13 +161,13 @@ const SignInPage = () => {
                         />
                     </div>
 
+                    {/* Thông báo lỗi đăng nhập */}
                     {data?.status === 'Lỗi' && (
                         <span style={{ color: 'red' }}>{data?.message}</span>
                     )}
 
-
+                    {/* Nút đăng nhập với trạng thái loading */}
                     <Loading isLoading={isLoading}>
-                        {/* Button Đăng nhập */}
                         <ButtonComponent
                             disabled={!email.length || !password.length}
                             onClick={handleSignIn}
@@ -171,8 +180,10 @@ const SignInPage = () => {
                             }}
                             styleTextButton={{ color: 'white', fontSize: '16px' }}
                             textButton="ĐĂNG NHẬP"
-                        ></ButtonComponent>
+                        />
                     </Loading>
+
+                    {/* Liên kết phụ */}
                     <p><WrapperTextLight onClick={handleForgotPass}>Quên mật khẩu</WrapperTextLight></p>
                     <p>Chưa có tài khoản? <WrapperTextLight onClick={handleNavigateSignUp}>Tạo tài khoản</WrapperTextLight></p>
                 </Col>
