@@ -50,6 +50,7 @@ const ResetPasswordPage = () => {
     };
     const handleLogOut = async () => {
         try {
+            await UserService.updateLogoutStatus(user?.id,user?.access_token)
             await UserService.logoutUser();
             localStorage.removeItem('access_token');
             dispatch(resetUser());
