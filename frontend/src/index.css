@@ -31,8 +31,6 @@ code {
   }
 }
 
-
-
 /* Đổi màu gạch chân khi chọn */
 :where(.ant-menu-light).ant-menu-horizontal > .ant-menu-item-selected::after,
 :where(.ant-menu-light).ant-menu-horizontal > .ant-menu-submenu-selected::after {

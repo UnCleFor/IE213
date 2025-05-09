@@ -3,7 +3,9 @@ import { Button, message } from 'antd';
 import { useMutationHooks } from '../../hooks/useMutationHook';
 import * as OrderService from '../../services/OrderService';
 import moment from 'moment'
-const VNPayButton = ({ 
+
+// Component nút thanh toán VNPay
+const VNPayButton = ({
   amount,
   orderInfo = `Thanh toán đơn hàng ${Date.now()}`,
   orderType = 'other',
@@ -11,24 +13,27 @@ const VNPayButton = ({
   onSuccess,
   onError
 }) => {
+  // Hook mutation để gọi API tạo URL thanh toán
   const paymentUrlMutation = useMutationHooks(
     (data) => OrderService.createPaymentUrl(data)
   );
 
+  // Hàm xử lý khi người dùng nhấn nút thanh toán
   const handlePayment = async () => {
-    // Validate input
     if (!amount || amount <= 0) {
+      // Kiểm tra số tiền hợp lệ
       message.error('Vui lòng nhập số tiền hợp lệ');
       return;
     }
 
+    // Kiểm tra dữ liệu đơn hàng có sản phẩm
     if (!orderData?.orderItems?.length) {
       message.error('Giỏ hàng không có sản phẩm nào');
       return;
     }
 
     try {
-      // Tạo payment data
+      // Chuẩn bị dữ liệu gửi sang API tạo thanh toán VNPay
       const paymentData = {
         amount: Math.round(Number(amount)),
         orderInfo: orderInfo.slice(0, 255), // Giới hạn độ dài theo yêu cầu VNPay
@@ -43,10 +48,10 @@ const VNPayButton = ({
 
       // Gọi API tạo URL thanh toán
       const response = await paymentUrlMutation.mutateAsync(paymentData);
-      
-      // Xử lý response
+
+      // Trích xuất URL thanh toán từ response
       const paymentUrl = extractPaymentUrl(response);
-      
+
       if (!paymentUrl) {
         throw new Error('Không nhận được URL thanh toán từ hệ thống');
       }
@@ -54,17 +59,15 @@ const VNPayButton = ({
       // Chuyển hướng đến VNPay
       localStorage.setItem('pendingOrder', JSON.stringify(orderData));
       window.location.href = paymentUrl;
-      
+
     } catch (error) {
       console.error('Payment error:', {
         error: error.response?.data || error.message,
         config: error.config
       });
-      
-      const errorMsg = error.response?.data?.message || 
-                      error.message || 
-                      'Tạo URL thanh toán thất bại';
-      
+      const errorMsg = error.response?.data?.message ||
+        error.message ||
+        'Tạo URL thanh toán thất bại';
       message.error(errorMsg);
       onError?.(error);
     }
@@ -94,7 +97,7 @@ const VNPayButton = ({
   };
 
   return (
-    <Button 
+    <Button
       type="primary"
       onClick={handlePayment}
       loading={paymentUrlMutation.isLoading}

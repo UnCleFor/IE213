@@ -1,8 +1,6 @@
-import { error } from "./components/Message/Message";
-
+// Hàm kiểm tra xem chuỗi có phải là JSON hợp lệ không
 export const isJsonString = (data) => {
   try {
-    console.log("📌 isJsonString - dữ liệu truyền vào:", data)
     JSON.parse(data)
   } catch (error) {
     console.error("❌ JSON.parse lỗi với:", data)
@@ -11,6 +9,7 @@ export const isJsonString = (data) => {
   return true
 }
 
+// Hàm tạo item menu (thường dùng cho thư viện antd Menu)
 export function getItem(label, key, icon, children, type) {
   return {
     key,
@@ -21,6 +20,7 @@ export function getItem(label, key, icon, children, type) {
   };
 }
 
+// Hàm chuyển đổi file sang base64
 export const getBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -29,24 +29,25 @@ export const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
+// Hàm khởi tạo Facebook SDK để sử dụng các chức năng của Facebook
 export const initFacebookSDK = () => {
   if (window.FB) {
     window.FB.XFBML.parse();
   }
   let locale = "vi_VN";
+
+    // Hàm khởi tạo FB SDK
   window.fbAsyncInit = function () {
     window.FB.init({
-      appId: process.env.REACT_APP_FB_ID, // You App ID
-      cookie: true, // enable cookies to allow the server to access
-      // the session
-      xfbml: true,  // parse social plugins on this page
-      version: "v8.0" // use version 2.1
+      appId: process.env.REACT_APP_FB_ID, 
+      cookie: true,
+      xfbml: true, 
+      version: "v8.0"
     });
   };
 
-  // Load the SDK asynchronously
+  // Load SDK Facebook bất đồng bộ
   (function (d, s, id) {
-    console.log(s);
     var js, fjs = d.getElementsByTagName(s)[0];
     if (d.getElementById(id)) return;
     js = d.createElement(s);
@@ -56,6 +57,7 @@ export const initFacebookSDK = () => {
   })(document, 'script', 'facebook-jssdk');
 };
 
+// Hàm định dạng giá tiền VNĐ (thêm dấu chấm phân cách và đơn vị)
 export const convertPrice = (price) => {
   try {
     const result = price?.toLocaleString('vi-VN', { minimumFractionDigits: 0 });
@@ -65,7 +67,8 @@ export const convertPrice = (price) => {
   }
 }
 
+// Hàm chuyển đổi VNĐ sang USD (tỷ giá cố định)
 export const convertVNDToUSD = (vnd) => {
-  const exchangeRate = 25000; // hoặc dùng tỷ giá thực nếu bạn có API
-  return (vnd / exchangeRate).toFixed(2); // làm tròn 2 chữ số thập phân
+  const exchangeRate = 25000; 
+  return (vnd / exchangeRate).toFixed(2);
 };

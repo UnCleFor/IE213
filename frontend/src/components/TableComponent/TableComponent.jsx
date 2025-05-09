@@ -4,13 +4,28 @@ import Loading from '../LoadingComponent/Loading';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
+
+/**
+ * TableComponent - Component hiển thị bảng dữ liệu có thể chọn nhiều dòng, xóa hàng loạt và xuất Excel.
+ * 
+ * @param {Array} data - Dữ liệu hiển thị trong bảng
+ * @param {Array} columns - Cấu hình cột của bảng
+ * @param {boolean} isLoading - Trạng thái loading cho toàn bộ bảng
+ * @param {Function} deleteAll - Hàm xử lý xóa các dòng được chọn
+ * @param {string} exportFileName - Tên file khi export ra Excel
+ * @param {string} exportSheetName - Tên sheet trong file Excel
+ * @param {Object} paginationConfig - Cấu hình phân trang
+ * @param {boolean} showDeleteAll - Có hiển thị nút xóa hàng loạt hay không
+ * @param {boolean} showExport - Có hiển thị nút export Excel hay không
+ */
+
 const TableComponent = (props) => {
   const {
     selectionType = 'checkbox',
     data = [],
     isLoading = false,
     columns = [],
-    deleteAll, // This prop can be undefined to disable delete functionality
+    deleteAll,
     exportFileName = 'data_export',
     exportSheetName = 'Sheet1',
     paginationConfig = {
@@ -19,15 +34,16 @@ const TableComponent = (props) => {
       pageSizeOptions: ['10', '20', '50', '100'],
       showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
     },
-    showDeleteAll = true, // New prop to control delete button visibility
-    showExport = true // New prop to control export button visibility
+    showDeleteAll = true,
+    showExport = true
   } = props;
 
-  const [rowSeletedKeys, setRowSeletedKeys] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(paginationConfig.defaultPageSize);
+  const [rowSeletedKeys, setRowSeletedKeys] = useState([]); // Các key của dòng đã chọn
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const [pageSize, setPageSize] = useState(paginationConfig.defaultPageSize); // Kích thước trang
   const tableRef = useRef(null);
 
+  // Cấu hình chọn dòng
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       setRowSeletedKeys(selectedRowKeys);
@@ -35,55 +51,61 @@ const TableComponent = (props) => {
     preserveSelectedRowKeys: true,
   };
 
+  // Xử lý khi nhấn nút "Xóa mục đã chọn"
   const handleDeleteAll = () => {
     deleteAll(rowSeletedKeys);
   };
 
+  // Hàm xử lý xuất dữ liệu ra file Excel
   const exportToExcel = () => {
     try {
       const exportData = data.map(item => {
         const flatItem = {};
-  
+
         // Hàm đệ quy để làm phẳng object, bỏ qua các trường không cần thiết
         const flatten = (obj, prefix = '') => {
           Object.entries(obj).forEach(([key, value]) => {
             const newKey = prefix ? `${prefix}.${key}` : key;
-  
-            // Bỏ qua các trường không cần export
+
+            // Bỏ qua các trường như hình ảnh, mật khẩu, v.v.
             if (['image', 'images', 'key', 'avatar', '__v', 'password'].some(
               word => newKey.toLowerCase().includes(word)
             )) return;
-  
-            // Xử lý đặc biệt cho orderItems
+
+            // Nếu là orderItems thì format thành chuỗi mô tả
             if (key === 'orderItems' && Array.isArray(value)) {
-              flatItem[newKey] = value.map(orderItem => 
+              flatItem[newKey] = value.map(orderItem =>
                 `${orderItem.name || orderItem.product?.name} (x${orderItem.amount})`
               ).join('; ');
             }
-            // Xử lý đặc biệt cho shippingAddress
+
+            // Nếu là shippingAddress thì lấy thông tin chi tiết
             else if (key === 'shippingAddress' && typeof value === 'object') {
               flatItem[`${newKey}.fullName`] = value.fullName;
               flatItem[`${newKey}.address`] = value.address;
               flatItem[`${newKey}.phone`] = value.phone;
               flatItem[`${newKey}.email`] = value.email;
             }
-            // Xử lý mảng thông thường
+
+            // Nếu là mảng thì chuyển sang chuỗi
             else if (Array.isArray(value)) {
               flatItem[newKey] = value.join(', ');
             }
-            // Xử lý object lồng nhau
+
+            // Nếu là object thì gọi đệ quy
             else if (typeof value === 'object' && value !== null) {
               flatten(value, newKey);
             }
-            // Xử lý giá trị đơn giản
+
+            // Giá trị đơn giản thì gán trực tiếp
             else {
               flatItem[newKey] = value;
             }
           });
         };
-  
+
         flatten(item);
-  
+
         // Định dạng các trường giá cả
         if (flatItem.totalPrice) {
           flatItem.totalPrice = `${flatItem.totalPrice.toLocaleString()} ₫`;
@@ -94,28 +116,30 @@ const TableComponent = (props) => {
         if (flatItem.itemsPrice) {
           flatItem.itemsPrice = `${flatItem.itemsPrice.toLocaleString()} ₫`;
         }
-  
+
         return flatItem;
       });
-  
+
+      // Tạo workbook và sheet từ dữ liệu
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(exportData);
-      
+
       // Tự động điều chỉnh độ rộng cột
       ws['!cols'] = Object.keys(exportData[0] || {}).map(() => ({ wch: 20 }));
-      
+
       XLSX.utils.book_append_sheet(wb, ws, exportSheetName);
-      
-      const excelBuffer = XLSX.write(wb, { 
-        bookType: 'xlsx', 
-        type: 'array' 
+
+      const excelBuffer = XLSX.write(wb, {
+        bookType: 'xlsx',
+        type: 'array'
       });
-      
-      const blob = new Blob([excelBuffer], { 
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+
+      // Tạo blob và lưu file
+      const blob = new Blob([excelBuffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       });
-      
-      saveAs(blob, `${exportFileName}_${new Date().toISOString().slice(0,10)}.xlsx`);
+
+      saveAs(blob, `${exportFileName}_${new Date().toISOString().slice(0, 10)}.xlsx`);
       message.success('Xuất file Excel thành công!');
     } catch (error) {
       console.error('Lỗi khi xuất Excel:', error);
@@ -123,6 +147,7 @@ const TableComponent = (props) => {
     }
   };
 
+  // Xử lý khi thay đổi trang hoặc pageSize
   const handleTableChange = (pagination, filters, sorter) => {
     setCurrentPage(pagination.current);
     setPageSize(pagination.pageSize);
@@ -131,6 +156,7 @@ const TableComponent = (props) => {
   return (
     <Loading isLoading={isLoading}>
       <div style={{ width: '100%', overflowX: 'auto' }}>
+        {/* Hiển thị nút export và delete nếu được bật */}
         {(showExport || (showDeleteAll && deleteAll)) && (
           <div style={{ marginBottom: 16, display: 'flex', gap: '10px' }}>
             {showExport && (
@@ -145,6 +171,8 @@ const TableComponent = (props) => {
             )}
           </div>
         )}
+
+        {/* Hiển thị bảng dữ liệu */}
         <Table
           {...props}
           ref={tableRef}
