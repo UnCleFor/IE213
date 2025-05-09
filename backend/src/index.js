@@ -13,12 +13,7 @@ const port = process.env.PORT || 3001
 
 //react-query
 app.use(cors({
-    origin: [
-        'http://localhost:3000',       // Local dev
-        'http://frontend:80',          // Docker network
-        'https://ie213.vercel.app' // Production
-      ],
-    //origin: 'https://ie213.vercel.app',
+    origin: 'https://ie213.vercel.app',
     //origin: 'http://localhost:3000',
     credentials: true
   }));
