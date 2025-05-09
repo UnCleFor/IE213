@@ -78,16 +78,17 @@ REACT_APP_API_URL=http://localhost:3001/api
 
 4. **Khởi chạy development**
    - Terminal 1 (backend):
-```bash
-cd ../backend
-npm run dev
-```
+     ```bash
+     cd ../backend
+     npm run dev
+     ```
+   
    - Terminal 2 (frontend):
-```bash
-cd ../frontend
-npm start
-```
-
+     ```bash
+     cd ../frontend
+     npm start
+     ```
+     
 Sau khi khởi chạy:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:3001
