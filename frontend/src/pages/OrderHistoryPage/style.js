@@ -1,11 +1,14 @@
-import { css,styled } from "styled-components";
+import {
+  css,
+  styled
+} from "styled-components";
 
 // Định dạng cho Card sản phẩm
-export const orderCardStyle = css`
+export const orderCardStyle = css `
   .ant-card {
     margin-bottom: 16px;
   }
-
+    
   /* Khi màn hình nhỏ hơn 768px */
   @media (max-width: 768px) {
     .ant-card-body {
@@ -18,7 +21,7 @@ export const orderCardStyle = css`
       justify-content: space-between;
       flex-direction: column; /* Sắp xếp theo chiều dọc */
     }
-    
+
     /* Chỉnh sửa vị trí nút khi ở mobile */
     .order-actions {
       display: flex;
@@ -26,7 +29,7 @@ export const orderCardStyle = css`
       margin-top: 16px;
     }
   }
-
+    
   /* Khi màn hình lớn hơn 768px */
   @media (min-width: 768px) {
     .order-actions {
@@ -36,12 +39,12 @@ export const orderCardStyle = css`
     }
   }
 `;
-export const ProductImage = styled.img`
+export const ProductImage = styled.img `
   width: 100px;
   height: auto;
   margin-right: 16px;
   flex-shrink: 0;
-   
+
   @media (max-width: 768px) {
     width: 80px;
     height: 80px;
@@ -54,4 +57,3 @@ export const ProductImage = styled.img`
     height: 70px;
   }
 `;
-

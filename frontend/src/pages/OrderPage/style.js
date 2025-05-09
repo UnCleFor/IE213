@@ -1,19 +1,22 @@
 import styled from 'styled-components';
-import { InputNumber, Checkbox as AntCheckbox } from 'antd';
+import {
+  InputNumber,
+  Checkbox as AntCheckbox
+} from 'antd';
 
-export const PageContainer = styled.div`
+export const PageContainer = styled.div `
   background: #f8f9fa;
   min-height: 100vh;
   padding: 10px 0;
 `;
 
-export const ContentContainer = styled.div`
+export const ContentContainer = styled.div `
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 15px;
 `;
 
-export const CartTitle = styled.h2`
+export const CartTitle = styled.h2 `
   font-size: 28px;
   color: #2a2a2a;
   margin-bottom: 30px;
@@ -25,7 +28,7 @@ export const CartTitle = styled.h2`
   }
 `;
 
-export const CartLayout = styled.div`
+export const CartLayout = styled.div `
   display: flex;
   gap: 24px;
   align-items: flex-start; /* Keep items aligned at the top */
@@ -36,7 +39,7 @@ export const CartLayout = styled.div`
   }
 `;
 
-export const CartLeft = styled.div`
+export const CartLeft = styled.div `
   flex: 1;
   background: #fff;
   border-radius: 8px;
@@ -48,7 +51,7 @@ export const CartLeft = styled.div`
   }
 `;
 
-export const CartRight = styled.div`
+export const CartRight = styled.div `
   width: 350px;
   background: #fff;
   border-radius: 8px;
@@ -65,7 +68,7 @@ export const CartRight = styled.div`
     min-height: auto; /* Reset for mobile */
   }
 `;
-export const CartHeader = styled.div`
+export const CartHeader = styled.div `
   display: flex;
   align-items: center;
   padding: 16px 20px;
@@ -76,7 +79,7 @@ export const CartHeader = styled.div`
   }
 `;
 
-export const CheckboxContainer = styled.div`
+export const CheckboxContainer = styled.div `
   display: flex;
   align-items: center;
   width: 40%;
@@ -87,14 +90,15 @@ export const CheckboxContainer = styled.div`
   }
 `;
 
-export const Checkbox = styled(AntCheckbox)`
+export const Checkbox = styled(AntCheckbox)
+`
   .ant-checkbox-inner {
     width: 18px;
     height: 18px;
   }
 `;
 
-export const HeaderText = styled.span`
+export const HeaderText = styled.span `
   font-weight: 500;
   color: #555;
   
@@ -103,7 +107,7 @@ export const HeaderText = styled.span`
   }
 `;
 
-export const HeaderActions = styled.div`
+export const HeaderActions = styled.div `
   display: flex;
   justify-content: space-between;
   width: 60%;
@@ -113,7 +117,7 @@ export const HeaderActions = styled.div`
   }
 `;
 
-export const CartItem = styled.div`
+export const CartItem = styled.div `
   display: flex;
   padding: 20px;
   border-bottom: 1px solid #f0f0f0;
@@ -130,7 +134,7 @@ export const CartItem = styled.div`
   }
 `;
 
-export const ProductInfo = styled.div`
+export const ProductInfo = styled.div `
   display: flex;
   align-items: center;
   width: 40%;
@@ -142,7 +146,7 @@ export const ProductInfo = styled.div`
   }
 `;
 
-export const ProductImage = styled.img`
+export const ProductImage = styled.img `
   width: 80px;
   height: 80px;
   object-fit: cover;
@@ -155,12 +159,12 @@ export const ProductImage = styled.img`
   }
 `;
 
-export const ProductDetails = styled.div`
+export const ProductDetails = styled.div `
   flex: 1;
   position: relative;
 `;
 
-export const ProductName = styled.div`
+export const ProductName = styled.div `
   font-weight: 500;
   color: #333;
   margin-bottom: 4px;
@@ -174,7 +178,7 @@ export const ProductName = styled.div`
   }
 `;
 
-export const ProductActions = styled.div`
+export const ProductActions = styled.div `
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -188,7 +192,7 @@ export const ProductActions = styled.div`
   }
 `;
 
-export const PriceColumn = styled.div`
+export const PriceColumn = styled.div `
   width: 35%;
   text-align: center;
   padding-left: 30px;
@@ -201,7 +205,7 @@ export const PriceColumn = styled.div`
   }
 `;
 
-export const QuantityColumn = styled.div`
+export const QuantityColumn = styled.div `
   width: 35%;
   text-align: center;
   
@@ -212,7 +216,7 @@ export const QuantityColumn = styled.div`
   }
 `;
 
-export const PriceText = styled.div`
+export const PriceText = styled.div `
   font-weight: 600;
   color: #333;
   
@@ -221,13 +225,13 @@ export const PriceText = styled.div`
   }
 `;
 
-export const OriginalPrice = styled.div`
+export const OriginalPrice = styled.div `
   color: #999;
   text-decoration: line-through;
   font-size: 13px;
 `;
 
-export const QuantityControl = styled.div`
+export const QuantityControl = styled.div `
   display: flex;
   align-items: center;
   justify-content: center;
@@ -238,7 +242,7 @@ export const QuantityControl = styled.div`
   }
 `;
 
-export const QuantityButton = styled.button`
+export const QuantityButton = styled.button `
   width: 28px;
   height: 28px;
   border: 1px solid #ddd;
@@ -256,7 +260,8 @@ export const QuantityButton = styled.button`
   }
 `;
 
-export const QuantityInput = styled(InputNumber)`
+export const QuantityInput = styled(InputNumber)
+`
   width: 50px !important;
   
   .ant-input-number-input {
@@ -268,7 +273,7 @@ export const QuantityInput = styled(InputNumber)`
   }
 `;
 
-export const DeleteButton = styled.button`
+export const DeleteButton = styled.button `
   display: flex;
   align-items: center;
   gap: 5px;
@@ -288,7 +293,7 @@ export const DeleteButton = styled.button`
 
 `;
 
-export const SummaryTitle = styled.h3`
+export const SummaryTitle = styled.h3 `
   font-size: 18px;
   margin-bottom: 20px;
   color: #333;
@@ -300,7 +305,7 @@ export const SummaryTitle = styled.h3`
   }
 `;
 
-export const SummaryItem = styled.div`
+export const SummaryItem = styled.div `
   display: flex;
   justify-content: space-between;
   margin-bottom: 12px;
@@ -310,11 +315,11 @@ export const SummaryItem = styled.div`
   }
 `;
 
-export const SummaryLabel = styled.span`
+export const SummaryLabel = styled.span `
   color: #666;
 `;
 
-export const TotalPrice = styled.div`
+export const TotalPrice = styled.div `
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
@@ -331,7 +336,7 @@ export const TotalPrice = styled.div`
   }
 `;
 
-export const CheckoutButton = styled.button`
+export const CheckoutButton = styled.button `
   width: 100%;
   padding: 12px;
   background: #a52a2a;
@@ -358,7 +363,7 @@ export const CheckoutButton = styled.button`
   }
 `;
 
-export const EmptyCart = styled.div`
+export const EmptyCart = styled.div `
   text-align: center;
   padding: 60px 0;
   color: #999;
@@ -377,7 +382,7 @@ export const EmptyCart = styled.div`
   }
 `;
 
-export const QuantityInputWrapper = styled.div`
+export const QuantityInputWrapper = styled.div `
   .ant-input-number-handler-wrap {
     display: none !important;
   }
@@ -388,7 +393,8 @@ export const QuantityInputWrapper = styled.div`
   }
 `;
 
-export const DisabledQuantityButton = styled(QuantityButton)`
+export const DisabledQuantityButton = styled(QuantityButton)
+`
   cursor: not-allowed;
   color: #ccc;
   border-color: #eee;
@@ -399,7 +405,7 @@ export const DisabledQuantityButton = styled(QuantityButton)`
   }
 `;
 
-export const MobilePriceLabel = styled.div`
+export const MobilePriceLabel = styled.div `
   display: none;
   font-size: 13px;
   color: #666;
@@ -410,7 +416,7 @@ export const MobilePriceLabel = styled.div`
   }
 `;
 
-export const MobileQuantityLabel = styled.div`
+export const MobileQuantityLabel = styled.div `
   display: none;
   font-size: 13px;
   color: #666;
@@ -423,20 +429,20 @@ export const MobileQuantityLabel = styled.div`
   }
 `;
 
-export const ProductMaterial = styled.div`
+export const ProductMaterial = styled.div `
   font-size: 13px;
   color: #666;
   margin-top: 4px;
 `;
 
-export const DeleteButtonWrapper = styled.div`
+export const DeleteButtonWrapper = styled.div `
   display: flex;
   justify-content: flex-end;
   width: 100%;
   margin-top: 10px;
 `;
 
-export const ProductBottomSection = styled.div`
+export const ProductBottomSection = styled.div `
   display: flex;
   width: 100%;
   padding-top: 10px;
@@ -444,7 +450,7 @@ export const ProductBottomSection = styled.div`
   margin-top: 10px;
 `;
 
-export const SummaryValue = styled.span`
+export const SummaryValue = styled.span `
   font-weight: 500;
   color: #333;
 `;

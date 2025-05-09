@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const PolicyContainer = styled.div`
+export const PolicyContainer = styled.div `
   max-width: 900px;
   margin: 50px auto;
   padding: 30px;
@@ -11,14 +11,14 @@ export const PolicyContainer = styled.div`
   border: 1px solid #ddd;
 `;
 
-export const Title = styled.h1`
+export const Title = styled.h1 `
   font-size: 28px;
   font-weight: bold;
   text-align: center;
   margin-bottom: 20px;
 `;
 
-export const SectionTitle = styled.h2`
+export const SectionTitle = styled.h2 `
   font-size: 22px;
   font-weight: bold;
   margin-top: 30px;
@@ -26,7 +26,7 @@ export const SectionTitle = styled.h2`
   color: #333;
 `;
 
-export const Content = styled.div`
+export const Content = styled.div `
   font-size: 18px;
   line-height: 1.6;
   color: #444;

@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Tabs, Card, Button, Row, Col, Empty, Tag, Modal, message, Spin } from "antd";
+import {
+    Tabs,
+    Card,
+    Button,
+    Row,
+    Col,
+    Empty,
+    Tag,
+    Modal,
+    message,
+    Spin
+} from "antd";
 import { Avatar } from "antd";
 import ContainerComponent from "../../components/ContainerComponent/ContainerComponent.jsx";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent.jsx";
@@ -11,18 +22,16 @@ import "./style.css";
 import { useMutationHooks } from "../../hooks/useMutationHook.js";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/LoadingComponent/Loading.jsx";
-import { useLocation } from "react-router-dom";
 import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
-import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
-const { TabPane } = Tabs;
+const { TabPane } = Tabs; //Khai báo để sử dụng trực tiếp trong JSX
 
 const OrderHistoryPage = () => {
-    const user = useSelector((state) => state.user);
-    const queryClient = useQueryClient();
-    const [loading, setLoading] = useState(false);
-    const [isFinishUpdated, setIsFinishUpdated] = useState(false);
+    const user = useSelector((state) => state.user); // Lấy thông tin người dùng
+    const queryClient = useQueryClient(); // Làm mới cache
+    const [loading, setLoading] = useState(false); // Trạng thái loading
+    const [isFinishUpdated, setIsFinishUpdated] = useState(false); //Trạng thái loading
     const navigate = useNavigate()
-
+    // Lấy Đơn hàng theo Người dùng
     const { isLoading: isLoadingOrder, data: orders, isError, error } = useQuery({
         queryKey: ['orders', user.id, user.access_token],
         queryFn: async () => {
@@ -36,17 +45,18 @@ const OrderHistoryPage = () => {
             message.error('Không thể lấy đơn hàng');
         }
     });
-
+    // Mutation cập nhật trạng thái Đơn hàng
     const mutationUpdate = useMutationHooks(({ id, token, ...rests }) => {
         return OrderService.updatedOrder(id, rests, token);
     });
+    // Mutation xóa Đơn hàng
     const mutationDelete = useMutationHooks(({ id, token }) => {
         return OrderService.deleteOrder(id, token);
     });
-
+    // Trạng thái và dữ liệu trả về từ mutation
     const { data: dataUpdated, isLoading: isLoadingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate;
     const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete;
-
+    // Hàm hủy đơn hàng
     const cancelOrder = (orderId) => {
         Modal.confirm({
             title: "Xác nhận hủy đơn",
@@ -67,7 +77,7 @@ const OrderHistoryPage = () => {
                 setLoading(true);
                 setIsFinishUpdated(true);
                 try {
-                     mutationUpdate.mutate({
+                    mutationUpdate.mutate({
                         id: orderId,
                         token: user.access_token,
                         state: "Đã hủy",
@@ -80,7 +90,7 @@ const OrderHistoryPage = () => {
             },
         });
     };
-
+    // Hàm xóa Đơn hàng
     const removeOrder = (orderId) => {
         Modal.confirm({
             title: <span style={{ color: "brown" }}>Xác nhận xóa đơn</span>,
@@ -105,7 +115,7 @@ const OrderHistoryPage = () => {
                 setLoading(true);
                 setIsFinishUpdated(true);
                 try {
-                     mutationDelete.mutate({
+                    mutationDelete.mutate({
                         id: orderId,
                         token: user.access_token,
                     });
@@ -117,19 +127,18 @@ const OrderHistoryPage = () => {
             },
         });
     };
-
+    // Theo dõi việc cập nhật trạng thái Đơn hàng
     useEffect(() => {
         if (isSuccessUpdated && dataUpdated?.status === 'OK') {
             message.success('Hủy đơn thành công');
             queryClient.invalidateQueries(['orders']);
-           setIsFinishUpdated(false);
+            setIsFinishUpdated(false);
         } else if (dataUpdated?.status === 'ERR') {
             setIsFinishUpdated(false);
             message.error('Hủy đơn thất bại!');
         }
-
     }, [isSuccessUpdated, isErrorUpdated]);
-
+    // Theo dõi việc xóa Đơn hàng
     useEffect(() => {
         if (isSuccessDeleted && dataDeleted?.status === 'OK') {
             message.success('Xóa đơn thành công');
@@ -140,20 +149,19 @@ const OrderHistoryPage = () => {
             setIsFinishUpdated(false);
         }
     }, [isSuccessDeleted, isErrorDeleted]);
+    // Hàm định dạng lại thời gian tạo Đơn hàng
     const formatOrderDate = (dateString) => {
         const date = new Date(dateString);
-        
         // Format date: DD/MM/YYYY
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const year = date.getFullYear();
-        
         // Format time: HH:MM
         const hours = date.getHours().toString().padStart(2, '0');
         const minutes = date.getMinutes().toString().padStart(2, '0');
-        
         return `ngày ${day}/${month}/${year} lúc ${hours}:${minutes}`;
-      };
+    };
+    // Hàm tạo giao diện cho một Đơn hàng
     const renderOrder = (order) => {
         const firstProduct = order.orderItems[0];
         const formattedDate = formatOrderDate(order.createdAt);
@@ -174,7 +182,6 @@ const OrderHistoryPage = () => {
                             alt={firstProduct?.name}
                             style={{ marginTop: 11 }}
                         />
-                        {/* <ProductImage src={pic} alt="Sofa đơn" /> */}
                         <div>
                             <p>
                                 <strong>Người nhận:</strong> {order.shippingAddress?.fullName}
@@ -187,7 +194,6 @@ const OrderHistoryPage = () => {
                             </p>
                         </div>
                     </Col>
-
                     {/* Tổng tiền đơn + nút */}
                     <Col
                         xs={24}
@@ -198,7 +204,6 @@ const OrderHistoryPage = () => {
                             justifyContent: "space-between",
                             alignItems: "flex-end",
                             gap: 8,
-                            //marginTop: "16px", // Thêm khoảng cách khi màn hình nhỏ
                         }}
                     >
                         <p style={{ fontWeight: "bold", marginBottom: 8, color: "black" }}>
@@ -216,7 +221,6 @@ const OrderHistoryPage = () => {
                                 </Button>
                             )}
                             <ButtonComponent
-                                //onClick={handleUpdate}
                                 size="middle"
                                 styleButton={{
                                     backgroundColor: 'brown',
@@ -234,14 +238,13 @@ const OrderHistoryPage = () => {
                                 textButton="Xem chi tiết"
                                 onClick={() => navigate(`/order_detail/${order?._id}`)}
                             />
-
                         </div>
                     </Col>
                 </Row>
             </Card>
         );
     };
-
+    // Định dạng Màu sắc hiển thị cho từng Trạng thái đơn hàng
     const getStateColor = (state) => {
         switch (state) {
             case "Đã đặt":
@@ -258,11 +261,10 @@ const OrderHistoryPage = () => {
                 return "gray"; // Trạng thái khác
         }
     };
-
+    // Hàm lấy Trạng thái Đơn hàng
     const getOrdersByState = (state) => {
         return orders.filter((o) => o.state === state);
     };
-
     if (!orders) {
         return (
             <div style={{ textAlign: 'center', marginTop: 50, marginBottom: 50 }}>
@@ -272,46 +274,48 @@ const OrderHistoryPage = () => {
     }
     const styles = {
         breadcrumbWrapper: {
-          marginBottom: 20,  // Điều chỉnh khoảng cách nếu cần
+            marginBottom: 20,  // Điều chỉnh khoảng cách nếu cần
             // Đảm bảo rằng breadcrumb căn chỉnh với navbar
         },
-      };
+    };
 
     return (
         <ContainerComponent>
-            
             <div style={styles.breadcrumbWrapper}>
+                {/* Tạo Breadcrumb ở đầu trang */}
                 <BreadcrumbComponent
-                        breadcrumbs={[
-                            { name: "Trang chủ", link: "/" },
-                            { name: "Lịch sử mua hàng", isCurrent: true },
-                        ]}
-                    />
-                </div>   
-        <Loading isLoading={isLoadingOrder || isFinishUpdated}> 
-            <div style={{ width: '100%' }}>
-                <h2 style={{ marginBottom: 16 }}>Đơn hàng của bạn</h2>
-                <Tabs defaultActiveKey="1" type="line">
-                    <TabPane tab="Tất cả" key="1">
-                        {orders.length ? orders.map(renderOrder) : <Empty />}
-                    </TabPane>
-                    <TabPane tab="Đã đặt" key="2">
-                        {getOrdersByState("Đã đặt").map(renderOrder)}
-                    </TabPane>
-                    <TabPane tab="Đã xác nhận" key="3">
-                        {getOrdersByState("Đã xác nhận").map(renderOrder)}
-                    </TabPane>
-                    <TabPane tab="Đang giao hàng" key="4">
-                        {getOrdersByState("Đang giao hàng").map(renderOrder)}
-                    </TabPane>
-                    <TabPane tab="Đã giao hàng" key="5">
-                        {getOrdersByState("Đã giao hàng").map(renderOrder)}
-                    </TabPane>
-                    <TabPane tab="Đã hủy" key="6">
-                        {getOrdersByState("Đã hủy").map(renderOrder)}
-                    </TabPane>
-                </Tabs>
+                    breadcrumbs={[
+                        { name: "Trang chủ", link: "/" },
+                        { name: "Lịch sử mua hàng", isCurrent: true },
+                    ]}
+                />
             </div>
+
+            <Loading isLoading={isLoadingOrder || isFinishUpdated}>
+                <div style={{ width: '100%' }}>
+                    {/* Thông tin Đơn hàng */}
+                    <h2 style={{ marginBottom: 16 }}>Đơn hàng của bạn</h2>
+                    <Tabs defaultActiveKey="1" type="line"> {/* Chia Đơn hàng thành từng tab theo Trạng thái Đơn hàng */}
+                        <TabPane tab="Tất cả" key="1">
+                            {orders.length ? orders.map(renderOrder) : <Empty />}
+                        </TabPane>
+                        <TabPane tab="Đã đặt" key="2">
+                            {getOrdersByState("Đã đặt").map(renderOrder)}
+                        </TabPane>
+                        <TabPane tab="Đã xác nhận" key="3">
+                            {getOrdersByState("Đã xác nhận").map(renderOrder)}
+                        </TabPane>
+                        <TabPane tab="Đang giao hàng" key="4">
+                            {getOrdersByState("Đang giao hàng").map(renderOrder)}
+                        </TabPane>
+                        <TabPane tab="Đã giao hàng" key="5">
+                            {getOrdersByState("Đã giao hàng").map(renderOrder)}
+                        </TabPane>
+                        <TabPane tab="Đã hủy" key="6">
+                            {getOrdersByState("Đã hủy").map(renderOrder)}
+                        </TabPane>
+                    </Tabs>
+                </div>
             </Loading>
         </ContainerComponent>
     );

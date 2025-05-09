@@ -19,19 +19,21 @@ const { Sider, Content } = Layout;
 
 const AdminPage = () => {
   const items = [
-    getItem('Truy cập', 'login',<LoginOutlined />),
+    getItem('Truy cập', 'login', <LoginOutlined />),
     getItem('Người dùng', 'user', <UserOutlined />),
     getItem('Sản phẩm', 'product', <AppstoreOutlined />),
-    getItem('Đơn hàng','order',<ShoppingCartOutlined />)
+    getItem('Đơn hàng', 'order', <ShoppingCartOutlined />)
   ];
 
+  // Lưu trạng thái sidebar và mục menu được chọn
   const [collapsed, setCollapsed] = useState(false);
   const [keySelected, setKeySelected] = useState('login');
 
+  // Hàm render nội dung trang dựa vào mục menu được chọn
   const renderPage = (key) => {
     switch (key) {
       case 'login':
-        return <AdminLogin/>
+        return <AdminLogin />
       case 'user':
         return <AdminUser />;
       case 'product':
@@ -43,14 +45,17 @@ const AdminPage = () => {
     }
   };
 
+  // Thay đổi giá trị của mục menu được chọn
   const handleOnClick = ({ key }) => {
     setKeySelected(key);
   };
 
   return (
     <>
+      {/* Vẫn hiển thị header nhưng ẩn Thanh tìm kiếm và Giỏ hàng */}
       <HeaderComponent isHiddenSearch isHiddenCart />
 
+      {/* Chia bố cục cho Sider và Content */}
       <Layout style={{ minHeight: '100vh' }}>
         <Sider
           collapsed={collapsed}
@@ -68,7 +73,7 @@ const AdminPage = () => {
           {/* Nút toggle custom nằm ở trên */}
           <Button
             type="text"
-            icon={collapsed ? <MenuUnfoldOutlined style={{color:'white'}} /> : <MenuFoldOutlined style={{color:'white'}} />}
+            icon={collapsed ? <MenuUnfoldOutlined style={{ color: 'white' }} /> : <MenuFoldOutlined style={{ color: 'white' }} />}
             onClick={() => setCollapsed(!collapsed)}
             style={{
               position: 'absolute',
@@ -76,7 +81,7 @@ const AdminPage = () => {
               left: 1,
               zIndex: 1001,
               fontSize: 18,
-              backgroundColor:'brown',
+              backgroundColor: 'brown',
             }}
           />
           <div
@@ -92,6 +97,8 @@ const AdminPage = () => {
           >
             {collapsed ? 'A' : 'Admin'}
           </div>
+
+          {/* Menu điều hướng được hiển thị bên trái */}
           <Menu
             mode="inline"
             selectedKeys={[keySelected]}
@@ -101,13 +108,14 @@ const AdminPage = () => {
           />
         </Sider>
 
+        {/* Nội dung chính được hiển thị bên phải */}
         <Layout>
           <Content
             style={{
-              
+
               padding: '24px',
               background: '#fff',
-              
+
               boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
             }}
           >

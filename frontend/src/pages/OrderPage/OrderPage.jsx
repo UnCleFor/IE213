@@ -38,27 +38,26 @@ import {
   MobilePriceLabel,
   MobileQuantityLabel
 } from './style';
-import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  MinusOutlined,
+  PlusOutlined
+} from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { convertPrice } from '../../utils';
 import { useNavigate } from "react-router-dom";
 import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
-import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
 
 const OrderPage = () => {
-  const order = useSelector((state) => state.order);
+  const order = useSelector((state) => state.order); // Lấy
   const navigate = useNavigate()
-  const [listChecked, setListChecked] = useState([]);
-  const [inputValues, setInputValues] = useState({});
+  const [listChecked, setListChecked] = useState([]); // Quản lý Sản phẩm được check
+  const [inputValues, setInputValues] = useState({}); // Quản lý Số lượng Sản phẩm
   const dispatch = useDispatch();
-
+  // Cập nhật danh sách Sản phẩm được chọn cho redux
   useEffect(() => {
     dispatch(selectedOrder({ listChecked }))
   }, [listChecked])
-
-  const priceMemo = useMemo(() => {
-    return order?.orderItems?.reduce((total, curr) => total + (curr.price * curr.amount), 0);
-  }, [order]);
 
   const priceDiscountMemo = useMemo(() => {
     return order?.orderItems?.reduce((total, curr) => {
@@ -152,6 +151,7 @@ const OrderPage = () => {
     <PageContainer>
       <ContentContainer>
         <div style={styles.breadcrumbWrapper}>
+          {/* Tạo Breadcrumb ở đầu trang */}
           <BreadcrumbComponent
             breadcrumbs={[
               { name: "Trang chủ", link: "/" },
@@ -159,9 +159,8 @@ const OrderPage = () => {
             ]}
           />
         </div>
-
+        {/* Hiển thị Giỏ hàng */}
         <CartTitle>Giỏ hàng của bạn</CartTitle>
-
         {order?.orderItems?.length > 0 ? (
           <CartLayout>
             <CartLeft>
@@ -193,7 +192,7 @@ const OrderPage = () => {
                     />
                     <ProductImage src={orderItem?.image} alt={orderItem?.name} />
                     <ProductDetails>
-                      <ProductName  style={{cursor:'pointer'}}onClick={() => handleProductClick(orderItem?.product)}>{orderItem?.name}</ProductName>
+                      <ProductName style={{ cursor: 'pointer' }} onClick={() => handleProductClick(orderItem?.product)}>{orderItem?.name}</ProductName>
                       <DeleteButton onClick={() => handleDeleteOrder(orderItem?.product)}>
                         <DeleteOutlined /> Xóa
                       </DeleteButton>
@@ -258,8 +257,8 @@ const OrderPage = () => {
 
             <CartRight>
               <div style={{ padding: '16px' }}>
+                {/* Thông tin Giỏ hàng */}
                 <SummaryTitle>Thông tin đơn hàng</SummaryTitle>
-
                 {listChecked.length > 0 ? (
                   <>
                     <SummaryItem>
@@ -274,7 +273,6 @@ const OrderPage = () => {
                         )}
                       </SummaryValue>
                     </SummaryItem>
-
                     {priceDiscountMemo > 0 && (
                       <SummaryItem>
                         <SummaryLabel>Giảm giá</SummaryLabel>
@@ -283,11 +281,9 @@ const OrderPage = () => {
                         </SummaryValue>
                       </SummaryItem>
                     )}
-
                     <p style={{ color: '#666', fontSize: '14px', margin: '10px 0' }}>
                       Phí vận chuyển được tính ở trang thanh toán.
                     </p>
-
                     <TotalPrice>
                       <span>Tổng cộng</span>
                       <span>
@@ -306,11 +302,11 @@ const OrderPage = () => {
                     </TotalPrice>
                   </>
                 ) : (
+                  // Hiển thị khi chưa chọn Sản phẩm
                   <p style={{ color: '#666', fontSize: '14px' }}>
                     Vui lòng chọn sản phẩm để xem thông tin đơn hàng.
                   </p>
                 )}
-
                 <CheckoutButton
                   disabled={listChecked.length === 0}
                   style={{
@@ -325,6 +321,7 @@ const OrderPage = () => {
             </CartRight>
           </CartLayout>
         ) : (
+          // Hiển thị khi Giỏ hàng rỗng
           <EmptyCart>
             <h3>Giỏ hàng của bạn đang trống</h3>
             <p>Hãy thêm sản phẩm vào giỏ hàng để bắt đầu mua sắm</p>

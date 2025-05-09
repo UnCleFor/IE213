@@ -7,15 +7,17 @@ import ContainerComponent from "../../components/ContainerComponent/ContainerCom
 const ReturnPolicyPage = () => {
   return (
     <ContainerComponent>
-    <BreadcrumbWrapper>
-      {/* Breadcrumb Component */}
-      <BreadcrumbComponent
-        breadcrumbs={[
-          { name: 'Trang chủ', link: '/' },
-          { name: 'Chính sách đổi trả', isCurrent: true }
-        ]}
-      />
-    </BreadcrumbWrapper>  
+      {/* Tạo Breadcrumb ở đầu trang */}
+      <BreadcrumbWrapper>
+        <BreadcrumbComponent
+          breadcrumbs={[
+            { name: 'Trang chủ', link: '/' },
+            { name: 'Chính sách đổi trả', isCurrent: true }
+          ]}
+        />
+      </BreadcrumbWrapper>
+
+      {/* Các thông tin Chính sách đổi trả */}
       <PolicyContainer>
         <Title>Chính sách đổi trả</Title>
         <SectionTitle>1. Điều kiện đổi trả</SectionTitle>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Row, Col, Image } from "antd";
-import { WrapperContainerLeft, WrapperContainerRight, WrapperTextLight } from "./style";
+import { WrapperTextLight } from "./style";
 import InputForm from "../../components/InputForm/InputForm";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import logo from "../../assets/images/beautihome.png";
@@ -10,23 +10,25 @@ import { EyeFilled, EyeInvisibleFilled } from "@ant-design/icons";
 import * as EmailService from "../../services/EmailService";
 
 const ForgotPasswordPage = () => {
-    const [email, setEmail] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [otp, setOtp] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    // Quản lý nhập liệu
+    const [email, setEmail] = useState(''); // Email
+    const [newPassword, setNewPassword] = useState(''); // Mật khẩu sau khi đổi
+    const [otp, setOtp] = useState(''); // Mã OTP
+    const [confirmPassword, setConfirmPassword] = useState(''); // Xác nhận mật khẩu
     const [isShowPassword, setIsShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
     const [step, setStep] = useState(1); // 1: Nhập email, 2: Nhập mật khẩu mới
     const navigate = useNavigate();
 
+    // Hàm thay đổi input
     const handleOnchange = (setter) => (value) => setter(value);
-
+    // Gọi API gửi OTP
     const handleSendOTP = async () => {
-        // TODO: Gọi API gửi OTP
         try {
             setLoading(true);
             const res = await EmailService.forgotPassword(email);
+
             if (res.status === 200) {
                 message.success('Mã OTP đã được gửi đến email của bạn');
                 setStep(2);
@@ -41,7 +43,7 @@ const ForgotPasswordPage = () => {
             setLoading(false);
         }
     };
-
+    // Kiểm tra xác nhận mật khẩu
     const handleResetPassword = async () => {
         if (newPassword !== confirmPassword) {
             message.error('Mật khẩu mới và xác nhận mật khẩu không khớp');
@@ -69,7 +71,7 @@ const ForgotPasswordPage = () => {
             setLoading(false);
         }
     };
-
+    // Điều hướng đến trang đăng nhập
     const handleBackToSignIn = () => {
         navigate('/sign_in');
     };
@@ -93,20 +95,21 @@ const ForgotPasswordPage = () => {
                     overflow: 'hidden'
                 }}
             >
-                {/* logo */}
+                {/* Logo */}
                 <Col xs={24} md={9} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
                     <Image src={logo} preview={false} alt="logo" width="100%" />
                 </Col>
 
-                {/* nhập liệu */}
+                {/* Form cho người dùng nhập liệu */}
                 <Col xs={24} md={15} style={{ padding: '20px' }}>
                     <p style={{ textAlign: 'center', fontSize: '20px' }}>QUÊN MẬT KHẨU</p>
 
+                    {/* Bước 1: Nhập Email */}
                     {step === 1 ? (
                         <>
                             <p style={{ marginBottom: '20px' }}>Vui lòng nhập email đã đăng ký để đặt lại mật khẩu</p>
 
-                            {/* Input Email */}
+                            {/* Email */}
                             <InputForm
                                 style={{ marginBottom: '20px' }}
                                 placeholder="Email*"
@@ -116,7 +119,7 @@ const ForgotPasswordPage = () => {
 
                             <ButtonComponent
                                 disabled={!email}
-                                onClick={handleSendOTP}
+                                onClick={handleSendOTP} // Gọi hàm gửi OTP cho email người dùng
                                 size="large"
                                 loading={loading}
                                 styleButton={{
@@ -134,11 +137,12 @@ const ForgotPasswordPage = () => {
                             </p>
                         </>
                     ) : (
+                        // Bước 2: Xác nhận mã OTP và đổi lại mật khẩu
                         <>
                             <p style={{ marginBottom: '8px' }}>
                                 Vui lòng nhập mã OTP đã được gửi đến email <strong>{email}</strong>
                             </p>
-                            {/* Input OTP (có thể thêm nếu cần) */}
+                            {/* OTP */}
                             <InputForm
                                 style={{ marginBottom: '20px' }}
                                 placeholder="Mã OTP*"
@@ -147,7 +151,7 @@ const ForgotPasswordPage = () => {
                             />
 
                             <p style={{ marginBottom: '20px' }}>Vui lòng nhập mật khẩu mới</p>
-                            {/* Input Mật khẩu mới */}
+                            {/* Mật khẩu mới */}
                             <div style={{ position: 'relative', marginBottom: '15px' }}>
                                 <span
                                     onClick={() => setIsShowPassword(!isShowPassword)}
@@ -173,7 +177,7 @@ const ForgotPasswordPage = () => {
                                 />
                             </div>
 
-                            {/* Input Xác nhận mật khẩu */}
+                            {/* Xác nhận mật khẩu mới */}
                             <div style={{ position: 'relative', marginBottom: '20px' }}>
                                 <span
                                     onClick={() => setIsShowConfirmPassword(!isShowConfirmPassword)}

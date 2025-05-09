@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const WrapperContainerLeft = styled.div`
+export const WrapperContainerLeft = styled.div `
     width: 150px;
     padding: 20px;
     display: flex;
@@ -11,14 +11,14 @@ export const WrapperContainerLeft = styled.div`
     box-shadow: 1px 0 5px rgba(0, 0, 0, 0.2);
 `
 
-export const WrapperContainerRight = styled.div`
+export const WrapperContainerRight = styled.div `
     flex: 1;
     padding: 0px 15px;
     display: flex;
     flex-direction: column;
 `
 
-export const WrapperTextLight = styled.span`
+export const WrapperTextLight = styled.span `
     color: #99714e;
     fone-size: 13px;
     cursor: pointer;

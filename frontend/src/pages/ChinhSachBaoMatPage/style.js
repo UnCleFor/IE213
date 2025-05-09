@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const PrivacyContainer = styled.div`
+export const PrivacyContainer = styled.div `
   max-width: 900px;
   margin: 50px auto;
   padding: 30px;
@@ -11,14 +11,14 @@ export const PrivacyContainer = styled.div`
   border: 1px solid #ddd;
 `;
 
-export const PrivacyTitle = styled.h1`
+export const PrivacyTitle = styled.h1 `
   font-size: 28px;
   font-weight: bold;
   text-align: center;
   margin-bottom: 20px;
 `;
 
-export const PrivacySectionTitle = styled.h2`
+export const PrivacySectionTitle = styled.h2 `
   font-size: 22px;
   font-weight: bold;
   margin-top: 30px;
@@ -26,7 +26,7 @@ export const PrivacySectionTitle = styled.h2`
   color: #333;
 `;
 
-export const PrivacyContent = styled.div`
+export const PrivacyContent = styled.div `
   font-size: 18px;
   line-height: 1.6;
   color: #444;

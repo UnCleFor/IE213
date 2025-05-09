@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, Row, Col, Typography, Tag, Avatar, Spin } from "antd";
+import { 
+  Card, 
+  Row, 
+  Col, 
+  Typography, 
+  Tag, 
+  Avatar, 
+  Spin 
+} from "antd";
 import ContainerComponent from "../../components/ContainerComponent/ContainerComponent.jsx";
 import { OrderDetailWrapper } from "./style.js";
 import * as OrderService from "../../services/OrderService.js"
@@ -7,20 +15,15 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { convertPrice } from "../../utils.js";
-import Loading from "../../components/LoadingComponent/Loading.jsx";
-import { useLocation } from "react-router-dom";
 import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
-import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
 
-const { Title, Text } = Typography;
+const { Title, Text } = Typography; // Trích xuất các thành phần Typography
 
 const OrderDetailPage = () => {
-  const user = useSelector((state) => state.user)
-  const { orderId } = useParams();
-  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
-
-  console.log('orderId', orderId)
-
+  const user = useSelector((state) => state.user) // Lấy thông tin người dùng
+  const { orderId } = useParams(); // Lấy Số định danh của Đơn hàng từ đường dẫn trang 
+  const [isLoadingDetail, setIsLoadingDetail] = useState(false); // Trạng thái loading
+  // Sử dụng React Query để lấy Chi tiết đơn hàng
   const fetchOrderDetail = async (context) => {
     setIsLoadingDetail(true)
     const id = context?.queryKey && context?.queryKey[1]
@@ -30,14 +33,12 @@ const OrderDetailPage = () => {
     setIsLoadingDetail(false)
     return res.data
   };
-
+  // Quản lý trạng thái loading bằng Reacct Query 
   const { isLoading, data: orderDetail, isError, error } = useQuery({
     queryKey: ["orderDetail", orderId, user?.access_token],
     queryFn: fetchOrderDetail
   });
-
-  console.log('data', orderDetail)
-
+  // Định dạng Màu sắc hiển thị cho từng Trạng thái đơn hàng
   const getStateColor = (state) => {
     switch (state) {
       case "Đã đặt":
@@ -52,20 +53,7 @@ const OrderDetailPage = () => {
         return "gray"; // Trạng thái khác
     }
   };
-
-  useEffect(() => {
-    // const fetchOrderDetail = async () => {
-    //   try {
-    //     // const res = await api.get(`/orders/${orderId}`);
-    //     // setOrderDetail(res.data);
-    //     setOrderDetail(mockOrderDetail); // Dữ liệu mẫu
-    //   } catch (err) {
-    //     console.error("Error fetching order details:", err);
-    //   }
-    // };
-    // fetchOrderDetail();
-  }, [orderId]);
-
+  // Hiển thị đang tải Đơn hàng
   if (!orderDetail) {
     return (
       <div style={{ textAlign: 'center', marginTop: 50, marginBottom: 50 }}>
@@ -77,6 +65,7 @@ const OrderDetailPage = () => {
   return (
     <ContainerComponent>
       <OrderDetailWrapper>
+        {/* Tạo Breadcrumb ở đầu trang */}
         <BreadcrumbComponent
           breadcrumbs={[
             { name: 'Trang chủ', link: '/' },
@@ -84,11 +73,12 @@ const OrderDetailPage = () => {
             { name: 'Chi tiết đơn hàng', isCurrent: true }
           ]}
         />
+
         <div style={{ width: "100%" }}>
+          {/* Hiển thị Thông tin chi tiết của Đơn hàng */}
           <Title level={3} style={{ marginBottom: 16 }}>
             Chi tiết đơn hàng
           </Title>
-
           <Card title="Thông tin giao hàng" bordered={false} style={{ marginBottom: 16 }}>
             <Row gutter={[16, 16]}>
               <Col xs={24} md={12}>
@@ -123,11 +113,11 @@ const OrderDetailPage = () => {
               </Col>
             </Row>
           </Card>
-
+            
+          {/* Hiển thị Sản phẩm có trong Đơn hàng */}
           <Card title="Danh sách sản phẩm" bordered={false} style={{ marginBottom: 16 }}>
-            {/* Header - chỉ hiển thị trên PC */}
+            {/* Đề mục - chỉ hiển thị trên PC */}
             <Row
-
               gutter={[16, 8]}
               className="product-list-header" // chỉ cần class, không cần style inline display
               style={{
@@ -142,7 +132,6 @@ const OrderDetailPage = () => {
               <Col md={4}>Tiết kiệm</Col>
               <Col md={4}>Thành tiền</Col>
             </Row>
-
             {orderDetail.orderItems.map((product, index) => (
               <div
                 key={index}
@@ -158,7 +147,7 @@ const OrderDetailPage = () => {
                     <span style={{ fontWeight: 500 }}>{product.name}</span>
                   </Col>
 
-                  {/* Mobile view: dạng dọc */}
+                  {/* Dạng dọc - chỉ hiển thị trên điện thoại */}
                   <Col xs={24} md={0}>
                     <div style={{ marginTop: 8 }}>
                       <div><strong>Số lượng:</strong> {product.amount}</div>
@@ -175,7 +164,7 @@ const OrderDetailPage = () => {
                     </div>
                   </Col>
 
-                  {/* PC view: cột riêng biệt */}
+                  {/* Cột riêng biệt - chỉ hiển thị trên PC */}
                   <Col xs={0} md={4}>{product.amount}</Col>
                   <Col xs={0} md={6}>{convertPrice(product.price)}</Col>
                   <Col xs={0} md={4}>
@@ -188,8 +177,6 @@ const OrderDetailPage = () => {
               </div>
             ))}
           </Card>
-
-
 
           <Card bordered={false} style={{ marginBottom: 16 }}>
             <Row justify="end">
@@ -210,17 +197,10 @@ const OrderDetailPage = () => {
               </Col>
             </Row>
           </Card>
-
-          {/* <Row justify="start" style={{ marginTop: 24 }}>
-          <Button type="primary" onClick={() => window.history.back()}>
-            Quay lại
-          </Button>
-        </Row> */}
         </div>
       </OrderDetailWrapper>
     </ContainerComponent>
   );
 };
-
 
 export default OrderDetailPage;

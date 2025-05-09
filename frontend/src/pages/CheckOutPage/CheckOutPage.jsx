@@ -1,5 +1,19 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { Card, Row, Col, Typography, Radio, Input, Button, Form, Divider, Avatar } from "antd";
+import React, { 
+  useState,
+  useMemo,
+  useEffect
+} from "react";
+import {
+  Card,
+  Row,
+  Col,
+  Typography,
+  Radio,
+  Input,
+  Form,
+  Divider,
+  Avatar
+} from "antd";
 import ContainerComponent from "../../components/ContainerComponent/ContainerComponent";
 import { OrderDetailWrapper } from "./style";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
@@ -13,19 +27,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 import * as message from '../../components/Message/Message';
 import { orderConstant } from "../../constant";
 import BreadcrumbComponent from "../../components/BreadcrumbComponent/BreadcrumbComponent";
-import { BreadcrumbWrapper } from "../../components/BreadcrumbComponent/style";
 import PayPalButtonComponent from "../../components/PaypalButtonComponent/PaypalButtonComponent";
 import VNPayButton from "../../components/VNPayButton/VNPayButton";
 
 const { Title, Text } = Typography;
 
-// Dữ liệu giỏ hàng có avatar
+// Dữ liệu các phương thức được lấy từ file constant
 const shippingMethods = Object.keys(orderConstant.delivery).map((key) => ({
   id: key,
   name: orderConstant.delivery[key].label,
   fee: orderConstant.delivery[key].fee,
 }));
-
 const paymentMethods = Object.keys(orderConstant.payment).map((key) => ({
   id: key,
   name: orderConstant.payment[key],
@@ -33,44 +45,54 @@ const paymentMethods = Object.keys(orderConstant.payment).map((key) => ({
 
 const CheckoutPage = () => {
   const [form] = Form.useForm(); // Tạo form instance
-  const [delivery, setDelivery] = useState('fast')
-  const [payment, setPayment] = useState('cod')
+  const [delivery, setDelivery] = useState('standard') // Thiết lập mặc định là giao hàng tiêu chuẩn
+  const [payment, setPayment] = useState('cod') // Thiết lập mặc định là thanh toán khi nhận hàng
   const navigate = useNavigate()
-  const order = useSelector((state) => state.order);
-  const user = useSelector((state) => state.user);
-  const [pendingOrderData, setPendingOrderData] = useState(null);
+  const order = useSelector((state) => state.order); // Lấy thông tin đơn hàng từ trang giỏ hàng
+  const user = useSelector((state) => state.user); // Lấy thông tin người dùng
+  const [pendingOrderData, setPendingOrderData] = useState(null); // Trạng thái chờ thanh toán từ VNPay
   const location = useLocation();
-  const [loadingCheckOut, setIsLoadingCheckOut] = useState(false);
+  const [loadingCheckOut, setIsLoadingCheckOut] = useState(false); // Trạng thái loading khi Đặt hàng
+
+  // Tổng tiền của các sản phẩm có trong đơn
+  // được cập nhật khi order thay đổi
   const subtotal = useMemo(() => {
     return order?.orderItemsSelected?.reduce((total, item) => total + item.price * item.amount, 0);
   }, [order]);
+  // Tổng tiền tiết kiệm
+  // được cập nhật khi Đơn hàng thay đổi
   const totalDiscount = useMemo(() => {
     return order?.orderItemsSelected?.reduce((total, item) => {
       const discount = item.discount || 0;
       return total + item.price * item.amount * discount / 100;
     }, 0);
   }, [order]);
+  // Phí giao hàng
+  // được cập nhật khi người dùng thay đổi phương thức giao hàng
   const shippingFee = useMemo(() => {
     const selected = shippingMethods.find((s) => s.id === delivery);
     return selected ? selected.fee : 0;
   }, [delivery]);
+  // Tổng tiền người dùng phải thanh toán
   const total = subtotal + shippingFee - totalDiscount;
 
+  // Hook dùng để cập nhật thông tin người dùng
   const mutationUpdate = useMutationHooks((data) => {
     const { id, token, ...rests } = data
     const res = UserService.updateUser(id, { ...rests }, token)
     return res
   })
-
+  // Hook dùng để tạo đơn hàng mới
   const mutationAddOrder = useMutationHooks((data) => {
     const { token, ...rests } = data
     const res = OrderService.createOrder({ ...rests }, token)
     return res
   })
 
-  const { isLoading, data } = mutationUpdate
-  const { data: dataAdd, isLoading: isLoadingAddOrder, isSuccess, isError } = mutationAddOrder
+  const { isLoading, data } = mutationUpdate // Trạng thái và dữ liệu được lấy từ mutation cập nhật người dùng
+  const { data: dataAdd, isLoading: isLoadingAddOrder, isSuccess, isError } = mutationAddOrder // Trạng thái và dữ liệu được lấy từ mutation tạo đơn hàng
 
+  // Theo dõi kết quả đặt hàng (mutationAddOrder) để xử lý điều hướng và thông báo
   useEffect(() => {
     if (isSuccess && dataAdd?.status === 'OK') {
       message.success('Đặt hàng thành công')
@@ -82,6 +104,7 @@ const CheckoutPage = () => {
     }
   }, [isSuccess, isError]);
 
+  // Hàm tạo đơn hàng
   const handleAddOrder = (isPaid) => {
     form.validateFields().then((values) => {
       setIsLoadingCheckOut(true)
@@ -110,35 +133,7 @@ const CheckoutPage = () => {
     });
   }
 
-  const handlePayPalSuccess = () => {
-    form.validateFields().then((values) => {
-      if (user?.access_token && order?.orderItemsSelected) {
-        mutationAddOrder.mutate(
-          {
-            token: user?.access_token,
-            orderItems: order?.orderItemsSelected,
-            fullName: values.name,
-            address: values.address,
-            phone: values.phone,
-            paymentMethod: 'PayPal', // Có thể hardcode nếu muốn
-            shippingMethod: shippingMethods.find((s) => s.id === delivery).name,
-            itemsPrice: subtotal,
-            totalDiscount: totalDiscount,
-            shippingPrice: shippingFee,
-            totalPrice: total,
-            user: user?.id,
-            email: user?.email,
-            isPaid: true, // Đánh dấu đã thanh toán
-            paymentDetails: {
-              method: 'PayPal',
-              status: 'completed'
-            }
-          }
-        );
-      }
-    });
-  }
-
+  // Hàm lấy dữ liệu từ người dùng, form, ... để thực hiện thanh toán
   const getOrderData = (values) => ({
     token: user?.access_token,
     orderItems: order?.orderItemsSelected,
@@ -155,8 +150,7 @@ const CheckoutPage = () => {
     email: user?.email
   });
 
-  console.log('orderdata', getOrderData(form.getFieldsValue()))
-
+  // Xử lý callback từ VNPay qua URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const paymentStatus = params.get('vnp_ResponseCode');
@@ -208,32 +202,12 @@ const CheckoutPage = () => {
       navigate(location.pathname, { replace: true });
     }
   }, [location, navigate]);
-  
-  const handleVNPaySuccess = async (transactionData) => {
-    try {
-      const values = form.getFieldsValue();
-      const orderData = {
-        token: user?.access_token,
-        ...getOrderData(values),
-        isPaid: true,
-      };
-  
-      const response = await mutationAddOrder.mutateAsync(orderData);
-      if (response?.status === 'OK') {
-        navigate('/order_history');
-      } else {
-        throw new Error(response?.message || 'Tạo đơn hàng thất bại');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      message.error('Xử lý đơn hàng thất bại: ' + error.message);
-    }
-  };
 
   return (
     <ContainerComponent>
       <Loading isLoading={isLoadingAddOrder || loadingCheckOut}>
         <OrderDetailWrapper>
+          {/* Tạo Breadcrumb ở đầu trang */}
           <BreadcrumbComponent
             breadcrumbs={[
               { name: 'Trang chủ', link: '/' },
@@ -241,9 +215,10 @@ const CheckoutPage = () => {
               { name: 'Thanh toán', isCurrent: true }
             ]}
           />
+
           <Title level={3}>Thanh toán</Title>
           <Form form={form} layout="vertical">
-            {/* Thông tin người nhận */}
+            {/* Thông tin người nhận  */}
             <Card title="Thông tin người nhận" style={{ marginBottom: 16 }}>
               <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
@@ -326,7 +301,7 @@ const CheckoutPage = () => {
               </Row>
               {order?.discount > 0 && (
                 <Row justify="space-between">
-                  <Text>Giảm giá:</Text>
+                  <Text>Tiết kiệm:</Text>
                   <Text>{convertPrice(totalDiscount)}</Text>
                 </Row>
               )}
@@ -342,6 +317,7 @@ const CheckoutPage = () => {
 
             {/* Nút đặt hàng */}
             <Row justify="end">
+              {/* Thanh toán bằng Paypal */}
               {payment === "paypal" ? (
                 <PayPalButtonComponent
                 amount={convertVNDToUSD(total)}
@@ -352,6 +328,7 @@ const CheckoutPage = () => {
                 }}
               />
               ) : payment === "vnpay" ? (
+                // Thanh toán bằng VNPay
                 <VNPayButton
                   amount={total}
                   orderInfo={`Thanh toán đơn hàng từ ${user?.email}`}
@@ -362,6 +339,7 @@ const CheckoutPage = () => {
                   onError={() => message.error('Lỗi thanh toán VNPay')}
                 />
               ) : (
+                // Thanh toán khi nhận hàng
                 <ButtonComponent
                   onClick={() => { handleAddOrder(false) }}
                   size="large"

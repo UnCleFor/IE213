@@ -12,7 +12,6 @@ import img3 from '../../assets/images/img3.jpeg';
 import img4 from '../../assets/images/img4.jpeg';
 import img5 from '../../assets/images/img5.jpeg';
 import img6 from '../../assets/images/img6.jpeg';
-
 import ProductSliderComponent from '../../components/ProductSliderComponent/ProductSliderComponent';
 import PromotionProductSliderComponent from '../../components/PromotionProductSliderComponent/PromotionProductSliderComponent';
 import * as ProductService from '../../services/ProductService';
@@ -27,7 +26,6 @@ import {
   CategoryGrid,
   CategoryCard,
   NewsletterSection,
-  NewsletterForm,
   TestimonialSection,
   TestimonialCard,
   InstagramSection,
@@ -49,6 +47,8 @@ const HomePage = () => {
   const [loading, setLoading] = useState(6);
   const [typeProducts, setTypeProducts] = useState([]);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // Danh mục sản phẩm
   const categories = [
     { id: 1, name: 'Phòng khách', image: slider3 },
     { id: 2, name: 'Phòng ăn', image: slider1 },
@@ -58,13 +58,15 @@ const HomePage = () => {
   ];
 
   const navigate = useNavigate();
+  // Hàm điều hướng theo danh mục
   const handleNavigateRoom = (name) => {
-    return () => { // Trả về một hàm mới
+    return () => { 
       if (name) {
         navigate(`/product/${name}`, { state: { filterBy: 'room' } });
       }
     };
   };
+  // Lắng nghe sự kiện cuộn trang
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -78,14 +80,9 @@ const HomePage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const fetchProductAll = async (context) => {
-    const limit = context?.queryKey && context?.queryKey[1];
-    const search = context?.queryKey && context?.queryKey[2];
-    const res = await ProductService.getAllProduct(search, limit);
-    return res;
-  };
-
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(10); // Số sản phẩm lấy ra
+  
+  // Các nhận xét giả định để thêm sinh động
   const testimonials = [
     { id: 1, name: 'Ngọc Anh', comment: 'Nội thất đẹp, chất lượng tốt, lắp đặt chuyên nghiệp!', rating: 5 },
     { id: 2, name: 'Minh Tuấn', comment: 'Thiết kế hiện đại, đúng như hình ảnh, giao hàng đúng hẹn.', rating: 5 },
@@ -100,7 +97,7 @@ const HomePage = () => {
 
   return (
     <div style={{ overflowX: 'hidden' }}>
-      {/* Hero Banner */}
+      {/* Banner tạo ấn tượng với người dùng */}
       <HeroSection>
         <SliderComponent
           arrImages={[slider1, slider2, slider3]}
@@ -110,11 +107,10 @@ const HomePage = () => {
         <HeroContent>
           <HeroTitle>The Beauté Home</HeroTitle>
           <HeroSubtitle>Tôn vinh vẻ đẹp trong từng không gian sống</HeroSubtitle>
-
         </HeroContent>
       </HeroSection>
 
-      {/* Các tính năng nổi bật */}
+      {/* Các điều khoản với người dùng */}
       <ContainerComponent>
         <FeatureGrid>
           <FeatureItem>
@@ -170,14 +166,6 @@ const HomePage = () => {
         </SectionWrapper>
       </ContainerComponent>
 
-      {/* Sản phẩm bán chạy */}
-      {/* <ContainerComponent>
-        <SectionWrapper>
-          <SectionTitle>Sản Phẩm Bán Chạy</SectionTitle>
-          <ProductSliderComponent limit={limit} />
-        </SectionWrapper>
-      </ContainerComponent> */}
-
       {/* Sản phẩm khuyến mãi */}
       <ContainerComponent>
         <PromotionSectionWrapper>
@@ -197,7 +185,7 @@ const HomePage = () => {
         </SectionWrapper>
       </ContainerComponent>
 
-      {/* Phản hồi khách hàng */}
+      {/* Các nhận xét giả định khách hàng */}
       <NewsletterSection>
         <ContainerComponent>
           <TestimonialSection>
@@ -216,6 +204,7 @@ const HomePage = () => {
           </TestimonialSection>
         </ContainerComponent>
       </NewsletterSection>
+
       {/* Instagram */}
       <ContainerComponent>
         <InstagramSection>
@@ -235,7 +224,7 @@ const HomePage = () => {
         </InstagramSection>
       </ContainerComponent>
 
-      {/* Newsletter */}
+      {/* Lời hứa hẹn nhằm khuyến khích người dùng đăng ký */}
       <NewsletterSection>
         <ContainerComponent>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -243,19 +232,6 @@ const HomePage = () => {
               <h3>Nhận Ưu Đãi Đặc Biệt</h3>
               <p>Đăng ký để nhận thông tin mới nhất và khuyến mãi từ chúng tôi</p>
             </div>
-            {/* <NewsletterForm>
-              <input type="email" placeholder="Nhập email của bạn" />
-              <ButtonComponent
-                textButton="Đăng ký"
-                styleButton={{
-                  backgroundColor: '#8B4513',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '0 4px 4px 0'
-                }}
-                styleTextButton={{ color: 'white' }}
-              />
-            </NewsletterForm> */}
           </div>
         </ContainerComponent>
       </NewsletterSection>
@@ -263,7 +239,7 @@ const HomePage = () => {
   );
 };
 
-// Component đồng hồ đếm ngược
+// Đồng hồ đếm ngược giờ khuyến mãi
 const CountdownTimer = ({ targetDate }) => {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
