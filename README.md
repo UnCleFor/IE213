@@ -22,8 +22,6 @@
 - **Link đến video báo cáo:** Đang bổ sung  
 - **Link deploy project:** [https://ie213.vercel.app/]
 
-
-```markdown
 ## Tổ chức folder
 
     📦 repository
@@ -35,6 +33,7 @@
     ├── 📄 docker-compose.yml  # Triển khai Docker
     ├── 📄 package.json        # Dependencies
     └── 📄 README.md           # Tài nguyên cuối kì, hướng dẫn cài đặt và sử dụng hệ thống
+    
 ## Hướng dẫn cài đặt và sử dụng hệ thống trên local
 
 ### Cấu hình quan trọng cho Local
@@ -44,32 +43,56 @@
 | Frontend   |    `.env`     | `REACT_APP_API_URL=http://localhost:3001/api`        | Kết nối tới API local     |
 | Backend    |    `index.js` | `origin: 'http://localhost:3000'`                    | Cho phép CORS từ frontend |
 
+```markdown
 ### Cài đặt thủ công không dùng Docker
 
-1. Clone repository
+1. **Clone repository**
+```bash
 git clone https://github.com/UnCleFor/IE213.git
-cd ie213
+cd IE213
+```
 
-2. Cài đặt backend
-Trong ../backend/src/index.js chỉnh cấu hình cors origin thành http://localhost:3000
+2. **Cài đặt backend**
+```bash
 cd backend
 npm install
+```
+Chỉnh sửa file `backend/src/index.js`:
+```javascript
+// Cấu hình CORS
+app.use(cors({
+  origin: 'http://localhost:3000',  // Đảm bảo khớp với frontend URL
+  credentials: true
+}));
+```
 
-3. Cài đặt frontend
-Trong ../frontend/.env chỉnh cấu hình REACT_APP_API_URL thành http://localhost:3001/api
+3. **Cài đặt frontend**
+```bash
 cd ../frontend
 npm install
+```
+Chỉnh sửa file `frontend/.env`:
+```env
+REACT_APP_API_URL=http://localhost:3001/api
+```
 
-4. Khởi chạy development
-4.1. Terminal 1 (backend)
+4. **Khởi chạy development**
+   - Terminal 1 (backend):
+```bash
 cd ../backend
 npm run dev
-
-4.2. Terminal 2 (frontend)
+```
+   - Terminal 2 (frontend):
+```bash
 cd ../frontend
 npm start
+```
 
-### Triển khai với Docker
+Sau khi khởi chạy:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:3001
+```
+```
 1. Cài đặt Docker
 Đảm bảo đã cài đặt Docker và Docker Compose
 
