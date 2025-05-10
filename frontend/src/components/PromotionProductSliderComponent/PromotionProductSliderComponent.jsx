@@ -10,7 +10,6 @@ import {
   SliderWrapper,
   ArrowButton,
   SwipeHint,
-  DiscountBadge
 } from './style';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -23,11 +22,10 @@ import { buyNowProduct } from '../../redux/slices/orderSlide';
 import { useDispatch, useSelector } from 'react-redux';
 import { message } from 'antd';
 
-// Custom arrows
+// Các mũi tên tùy chỉnh cho slider
 const NextArrow = ({ onClick }) => (
   <ArrowButton direction="right" onClick={onClick}>→</ArrowButton>
 );
-
 const PrevArrow = ({ onClick }) => (
   <ArrowButton direction="left" onClick={onClick}>←</ArrowButton>
 );
@@ -36,12 +34,13 @@ const PromotionProductSliderComponent = () => {
   const navigate = useNavigate(); 
   const dispatch = useDispatch()
   const location = useLocation()
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.user); // Lấy Thông tin Người dùng
+  // Lấy sản phẩm khuyến mãi từ API sử dụng react-query
   const { data: products } = useQuery({
     queryKey: ['products-promotion'],
     queryFn: () => ProductService.getDiscountedProducts(6, 0) 
   });
-
+  // Điều hướng xem Chi tiết Sản phẩm
   const handleDetailsProduct = (id) => {
     navigate(`/product_details/${id}`);
     window.scrollTo({
@@ -50,6 +49,7 @@ const PromotionProductSliderComponent = () => {
     });
   };
 
+  // Cấu hình cho slider (hiển thị 1 sản phẩm mỗi lần)
   const settings = {
     infinite: false,
     slidesToShow: 1,
@@ -59,13 +59,15 @@ const PromotionProductSliderComponent = () => {
   };
 
   if (!products?.data) return <div style={{alignContent:'center'}}>Đang tải sản phẩm...</div>;
+  // Mua ngay
   const handleBuyNow = (product) => {
     if (!user?.id) {
-      navigate('/sign_in', { state: location?.pathname });
+      navigate('/sign_in', { state: location?.pathname }); // Khi chưa đăng nhập
       message.warning('Vui lòng đăng nhập để mua hàng');
     } else if (product.countInStock === 0) {
-      message.error('Sản phẩm đã hết hàng');
+      message.error('Sản phẩm đã hết hàng'); // Sản phẩm hết hàng
     } else {
+      // Dispatch action để thêm sản phẩm vào giỏ và điều hướng đến trang thanh toán
       dispatch(buyNowProduct({
         orderItem: {
           name: product.name,
@@ -78,7 +80,6 @@ const PromotionProductSliderComponent = () => {
         }
       }));
       navigate('/checkout'); 
-     
     }
   };
   return (
@@ -89,7 +90,6 @@ const PromotionProductSliderComponent = () => {
             <PromotionWrapper>
               <ProductImage src={product.image} alt={product.name} />
 
-              
               <ProductInfo>
                 <ProductName>{product.name}</ProductName>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>

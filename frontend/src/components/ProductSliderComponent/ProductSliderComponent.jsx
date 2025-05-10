@@ -21,10 +21,10 @@ const ProductSliderComponent = ({
   type = 'all', // 'all', 'newest', 'discounted'
   title = '' 
 }) => {
-  const sliderRef = useRef(null);
-  const user = useSelector((state) => state.user);
-  const searchProduct = useSelector((state) => state.product.search);
-  const searchDebounce = useDebounce(searchProduct, 1000);
+  const sliderRef = useRef(null); // Ref dùng để điều khiển slider
+  const user = useSelector((state) => state.user); // Lấy thông tin Người dùng
+  const searchProduct = useSelector((state) => state.product.search); // Lấy keyword tìm kiếm từ store
+  const searchDebounce = useDebounce(searchProduct, 1000); / Debounce từ khóa tìm kiếm để tránh gọi API liên tục
 
   // Chọn service phù hợp dựa trên prop type
   const getService = () => {
@@ -38,6 +38,7 @@ const ProductSliderComponent = ({
     }
   };
 
+  // Hàm fetch dữ liệu sản phẩm, dùng cho react-query
   const fetchProducts = async (context) => {
     const limit = context?.queryKey && context?.queryKey[1];
     const search = context?.queryKey && context?.queryKey[2];
@@ -45,15 +46,17 @@ const ProductSliderComponent = ({
     
     const service = getService();
     
+    // Nếu là sản phẩm mới hoặc giảm giá thì không dùng search
     if (productType === 'newest' || productType === 'discounted') {
       const res = await service(limit, 0); // page luôn là 0 cho slider
       return res.data;
     } else {
-      const res = await service(search, limit);
+      const res = await service(search, limit); // all products có filter theo search
       return res.data;
     }
   };
 
+  // Sử dụng useQuery để gọi API và quản lý trạng thái tải dữ liệu
   const { isLoading, data: products = [], error } = useQuery({
     queryKey: ['products', limit, searchDebounce, type],
     queryFn: fetchProducts,
@@ -88,6 +91,7 @@ const ProductSliderComponent = ({
     );
   }
 
+  // Duyệt danh sách sản phẩm và render mỗi sản phẩm dưới dạng CardComponent
   const items = products.map((item) => (
     <SlideItemWrapper key={item._id}>
       <CardComponent
@@ -107,6 +111,7 @@ const ProductSliderComponent = ({
     </SlideItemWrapper>
   ));
 
+  // Cấu hình cho react-slick slider
   const settings = {
     dots: false,
     infinite: false,

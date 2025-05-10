@@ -2,42 +2,27 @@ import React, { useEffect, useState } from "react";
 import { Button, Grid, Menu, Drawer, theme } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import ContainerComponent from "../ContainerComponent/ContainerComponent";
-import { getAllTypeProduct } from "../../services/ProductService";
 import { useNavigate } from 'react-router-dom'
-
 const { useToken } = theme;
 const { useBreakpoint } = Grid;
 
 export default function NavbarComponent() {
-  const { token } = useToken();
-  const screens = useBreakpoint();
-  const [open, setOpen] = useState(false);
-  const [current, setCurrent] = useState("");
-  const [currentType, setCurrentType] = useState(null);
-  const navigate = useNavigate()
-  
-  const handleClick = (e) => {
-    setOpen(false);
-  };
-
+  const { token } = useToken(); // Lấy token
+  const screens = useBreakpoint(); // Lấy kích thích màn hình
+  const [open, setOpen] = useState(false); // Quản lý đóng mở các danh mục
+  const [current, setCurrent] = useState(""); // Quản lý Danh mục
+  const navigate = useNavigate() 
+  // Điều hướng sang Đề mục cha
   const handleParentClick = (key, label) => {
     navigate(`/product/${key}`, {state: {label, filterBy: 'room' }});
     setOpen(false);
   };
-
+    // Điều hướng sang Trang Shop the look
   const handleShopTheLookClick = () => {
     navigate('/shop-the-look');
     setOpen(false);
   };
-
-  // Tạo style cho label
-  const getLabelStyle = () => ({
-    color: 'white',
-    ':hover': {
-      color: 'white',
-    },
-  });
-
+  // Các đề mục con
   const productTypesByRoom = [
     {
       label: <span onClick={() => handleParentClick("phong-khach", "Phòng khách")}>Phòng khách</span>,
@@ -106,7 +91,7 @@ export default function NavbarComponent() {
       key: "ShopTheLook",
     },
   ];
-
+  // Xác định Đề mục cha cho các Đề mục con
   const handleNavigatetype = (e) => {
     const { key } = e;
     const findLabel = (items, key) => {
@@ -119,16 +104,13 @@ export default function NavbarComponent() {
       }
       return null;
     };
-  
     const label = findLabel(productTypesByRoom, key);
-    
     if (key === 'ShopTheLook') {
       handleShopTheLookClick();
     } else {
       navigate(`/product/${key}`, {state: {label, filterBy: 'type'}});
     }
   };
-  
   const styles = {
     header: {
       backgroundColor: "brown",
@@ -179,7 +161,9 @@ export default function NavbarComponent() {
       <nav style={styles.header}>
         <ContainerComponent>
           <div style={styles.menuContainer}>
+            {/* Xác định thiết bị hiển thị */}
             {screens.md ? (
+              // Hiển thị desktop
               <Menu
                 rootClassName="custom-navbar"
                 style={styles.menu}
@@ -190,6 +174,7 @@ export default function NavbarComponent() {
               />
             ) : (
               <>
+                {/* Hiển thị điện thoại */}
                 <Button
                   type="text"
                   icon={<MenuOutlined />}

@@ -1,6 +1,7 @@
 import React from 'react'
 import { Spin } from 'antd'
 
+// Tạo Loading riêng cho Trang
 const Loading = ({ children, isLoading, delay = 200 }) => {
   if (!isLoading) return <>{children}</>
 

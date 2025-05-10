@@ -1,43 +1,40 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { Col, Row, Button, Grid, theme, Popover, message } from "antd";
 import {
-  // WrapperHeader,
+  Col,
+  Row,
+  Grid,
+  theme,
+  Popover,
+  message
+} from "antd";
+import {
   WrapperHeaderAccount,
   WrapperTextHeaderSmall,
-  SearchInputWrapper,
-  WrapperSearchMobile,
   WrapperContentPopup,
 } from "./style";
 import {
   UserOutlined,
-  CaretDownOutlined,
   ShoppingCartOutlined,
-  SearchOutlined,
-  CloseOutlined,
 } from "@ant-design/icons";
 import SearchButton from "../SearchButton/SearchButton";
 import beautihome from "./beautihome.png";
-
 import ContainerComponent from "../ContainerComponent/ContainerComponent";
 import { useDispatch, useSelector } from "react-redux";
 import * as UserService from '../../services/UserService'
 import { resetUser } from '../../redux/slices/userSlide';
 import Loading from "../../components/LoadingComponent/Loading";
-import { searchProduct } from "../../redux/slices/productSlide";
 import { resetOrder } from '../../redux/slices/orderSlide'
-
 const { useBreakpoint } = Grid;
 const { useToken } = theme;
-const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
 
-  const { token } = useToken();
-  const screens = useBreakpoint();
-  //const [showSearch, setShowSearch] = useState(false);
+const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
+  const { token } = useToken(); // Lấy token
+  const screens = useBreakpoint(); // Xác định kích thước màn hình
   const [showPopover, setShowPopover] = useState(false); // Khai báo state showPopover
-  const [userName, setUserName] = useState('')
-  const [userAvatar, setUserAvatar] = useState('')
-  const order = useSelector((state) => state.order)
+  const [userName, setUserName] = useState('') // Quản lý biến Tên Người dùng
+  const [userAvatar, setUserAvatar] = useState('') // Quản lý biến Ảnh đại diện
+  const order = useSelector((state) => state.order) // Lấy thông tin Đơn hàng
   const totalQuantity = order?.orderItems?.reduce((sum, item) => sum + item.amount, 0);
   const styles = {
     container: {
@@ -65,36 +62,33 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       fontSize: "20px",
     },
   };
-
   const navigate = useNavigate()
-  const user = useSelector((state) => state.user)
-  const dispatch = useDispatch()
-  const [search, setSearch] = useState()
-  const [loading, setLoading] = useState(false)
+  const user = useSelector((state) => state.user) // Lấy thông tin Người dùng
+  const dispatch = useDispatch() // Truy vấn hàm dispatch từ redux
+  const [search, setSearch] = useState() // Quản lý biến tìm kiếm
+  const [loading, setLoading] = useState(false) // Quản lý biến loading môi trường
   const handleNavigateLogin = () => {
     navigate('/sign_in')
   }
   const handleNavigateCart = () => {
     navigate('/order')
   }
-
+  // Hàm xử lý đăng xuất
   const handleLogOut = async () => {
     try {
       setLoading(true);
-      await UserService.updateLogoutStatus(user?.id,user?.access_token)
+      await UserService.updateLogoutStatus(user?.id, user?.access_token)
       await UserService.logoutUser(); // Gọi API logout
       localStorage.removeItem('access_token'); // Xoá token khỏi localStorage
-      dispatch(resetUser()); // Reset user trong Redux
-      dispatch(resetOrder())
+      dispatch(resetUser()); // Reset Thông tin Người dùng trong Redux
+      dispatch(resetOrder()) // Reset Thông tin Đơn hàng trong Redux
       navigate('/')
-      
       setLoading(false);
     } catch (error) {
-      console.error('Logout error:', error);
-      
       setLoading(false);
     }
   };
+  // Điều hướng đến trang Đơn hàng
   const handleOrderHistory = async () => {
     try {
       setLoading(true)
@@ -105,6 +99,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       setLoading(false);
     }
   }
+  // Điều hướng về Trang chủ
   const handleHome = async () => {
     try {
       setLoading(true)
@@ -115,6 +110,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       setLoading(false);
     }
   }
+  // Điều hướng đến trang Admin
   const handleAdmin = async () => {
     try {
       setLoading(true)
@@ -125,12 +121,14 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       setLoading(false);
     }
   }
+  // Theo dõi thái cập nhật Tên và Ảnh đại diện
   useEffect(() => {
     setLoading(true)
     setUserName(user?.name)
     setUserAvatar(user?.avatar)
     setLoading(false)
   }, [user?.name, user?.avatar])
+  // Drop down điều hướng đến các trang quản lý
   const content = (
     <div>
       <WrapperContentPopup onClick={() => navigate('/account')}>Thông tin người dùng</WrapperContentPopup>
@@ -138,30 +136,30 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       {user?.isAdmin && (
         <WrapperContentPopup onClick={handleAdmin}>Quản lý hệ thống</WrapperContentPopup>
       )}
-      <WrapperContentPopup onClick={()=> {handleLogOut(); message.success('Đăng xuất thành công')}}>Đăng xuất</WrapperContentPopup>
+      <WrapperContentPopup onClick={() => { handleLogOut(); message.success('Đăng xuất thành công') }}>Đăng xuất</WrapperContentPopup>
     </div>
   )
-
+  // Hàm quản lý giá trị search
   const handleInputChange = (e) => {
     setSearch(e.target.value);
   };
-  
+  // Điều hướng đến Trang tìm kiếm
   const handleSearchClick = () => {
     if (search.trim() !== "") {
       navigate("/search", { state: { keyword: search } });
       setSearch('');
     }
   };
-
+  // Theo dõi Trạng thái Đăng nhập
   useEffect(() => {
     // Nếu chưa có user hoặc access_token thì không làm gì
     if (!user?.id || !user?.access_token) return;
-  
+
     const interval = setInterval(async () => {
       try {
         const res = await UserService.getDetailUser(user.id, user.access_token);
-        
-        if (res?.data?.isBlocked ) {
+
+        if (res?.data?.isBlocked) {
           message.warning('Tài khoản của bạn đã bị chặn. Đăng xuất...');
           handleLogOut();
         }
@@ -173,12 +171,12 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
         console.error('Lỗi kiểm tra trạng thái chặn:', error);
       }
     }, 10000); // kiểm tra mỗi 10s
-  
+
     return () => clearInterval(interval); // clear interval khi component unmount
   }, [user?.id, user?.access_token]); // chỉ chạy khi user đã có dữ liệu
+
   return (
     <div style={{ position: "relative" }}>
-      {/* <div style= {styles.header}> */}
       <div style={isHiddenSearch && isHiddenCart ? styles.header : { justifyContent: 'space-between' }}>
         <ContainerComponent>
           <Row align="middle" style={{ width: "100%" }} gutter={[16, 16]}>
@@ -187,10 +185,6 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
               <img src={beautihome} alt="BeautiHome Logo" style={{ ...styles.logo, cursor: 'pointer' }} onClick={handleHome} />
             </Col>
 
-            {/* Thanh tìm kiếm luôn hiện ở mobile (ẩn ở md trở lên) */}
-
-
-            {/* Thanh tìm kiếm trên PC */}
             {!screens.xs && !isHiddenSearch && (
               <Col sm={14} md={12} style={{ textAlign: "center" }}>
                 <SearchButton
@@ -203,16 +197,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                 />
               </Col>
             )}
-
-            {/* Icon Tìm kiếm, User, Giỏ hàng */}
             <Col xs={18} sm={6} md={8} style={{ display: "flex", justifyContent: "flex-end", gap: "20px" }}>
-              {/* {screens.xs && (
-                <Button
-                  type="text"
-                  icon={<SearchOutlined style={{ fontSize: "20px", color: "brown" }} />}
-                  onClick={() => setShowSearch(true)}
-                />
-              )} */}
               <Loading isLoading={loading}>
                 <WrapperHeaderAccount>
                   {userAvatar ? (
@@ -252,7 +237,6 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                     )
                   )}
                 </WrapperHeaderAccount>
-
               </Loading>
               {!isHiddenCart && (
                 <WrapperHeaderAccount onClick={handleNavigateCart} style={{ cursor: 'pointer' }}>
@@ -280,16 +264,12 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                       </span>
                     )}
                   </div>
-
                   {!screens.xs && <WrapperTextHeaderSmall>Cart</WrapperTextHeaderSmall>}
                 </WrapperHeaderAccount>
               )}
-
             </Col>
           </Row>
-
         </ContainerComponent>
-
         <Row>
           {screens.xs && !isHiddenSearch && (
             <Col xs={24} style={{ padding: 10 }}>
@@ -299,28 +279,13 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                 textButton="Search"
                 value={search}
                 style={{ width: "100%" }} // Đảm bảo SearchButton chiếm 100% chiều rộng
-                onChange={handleInputChange}
+                onChange={handleInputChange} 
                 onClick={handleSearchClick}
               />
             </Col>
           )}
         </Row>
       </div>
-
-      {/* Thanh tìm kiếm toàn màn hình khi nhấn kính lúp */}
-      {/* {screens.xs && showSearch && (
-        <WrapperSearchMobile>
-          <SearchInputWrapper>
-            <SearchButton size="large" placeholder="What you want to buy?" textButton="Search" />
-            <Button
-              type="text"
-              icon={<CloseOutlined style={{ fontSize: "18px", color: "brown" }} />}
-              onClick={() => setShowSearch(false)}
-              style={{ padding: 5 }}
-            />
-          </SearchInputWrapper>
-        </WrapperSearchMobile>
-      )} */}
     </div >
   );
 };

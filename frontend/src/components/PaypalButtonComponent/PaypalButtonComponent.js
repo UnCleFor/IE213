@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
 const PayPalButtonComponent = ({ amount, onSuccess }) => {
+  // Tham chiếu tới DOM element nơi nút PayPal sẽ được render
   const paypalRef = useRef();
+  // Trạng thái kiểm tra SDK của PayPal đã sẵn sàng hay chưa
   const [sdkReady, setSdkReady] = useState(false);
-
+  // useEffect để thêm script SDK của PayPal vào trang nếu chưa có
   useEffect(() => {
     const addPaypalScript = async () => {
       const script = document.createElement("script");
@@ -23,6 +25,7 @@ const PayPalButtonComponent = ({ amount, onSuccess }) => {
     }
   }, []);
 
+  // useEffect để khởi tạo nút PayPal sau khi SDK sẵn sàng
   useEffect(() => {
     if (sdkReady) {
       window.paypal
@@ -36,16 +39,19 @@ const PayPalButtonComponent = ({ amount, onSuccess }) => {
               }],
             });
           },
+          // Xử lý khi thanh toán thành công
           onApprove: (data, actions) => {
             return actions.order.capture().then(details => {
               console.log("Transaction completed by " + details.payer.name.given_name);
               onSuccess(details);
             });
           },
+           // Xử lý khi có lỗi xảy ra trong quá trình thanh toán
           onError: err => {
             console.error("PayPal Checkout onError", err);
           },
         })
+        // Render nút PayPal vào phần tử được tham chiếu
         .render(paypalRef.current);
     }
   }, [sdkReady, amount, onSuccess]);

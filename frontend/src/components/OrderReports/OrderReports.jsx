@@ -16,6 +16,7 @@ import {
 import React, { useEffect, useRef, useState } from 'react';
 import Loading from '../LoadingComponent/Loading';
 
+// Đăng ký các thành phần của Chart.js
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -27,10 +28,11 @@ ChartJS.register(
     PointElement,
     LineElement
 );
-const OrderReports = ({ orders, access_token, isLoading = false }) => {
-  const emailCache = useRef(new Map()); // phải đặt trong component nha
-  const [_, forceUpdate] = useState(false); // để khi cache xong email thì force update render lại
 
+const OrderReports = ({ orders, access_token, isLoading = false }) => {
+  const emailCache = useRef(new Map()); // Lưu cache email người dùng để tránh gọi API nhiều lần
+  const [_, forceUpdate] = useState(false); // Trigger re-render khi cache được cập nhật
+  // Hàm lấy Email Người dùng
   const handleGetUserEmail = async (id, access_token) => {
     try {
       const res = await UserService.getUserEmail(id, access_token);
@@ -70,7 +72,7 @@ const OrderReports = ({ orders, access_token, isLoading = false }) => {
     if (!orders?.data) return {};
 
     const orderData = orders.data;
-
+    // Khởi tạo các đối tượng thống kê
     const paymentMethods = {};
     const paymentRevenue = {};
     const statusCount = {};
@@ -78,27 +80,27 @@ const OrderReports = ({ orders, access_token, isLoading = false }) => {
     const yearlyRevenue = {};
     const yearlyOrders = {};
     const customerSpending = {};
-
+    // Duyệt qua từng đơn hàng và cập nhật dữ liệu
     orderData.forEach(order => {
       const date = new Date(order.createdAt);
       const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
       const year = date.getFullYear();
 
-      // Phương thức thanh toán
+      // Đếm số lượng và doanh thu theo phương thức thanh toán
       paymentMethods[order.paymentMethod] = (paymentMethods[order.paymentMethod] || 0) + 1;
       paymentRevenue[order.paymentMethod] = (paymentRevenue[order.paymentMethod] || 0) + order.totalPrice;
 
-      // Trạng thái đơn hàng
+      // Đếm trạng thái đơn hàng
       statusCount[order.state] = (statusCount[order.state] || 0) + 1;
 
-      // Doanh thu tháng
+      // Tổng hợp doanh thu theo tháng
       monthlyRevenue[monthYear] = (monthlyRevenue[monthYear] || 0) + order.totalPrice;
 
-      // Doanh thu và số đơn theo năm
+      // Tổng hợp doanh thu và số đơn theo năm
       yearlyRevenue[year] = (yearlyRevenue[year] || 0) + order.totalPrice;
       yearlyOrders[year] = (yearlyOrders[year] || 0) + 1;
 
-      // Chi tiêu khách hàng
+      // Tổng chi tiêu của từng khách hàng
       const customerId = order.user || 'Unknown';
       customerSpending[customerId] = (customerSpending[customerId] || 0) + order.totalPrice;
     });
@@ -116,8 +118,7 @@ const OrderReports = ({ orders, access_token, isLoading = false }) => {
 
   const reportData = processData();
 
-  // ========== Các chart data phía dưới:
-
+  // Chuẩn bị dữ liệu cho biểu đồ: Phương thức thanh toán
   const paymentData = {
     labels: Object.keys(reportData.paymentMethods || {}),
     datasets: [
@@ -139,6 +140,7 @@ const OrderReports = ({ orders, access_token, isLoading = false }) => {
     ],
   };
 
+  // Chuẩn bị dữ liệu cho biểu đồ: Trạng thái đơn hàng
   const statusData = {
     labels: Object.keys(reportData.statusCount || {}),
     datasets: [
@@ -164,6 +166,7 @@ const OrderReports = ({ orders, access_token, isLoading = false }) => {
     ],
   };
 
+  // Biểu đồ doanh thu theo tháng
   const revenueData = {
     labels: Object.keys(reportData.monthlyRevenue || {}),
     datasets: [
@@ -178,6 +181,7 @@ const OrderReports = ({ orders, access_token, isLoading = false }) => {
     ],
   };
 
+  // Biểu đồ doanh thu theo năm
   const yearlyRevenueData = {
     labels: Object.keys(reportData.yearlyRevenue || {}).sort(),
     datasets: [
@@ -191,6 +195,7 @@ const OrderReports = ({ orders, access_token, isLoading = false }) => {
     ],
   };
 
+  // Biểu đồ số lượng đơn hàng theo năm
   const yearlyOrdersData = {
     labels: Object.keys(reportData.yearlyOrders || {}).sort(),
     datasets: [
@@ -204,10 +209,12 @@ const OrderReports = ({ orders, access_token, isLoading = false }) => {
     ],
   };
 
+  // Lấy top 5 khách hàng có chi tiêu cao nhất
   const topCustomers = Object.keys(reportData.customerSpending || {})
     .sort((a, b) => reportData.customerSpending[b] - reportData.customerSpending[a])
     .slice(0, 5);
 
+  // Biểu đồ chi tiêu của top 5 khách hàng
   const topCustomersLabels = topCustomers.map((customerId) => 
     emailCache.current.get(customerId) || 'Loading...'
   );
@@ -223,6 +230,7 @@ const OrderReports = ({ orders, access_token, isLoading = false }) => {
     ],
   };
 
+  // Biểu đồ doanh thu theo phương thức thanh toán
   const paymentRevenueData = {
     labels: Object.keys(reportData.paymentRevenue || {}),
     datasets: [
@@ -244,8 +252,8 @@ const OrderReports = ({ orders, access_token, isLoading = false }) => {
     ],
   };
 
+  // Biểu đồ số lượng đơn hàng theo tháng trong năm hiện tại
   const currentYear = new Date().getFullYear();
-
   const monthlyOrdersCurrentYear = Array(12).fill(0);
   orders?.data?.forEach(order => {
     const date = new Date(order.createdAt);

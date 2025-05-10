@@ -1,34 +1,48 @@
-import { Col, Image, Row, Spin } from 'antd'
-import React, { useEffect, useState } from 'react'
-import imageProduct from '../../assets/images/z6436857502524_b8df322fa070c2dd15fc904c2ee1c100.jpg'
-import imageProductSmall from '../../assets/images/z6436857450475_595921696663d0fe0f381a7c4efb9de6.jpg'
-import { DetailsCell, RowDetail, SizeBox, SizeProduct, TableProductDetails, TitleCell, WrapperBtnBuy, WrapperStyleColImage, WrapperStyleImageSmall, WrapperStyleNameProduct, WrapperStylePriceProduct, WrapperQuantity } from './style'
+import { 
+    Col, 
+    Row, 
+    Spin 
+} from 'antd'
+import React, 
+    { useEffect, useState } 
+    from 'react'
+import { 
+    DetailsCell, 
+    RowDetail, 
+    SizeBox, 
+    SizeProduct, 
+    TableProductDetails, 
+    TitleCell, 
+    WrapperBtnBuy, 
+    WrapperStyleNameProduct, 
+    WrapperStylePriceProduct, 
+    WrapperQuantity 
+} from './style'
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import ButtonComponent from '../ButtonComponent/ButtonComponent'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { addOrderProduct, buyNowProduct } from '../../redux/slices/orderSlide'
 import * as ProductService from '../../services/ProductService'
 import { useQuery } from '@tanstack/react-query'
 import LikeButtonComponent from '../LikeButtonComponent/LikeButtonComponent'
 import CommentComponent from '../CommentComponent/CommentComponent'
 import { convertPrice, initFacebookSDK } from '../../utils'
-import Loading from '../LoadingComponent/Loading'
-import SliderComponent from '../SliderComponent/SliderComponent'
 import ProductImageGallery from '../ProductImageGallery/ProductImageGallery'
-import ContainerComponent from '../ContainerComponent/ContainerComponent'
 import * as message from '../Message/Message'
 import BreadcrumbComponent from '../BreadcrumbComponent/BreadcrumbComponent'
 
 const ProductDetailsComponent = ({ idProduct }) => {
+    // Khởi tạo state số lượng, màu sắc, loading
     const [quantity, setQuantity] = useState(1);
-    const user = useSelector((state) => state.user)
-    const order = useSelector((state) => state.order)
+    const user = useSelector((state) => state.user) // Lấy Thông tin Người dùng
     const navigate = useNavigate()
     const location = useLocation()
-    const dispatch = useDispatch()
+    const dispatch = useDispatch() // Lấy hàm dispatch từ redux
     const [selectedColor, setSelectedColor] = useState(null);
     const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+
+    // Hàm gọi API lấy chi tiết sản phẩm
     const fetchGetDetailsProduct = async (context) => {
         setIsLoadingDetail(true)
         const id = context?.queryKey && context?.queryKey[1]
@@ -38,23 +52,19 @@ const ProductDetailsComponent = ({ idProduct }) => {
         }
         setIsLoadingDetail(false)
     };
-
+    // Khởi tạo Facebook SDK
     useEffect(() => {
         initFacebookSDK()
     }, [])
 
+    // Sử dụng react-query để lấy chi tiết sản phẩm
     const { isLoading, data: productDetails } = useQuery({
         queryKey: ['product-details', idProduct],
         queryFn: fetchGetDetailsProduct,
         enabled: !!idProduct
     });
 
-    // useEffect(() => {
-    //      if (order.isSucessOrder) {
-    //         message.success('Đã thêm vào giỏ hàng')
-    //      }
-    // })
-
+    // Tăng số lượng
     const handleIncrease = () => {
         if (productDetails?.countInStock > quantity) {
             setQuantity(prev => prev + 1);
@@ -63,14 +73,14 @@ const ProductDetailsComponent = ({ idProduct }) => {
         }
     };
 
-    console.log('location', location)
-
+    // Giảm số lượng
     const handleDecrease = () => {
         if (quantity > 1) {
             setQuantity(prev => prev - 1);
         }
     };
 
+    // Thêm sản phẩm vào giỏ hàng
     const handleAddOrderProduct = () => {
         if (!user?.id) {
             navigate('/sign_in', { state: location?.pathname })
@@ -92,6 +102,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
         }
     }
 
+    // Mua ngay
     const handleBuyNow = () => {
         if (!user?.id) {
             navigate('/sign_in', { state: location?.pathname })
@@ -112,12 +123,15 @@ const ProductDetailsComponent = ({ idProduct }) => {
             navigate('/checkout')
         }
     }
+
     useEffect(() => {
         // Mặc định chọn màu đầu tiên trong mảng màu nếu có
         if (productDetails?.colors && productDetails?.colors.length > 0) {
             setSelectedColor(productDetails.colors[0]);
         }
     }, [productDetails]);
+
+    // Tạo dữ liệu breadcrumb
     const breadcrumbs = [
         { name: 'Trang chủ', link: '/' },
         { 
@@ -145,7 +159,9 @@ const ProductDetailsComponent = ({ idProduct }) => {
             }}>
                 <Spin size="large" />
             </div>
-        ) : (<div> <BreadcrumbComponent breadcrumbs={breadcrumbs}/>
+        ) : (<div> 
+            {/* Tạo Breadcrumb ở đầu trang */}
+            <BreadcrumbComponent breadcrumbs={breadcrumbs}/>
             <Row style={{ padding: '16px 0px', background: 'white' }} gutter={[16, 16]}>
 
                 {/* Căn giữa slide trong cột */}
@@ -347,6 +363,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                     </tbody>
                 </TableProductDetails>
             </div>
+            {/* Bình luận sản phẩm */}
             <CommentComponent dataHref={"https://developers.facebook.com/docs/plugins/comments#configurator"} width="1115" />
         </div>)
 

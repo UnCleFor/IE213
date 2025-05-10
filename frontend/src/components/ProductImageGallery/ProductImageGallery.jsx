@@ -29,17 +29,19 @@ const StyledMainImage = styled(Image)`
 `;
 
 const ProductImageGallery = ({ productDetails }) => {
-    const [currentImage, setCurrentImage] = useState('');
+    const [currentImage, setCurrentImage] = useState(''); // Quản lý ảnh chính của Sản phẩm
 
+    // Lắng nghe sự thay đổi của Thông tin Sản phẩm
     useEffect(() => {
         if (productDetails?.image) {
             setCurrentImage(productDetails.image);
         }
     }, [productDetails]);
 
+    // Tổng hợp tất cả ảnh từ Thông tin Sản phẩm
     const allImages = [productDetails?.image, ...(productDetails?.images || [])].filter(Boolean);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false); // Quản lý trạng thái mở/đóng modal phóng to ảnh
 
     const settings = {
         slidesToShow: 4,

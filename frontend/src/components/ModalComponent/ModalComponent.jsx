@@ -1,6 +1,7 @@
 import { Modal, Button } from 'antd';
 import React from 'react';
 
+// Tạo Modal riêng cho Trang
 const ModalComponent = ({ title = 'Modal', open = false, onCancel, onOk, children, ...rests }) => {
   return (
     <Modal
@@ -20,4 +21,3 @@ const ModalComponent = ({ title = 'Modal', open = false, onCancel, onOk, childre
 };
 
 export default ModalComponent;
-
