@@ -1,22 +1,27 @@
-import React from 'react'
 import HeaderComponent from '../HeaderComponent/HeaderComponent'
 import NavbarComponent from '../NavbarComponent/NavbarComponent';
 import FooterComponent from '../FooterComponent/FooterComponent';
 import Chatbot from '../ChatBotComponent/ChatBotComponent';
 
 // DefaultComponent là một layout bọc quanh nội dung chính của trang
-const DefaultComponent = ({ children }) => { 
+// Bọc quanh phần nội dung chính và bao gồm Header, Navbar, Footer, Chatbot
+const DefaultComponent = ({ children }) => {
   return (
     <div>
-      {/* HeaderComponent sẽ được hiển thị ở tất cả các trang sử dụng layout này */}
-      <HeaderComponent /> 
+      {/* Hiển thị phần đầu trang */}
+      <HeaderComponent />
 
-      <NavbarComponent/>
+      {/* Hiển thị thanh điều hướng chính */}
+      <NavbarComponent />
 
-      {/* children đại diện cho nội dung của từng trang (component được truyền vào) */}
+      {/* Phần nội dung động của từng trang cụ thể */}
       {children}
+
+      {/* Chatbot ảo hỗ trợ người dùng */}
       <Chatbot></Chatbot>
-      <FooterComponent/> 
+
+      {/* Hiển thị phần chân trang */}
+      <FooterComponent />
     </div>
   );
 };

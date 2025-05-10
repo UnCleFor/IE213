@@ -1,5 +1,4 @@
-import React from "react";
-import { Row, Col } from "antd";
+import { Col } from "antd";
 import {
   ColorFooter,
   FooterContainer,
@@ -13,22 +12,21 @@ import {
 } from "./style";
 import { useNavigate } from "react-router-dom";
 import ContainerComponent from "../ContainerComponent/ContainerComponent";
-import beautihome from "./beautihome.png";
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const navigate = useNavigate();
+
+  // Scroll lên đầu trang khi chuyển trang
   const handleScrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <ColorFooter>
-    <ContainerComponent>
-      <FooterContainer gutter={[16, 16]}>
-
-        
-          {/* Cột 1: BeauteHome & Về chúng tôi */}
+      <ContainerComponent>
+        <FooterContainer gutter={[16, 16]}>
+          {/* Cột 1: Giới thiệu BeauteHome */}
           <Col xs={24} sm={12} md={6}>
             <FooterSection>
               <FooterTitle>BeauteHome</FooterTitle>
@@ -41,10 +39,11 @@ const Footer = () => {
             </FooterSection>
           </Col>
 
-          {/* Cột 2: Khám phá */}
+          {/* Cột 2: Danh mục Khám phá sản phẩm */}
           <Col xs={24} sm={12} md={6}>
             <FooterSection>
               <FooterTitle>Khám phá</FooterTitle>
+
               <FooterLink
                 to="/product/phong-khach"
                 as={Link}
@@ -80,7 +79,7 @@ const Footer = () => {
               >
                 Phòng làm việc
               </FooterLink>
-              
+
               <FooterLink
                 to="/product/trang-tri-nha-cua"
                 as={Link}
@@ -92,10 +91,11 @@ const Footer = () => {
             </FooterSection>
           </Col>
 
-          {/* Cột 3: Chính sách */}
+          {/* Cột 3: Chính sách liên quan đến dịch vụ */}
           <Col xs={24} sm={12} md={6}>
             <FooterSection>
               <FooterTitle>Chính sách</FooterTitle>
+
               <FooterLink onClick={() => {
                 navigate("/chinhsachdoitra");
                 handleScrollToTop();
@@ -139,22 +139,19 @@ const Footer = () => {
                 </p>
               </ContactInfo>
             </SubscribeSection>
-            
           </Col>
-          
-        {/* Footer Bottom */}
-        <FooterBottom>
-          <p>© 2025 BeauteHome. All rights reserved.</p>
 
-          <SocialIcons>
-            <a href="#"><i className="fab fa-facebook-f"></i></a>
-            <a href="#"><i className="fab fa-instagram"></i></a>
-            <a href="#"><i className="fab fa-pinterest"></i></a>
-          </SocialIcons>
-        </FooterBottom>
-
-      </FooterContainer>
-    </ContainerComponent>
+          {/* Dòng dưới cùng của Footer chứa bản quyền và mạng xã hội */}
+          <FooterBottom>
+            <p>© 2025 BeauteHome. All rights reserved.</p>
+            <SocialIcons>
+              <a href="#"><i className="fab fa-facebook-f"></i></a>
+              <a href="#"><i className="fab fa-instagram"></i></a>
+              <a href="#"><i className="fab fa-pinterest"></i></a>
+            </SocialIcons>
+          </FooterBottom>
+        </FooterContainer>
+      </ContainerComponent>
     </ColorFooter>
   );
 };

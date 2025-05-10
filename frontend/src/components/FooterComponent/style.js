@@ -33,7 +33,7 @@ export const FooterLink = styled.a`
   text-decoration: none;
   margin-bottom: 10px;
   font-size: 14px;
-  cursor: pointer; /* Biến thành con trỏ tay khi hover */
+  cursor: pointer; 
   &:hover {
     color: brown;
   }
@@ -41,7 +41,6 @@ export const FooterLink = styled.a`
 
 export const SubscribeSection = styled.div`
   flex: 1;
-  //min-width: 300px;
   margin-bottom: 20px;
 `;
 
@@ -62,17 +61,16 @@ export const SocialIcons = styled.div`
   
   a {
     color: #fff;
-    font-size: 24px;  /* Tăng kích thước icon */
+    font-size: 24px;  
     margin-left: 15px;
     text-decoration: none;
     transition: color 0.3s ease;
   }
 
   a:hover {
-    color: #ddd; /* Thay đổi màu khi hover */
+    color: #ddd; 
   }
 `;
-
 
 export const ContactInfo = styled.div`
   p {

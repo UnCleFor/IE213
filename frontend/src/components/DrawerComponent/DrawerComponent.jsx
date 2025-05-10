@@ -1,38 +1,38 @@
 import { Drawer, Grid } from 'antd';
-import React from 'react';
 
 const { useBreakpoint } = Grid;
 
-const DrawerComponent = ({ 
-  title = 'Drawer', 
-  placement = 'right', 
-  isOpen = false, 
-  children, 
-  ...rests 
+const DrawerComponent = ({
+  title = 'Drawer', // Tiêu đề mặc định của Drawer
+  placement = 'right',  // Vị trí hiển thị mặc định
+  isOpen = false,  // Trạng thái mở/đóng
+  children,  // Nội dung bên trong Drawer
+  ...rests  // Các props bổ sung
 }) => {
-  const screens = useBreakpoint();
-  
-  // Tính toán responsive
+  const screens = useBreakpoint(); // Lấy thông tin kích thước màn hình để xử lý responsive
+
+  // Xác định các thuộc tính Drawer dựa trên độ rộng màn hình
   const getDrawerProps = () => {
-    if (screens.xs) { // Mobile
+    if (screens.xs) {
+      // Đối với thiết bị di động
       return {
-        height: '75%', // Giảm từ 85% xuống 75% để cao hơn
+        height: '75%',
         placement: 'bottom',
-        bodyStyle: { 
+        bodyStyle: {
           padding: '16px 0',
           margin: 0,
         },
         headerStyle: {
           padding: '16px 16px 8px',
         },
-        style: { 
+        style: {
           borderRadius: '16px 16px 0 0',
           overflow: 'hidden',
         },
         drawerStyle: {
           width: '100% !important',
           maxWidth: '100vw',
-          top: '25%', // Đặt vị trí top 25% thay vì mặc định
+          top: '25%',
           bottom: 0,
         },
         contentWrapperStyle: {
@@ -40,12 +40,14 @@ const DrawerComponent = ({
           top: '25%',
         }
       };
-    } else if (screens.sm) { // iPad
+    } else if (screens.sm) {
+      // Đối với tablet (iPad, màn hình nhỏ hơn PC)
       return {
         width: '80%',
         bodyStyle: { padding: '20px' }
       };
-    } else { // PC
+    } else {
+      // Đối với PC, laptop
       return {
         width: '50%',
         bodyStyle: { padding: '24px' }
@@ -54,14 +56,14 @@ const DrawerComponent = ({
   };
 
   return (
-    <Drawer 
+    <Drawer
       title={title}
       placement={placement}
       open={isOpen}
       closable={true}
       destroyOnClose={true}
       maskClosable={true}
-      {...getDrawerProps()}
+      {...getDrawerProps()} // Gán props tương ứng với từng loại màn hình
       {...rests}
     >
       <div style={{

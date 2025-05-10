@@ -1,6 +1,5 @@
-// src/components/Chatbot/style.js
 import styled, { keyframes } from 'styled-components';
-import { FaRobot, FaTimes, FaMinus, FaPaperPlane } from 'react-icons/fa';
+import { FaRobot, FaTimes, FaMinus } from 'react-icons/fa';
 
 const bounce = keyframes`
   0%, 100% { transform: translateY(0); }
@@ -29,7 +28,7 @@ export const ChatbotButton = styled.button`
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: #8B4513;  // Màu nâu đậm
+  background: #8B4513; 
   color: white;
   border: none;
   cursor: pointer;
@@ -40,7 +39,7 @@ export const ChatbotButton = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background: #6B3F28;  // Màu nâu trung bình khi hover
+    background: #6B3F28;  
     animation: ${bounce} 0.5s ease;
   }
 `;
@@ -49,7 +48,7 @@ export const ChatbotContainer = styled.div`
   width: 350px;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  background: #F5F5DC;  // Màu be sáng
+  background: #F5F5DC;  
   overflow: hidden;
   font-family: 'Arial', sans-serif;
   display: flex;
@@ -58,7 +57,7 @@ export const ChatbotContainer = styled.div`
 `;
 
 export const ChatHeader = styled.div`
-  background: #8B4513;  // Màu nâu đậm
+  background: #8B4513;  
   color: white;
   padding: 15px;
   display: flex;
@@ -79,7 +78,7 @@ export const ChatMessages = styled.div`
   flex: 1;
   padding: 15px;
   overflow-y: auto;
-  background: #FAF0E6;  // Màu be sáng
+  background: #FAF0E6;  
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -93,7 +92,7 @@ export const Message = styled.div`
   padding: 10px 15px;
   border-radius: 18px;
   word-break: break-word;
-  background: ${props => props.role === 'user' ? '#D2B48C' : 'white'};  // Nâu nhạt cho người dùng và nâu sáng cho bot
+  background: ${props => props.role === 'user' ? '#D2B48C' : 'white'};  
   margin-left: ${props => props.role === 'user' ? 'auto' : '0'};
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 
@@ -118,14 +117,14 @@ export const Input = styled.input`
   font-size: 14px;
 
   &:focus {
-    border-color: #8B4513;  // Màu nâu đậm khi focus
+    border-color: #8B4513;  
   }
 `;
 
 export const Button = styled.button`
   margin-left: 10px;
   padding: 0 15px;
-  background: #8B4513;  // Màu nâu đậm
+  background: #8B4513;  
   color: white;
   border: none;
   border-radius: 20px;
@@ -136,11 +135,11 @@ export const Button = styled.button`
   transition: background 0.3s;
 
   &:hover {
-    background: #6B3F28;  // Màu nâu trung bình khi hover
+    background: #6B3F28;  
   }
 
   &:disabled {
-    background: #D2B48C;  // Nâu nhạt khi vô hiệu hóa
+    background: #D2B48C;  
     cursor: not-allowed;
   }
 `;
@@ -154,7 +153,7 @@ export const LoadingIndicator = styled.div`
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #8B4513;  // Màu nâu đậm
+    background: #8B4513;  
     animation: ${loading} 1.4s infinite ease-in-out;
 
     &:nth-child(1) {
@@ -168,7 +167,7 @@ export const LoadingIndicator = styled.div`
 
 export const BotIcon = styled(FaRobot)`
   font-size: ${props => props.small ? '16px' : '24px'};
-  color: ${props => props.small ? '#8B4513' : 'white'};  // Màu nâu đậm hoặc trắng cho icon
+  color: ${props => props.small ? '#8B4513' : 'white'};  
   flex-shrink: 0;
 `;
 

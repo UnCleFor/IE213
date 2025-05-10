@@ -1,33 +1,44 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Tooltip, Modal, message } from "antd";
-import { ShoppingCartOutlined, EyeOutlined, HeartOutlined, PlusOutlined, MinusOutlined } from "@ant-design/icons";
+import { ShoppingCartOutlined, EyeOutlined, PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import { StyledCard, CardWrapper, ImageWrapper, HoverActions, WrapperTitle, WrapperPrice, SizeBox, SizeProduct, WrapperQuantity } from "./style";
-import tu_giay from "./tu_giay.webp";
 import { useLocation, useNavigate } from 'react-router-dom'
 import { convertPrice } from "../../utils";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
 import { addOrderProduct, buyNowProduct } from "../../redux/slices/orderSlide";
 import { useDispatch } from "react-redux";
 
-
 const CardComponent = ({ name, price, image, description, id, discount = 0, size, colors,countInStock,_id ,user }) => {
+  // Hooks
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [selectedColor, setSelectedColor] = useState(null);
   const location = useLocation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const [quantity, setQuantity] = useState(1);
-  const [selectedColor, setSelectedColor] = useState(null);
+
+  // Hiển thị modal xem nhanh
   const showQuickView = () => setIsModalVisible(true);
-  const handleClose = () => {setIsModalVisible(false); setQuantity(1);}
+
+  // Đóng modal và reset số lượng
+  const handleClose = () => {
+    setIsModalVisible(false); 
+    setQuantity(1);
+  }
+
+  // Mặc định chọn màu đầu tiên khi component mount
   useEffect(() => {
-    // Mặc định chọn màu đầu tiên trong mảng màu nếu có
     if (colors && colors.length > 0) {
       setSelectedColor(colors[0]);
     }
   }, [colors]);
+
+  // Chuyển hướng đến trang chi tiết sản phẩm
   const handleDetailsProduct = (id) => {
     navigate(`/product_details/${id}`)
   }
+
+  // Tăng số lượng sản phẩm
   const handleIncrease = () => {
           if (countInStock > quantity) {
               setQuantity(prev => prev + 1);
@@ -36,14 +47,15 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
           }
       };
 
-
+  // Giảm số lượng sản phẩm
   const handleDecrease = () => {
     if (quantity > 1) {
       setQuantity(prev => prev - 1);
     }
   };
+
+  // Thêm sản phẩm vào giỏ hàng với số lượng đã chọn
   const handleAddOrderProduct = () => {
-    console.log(user)
           if (!user) {
               navigate('/sign_in', { state: location?.pathname })
           } else if (countInStock === 0) {
@@ -63,29 +75,31 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
               message.success('Thêm vào giỏ hàng thành công');
           }
       }
-      const handleAddOrderOneProduct = () => {
-        console.log(user)
-              if (!user) {
-                  navigate('/sign_in', { state: location?.pathname })
-              } else if (countInStock === 0) {
-                  message.error('Sản phẩm đã hết hàng');
-              } else {
-                  dispatch(addOrderProduct({
-                      orderItem: {
-                          name: name,
-                          amount: 1,
-                          image: image,
-                          price: price,
-                          product: _id,
-                          discount: discount,
-                          countInStock: countInStock
-                      }
-                  }))
-                  message.success('Thêm vào giỏ hàng thành công');
-              }
+
+  // Thêm nhanh 1 sản phẩm vào giỏ hàng từ icon giỏ hàng
+    const handleAddOrderOneProduct = () => {
+          if (!user) {
+              navigate('/sign_in', { state: location?.pathname })
+          } else if (countInStock === 0) {
+              message.error('Sản phẩm đã hết hàng');
+          } else {
+              dispatch(addOrderProduct({
+                  orderItem: {
+                      name: name,
+                      amount: 1,
+                      image: image,
+                      price: price,
+                      product: _id,
+                      discount: discount,
+                      countInStock: countInStock
+                  }
+              }))
+              message.success('Thêm vào giỏ hàng thành công');
           }
+      }
   
-      const handleBuyNow = () => {
+  // Mua ngay sản phẩm
+    const handleBuyNow = () => {
           if (!user) {
               navigate('/sign_in', { state: location?.pathname })
           } else if (countInStock === 0) {
@@ -112,7 +126,7 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
         style={{ borderRadius: "0px", boxShadow: "none" }}
         cover={
           <ImageWrapper style={{ overflow: "hidden", borderRadius: "0px", position: "relative" }} onClick={() => handleDetailsProduct(id)}>
-            {/* Discount badge */}
+            {/* Hiển thị badge giảm giá nếu có */}
             {discount > 0 && (
               <div style={{
                 position: "absolute",
@@ -138,6 +152,8 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
               src={image}
               style={{ objectFit: "cover", width: "100%", borderRadius: "0px" }}
             />
+
+            {/* Các nút hành động khi hover */}
             <HoverActions className="hover-actions">
               <Tooltip title="Thêm vào giỏ hàng" placement="left">
                 <Button
@@ -155,19 +171,18 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
                   onClick={(e) => {
                     e.stopPropagation();
                     showQuickView();
-                  }} />
+                  }} 
+                />
               </Tooltip>
-              {/* <Tooltip title="Yêu thích" placement="left">
-                <Button
-                  shape="circle"
-                  icon={<HeartOutlined />} />
-              </Tooltip> */}
             </HoverActions>
           </ImageWrapper>
         }
-        
       >
+
+        {/* Tên sản phẩm */}
         <WrapperTitle>{name}</WrapperTitle>
+
+        {/* Giá sản phẩm */}
         <WrapperPrice>
           {discount > 0 ? (
             <span style={{ textDecoration: 'line-through', color: '#666' }}>
@@ -176,7 +191,6 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
           ) : (
             convertPrice(price)
           )}
-
           {discount > 0 && (
             <div>
               {convertPrice(price * (1 - discount / 100))}
@@ -185,11 +199,12 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
         </WrapperPrice>
       </StyledCard>
 
+      {/* Modal xem nhanh sản phẩm */}
       <Modal
         title={name}
         open={isModalVisible}
         onCancel={handleClose}
-        width={800} // Increased width to accommodate two columns
+        width={800} 
         footer={[
           <Button onClick={handleAddOrderProduct} key="add-cart" type="default" icon={<ShoppingCartOutlined />}>
             Thêm vào giỏ
@@ -200,7 +215,7 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
         ]}
       >
         <div style={{ display: 'flex', gap: '24px' }}>
-          {/* Left Column - Image */}
+          {/* Cột trái - hình ảnh sản phẩm */}
           <div style={{ flex: 1 }}>
             <img
               src={image}
@@ -214,10 +229,12 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
             />
           </div>
 
-          {/* Right Column - Product Details */}
+          {/* Cột phải - chi tiết sản phẩm */}
           <div style={{ flex: 1 }}>
           <p><strong>Số lượng còn lại:</strong> {countInStock}</p>
-            <SizeProduct>
+
+          {/* Kích thước */}
+          <SizeProduct>
               {size && (
                 <>
                   <p><strong>Kích thước</strong></p>
@@ -226,16 +243,16 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
                   </SizeBox>
                 </>
               )}
-            </SizeProduct>
+          </SizeProduct>
 
-            {selectedColor && (
+          {/* Màu sắc */}
+          {selectedColor && (
               <p style={{ display: 'flex', alignItems: 'center', gap: '20px', margin: 0, marginBottom: '18px', marginTop: '10px' }}>
                 <strong>Màu sắc: </strong>
                 <span style={{ fontWeight: 'normal' }}>{selectedColor}</span>
               </p>
-            )}
-
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+          )}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
               {colors?.map((color, index) => {
                 const colorMap = {
                   'Đỏ': '#ff0000',
@@ -264,6 +281,7 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
               })}
             </div>
 
+            {/* Giá sản phẩm */}
             <div style={{ marginBottom: '16px' }}>
               <p style={{ display: 'flex', gap: '5px', alignItems: 'baseline' }}>
                 <strong>Giá:</strong>
@@ -285,10 +303,13 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
               </p>
             </div>
 
+            {/* Mô tả sản phẩm */}
             <div>
               <p><strong>Mô tả:</strong></p>
               <p style={{ marginTop: '8px' }}>{description}</p>
             </div>
+
+            {/* Điều chỉnh số lượng */}
             <WrapperQuantity>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '20px 0' }}>
                 <ButtonComponent
@@ -308,7 +329,9 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
                   }}
                   onClick={handleDecrease}
                 />
-                <div style={{ fontSize: '18px', minWidth: '32px', textAlign: 'center' }}>{quantity}</div>
+                <div style={{ fontSize: '18px', minWidth: '32px', textAlign: 'center' }}>
+                  {quantity}
+                </div>
                 <ButtonComponent
                   size="middle"
                   onClick={handleIncrease}
@@ -334,4 +357,5 @@ const CardComponent = ({ name, price, image, description, id, discount = 0, size
     </CardWrapper>
   );
 };
+
 export default CardComponent;
